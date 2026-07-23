@@ -604,19 +604,6 @@ a{color:inherit;text-decoration:none;}
   html,body{background:#080809;}
   /* iOS에서는 fixed WebGL/blur 합성이 회색 막처럼 보일 수 있어 모바일 배경 효과를 제거한다. */
   .rays-bg,.gradual-blur{display:none!important;}
-  /* iOS WebGL은 투명 캔버스를 검은 사각형으로 합성할 수 있어, 모바일에서는 캔버스 대신 CSS 점을 쓴다. */
-  .symbol-wrap{width:86px;height:86px;aspect-ratio:auto;}
-  .symbol-wrap::before{
-    content:'';position:absolute;left:50%;top:50%;z-index:0;
-    width:30px;height:30px;border-radius:50%;transform:translate(-50%,-50%);
-    background:radial-gradient(circle at 32% 28%,#fff 0 5%,#b9b9b9 20%,#5a5a5a 52%,#161616 76%,#d9d9d9 100%);
-    box-shadow:0 0 14px rgba(255,255,255,.22),inset -5px -6px 8px rgba(0,0,0,.58);
-  }
-  .symbol-wrap > #symbol{opacity:0!important;}
-  .symbol-wrap > #symbolFallback,
-  .symbol-wrap > #bloom,
-  .symbol-wrap > #fold{display:none!important;}
-  .symbol-hint{top:calc(50% + 30px);white-space:nowrap;}
   .nav{padding:16px 18px;}
   .nav-mark{width:94px;height:16px;}
   .nav-mark img{width:222px;left:-66px;top:-63px;max-width:none;height:auto;}

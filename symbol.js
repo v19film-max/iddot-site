@@ -4,6 +4,7 @@
   'use strict';
 
   var canvas = document.getElementById('symbol');
+  var fallback = document.getElementById('symbolFallback');
   var video  = document.getElementById('bloom');   // 점 → 꽃
   var rvideo = document.getElementById('fold');    // 꽃 → 점
   var hint   = document.getElementById('symbolHint');
@@ -20,6 +21,10 @@
     video.addEventListener('click', function () { video.play(); });
     return;
   }
+
+  // WebGL이 정상 동작하면 검은 배경을 가진 폴백 이미지는 숨긴다.
+  // 그렇지 않으면 투명한 캔버스 아래로 폴백의 사각형이 비쳐 보인다.
+  if (fallback) fallback.style.display = 'none';
 
   var VERT = [
     'attribute vec2 aPos;',
