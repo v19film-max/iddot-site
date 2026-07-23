@@ -602,6 +602,11 @@ a{color:inherit;text-decoration:none;}
   html,body{background:#080809;}
   /* iOS에서는 fixed WebGL/blur 합성이 회색 막처럼 보일 수 있어 모바일 배경 효과를 제거한다. */
   .rays-bg,.gradual-blur{display:none!important;}
+  /* WebGL/영상 자산의 검정 바탕을 모바일 배경과 합성해 심볼 뒤 사각형을 없앤다. */
+  .symbol-wrap > #symbol,
+  .symbol-wrap > #symbolFallback,
+  .symbol-wrap > #bloom,
+  .symbol-wrap > #fold{mix-blend-mode:screen;}
   .nav{padding:16px 18px;}
   .nav-mark{width:94px;height:16px;}
   .nav-mark img{width:222px;left:-66px;top:-63px;max-width:none;height:auto;}
@@ -616,10 +621,10 @@ a{color:inherit;text-decoration:none;}
 
   /* 문의 폼 입력칸을 가리지 않도록 모바일에서는 고정 연락처를 숨긴다. */
   .corner-contact{display:none;}
-  .contact-heading,.contact-form__grid{grid-template-columns:1fr;}
-  .contact-heading{gap:18px;}
-  .contact-heading > p{margin:0;padding-top:4px;}
-  .contact-title{font-size:clamp(56px,16vw,72px);line-height:1;letter-spacing:-.065em;}
+  .contact-heading{display:block;}
+  .contact-heading > p{margin:0;max-width:24ch;}
+  .contact-form__grid{grid-template-columns:1fr;}
+  .contact-title{margin:0 0 28px;font-size:clamp(52px,15vw,68px);line-height:1;letter-spacing:-.065em;}
   .contact-form{margin-top:58px;}
   .contact-form__bottom{align-items:flex-start;flex-direction:column-reverse;}
   .site-footer__logo{height:180px;}
