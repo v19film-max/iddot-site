@@ -360,6 +360,7 @@ a{color:inherit;text-decoration:none;}
   font-family:var(--serif);font-size:64px;color:#4a4a4e;
 }
 .pc-avatar::before{content:attr(data-initial);}
+.pc-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
 .pc-info{
   position:relative;z-index:2;
   padding:18px 20px 22px;
@@ -371,6 +372,7 @@ a{color:inherit;text-decoration:none;}
   text-transform:uppercase;color:var(--mute);
 }
 .pc-contact{
+  display:block;
   font-size:12.5px;color:#c9c7c3;
   border-bottom:1px solid transparent;transition:border-color .2s ease;
 }
