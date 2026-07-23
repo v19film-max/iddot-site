@@ -605,7 +605,14 @@ a{color:inherit;text-decoration:none;}
   html,body{background:#080809;}
   /* iOS에서는 fixed WebGL/blur 합성이 회색 막처럼 보일 수 있어 모바일 배경 효과를 제거한다. */
   .rays-bg,.gradual-blur{display:none!important;}
-  .nav{padding:16px 18px;}
+  /* 본문이 고정 네비 뒤로 지나갈 때 읽기 어려워지지 않도록 상단에만 블러 스크림을 둔다. */
+  .nav{
+    padding:16px 18px 42px;
+    mix-blend-mode:normal;
+    background:linear-gradient(to bottom,rgba(8,8,9,.98),rgba(8,8,9,.88) 58%,rgba(8,8,9,.5) 82%,rgba(8,8,9,0));
+    -webkit-backdrop-filter:blur(14px);
+    backdrop-filter:blur(14px);
+  }
   .nav-mark{width:94px;height:16px;}
   .nav-mark img{width:222px;left:-66px;top:-63px;max-width:none;height:auto;}
   .nav-menu{gap:12px;}
