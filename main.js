@@ -127,4 +127,95 @@
       applyFilter(b.getAttribute('data-filter') || 'all');
     });
   });
+
+  /* ────────────────────────────────────────────
+     4. SPECULAR BUTTON — 커서를 따라 테두리가 빛남
+     ──────────────────────────────────────────── */
+  var specBtns = Array.prototype.slice.call(document.querySelectorAll('.spec-btn'));
+  var PROXIMITY = 260;
+
+  window.addEventListener('pointermove', function (e) {
+    specBtns.forEach(function (btn) {
+      var r = btn.getBoundingClientRect();
+      if (!r.width) return;
+      // 버튼 바깥에서의 최단 거리
+      var dx = Math.max(r.left - e.clientX, 0, e.clientX - r.right);
+      var dy = Math.max(r.top - e.clientY, 0, e.clientY - r.bottom);
+      var dist = Math.hypot(dx, dy);
+      var t = Math.max(0, 1 - dist / PROXIMITY);
+      btn.style.setProperty('--glow', (t * t * (3 - 2 * t)).toFixed(3));
+      btn.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      btn.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    });
+  }, { passive: true });
+
+  /* ────────────────────────────────────────────
+     5. INQUIRY MODAL
+     ──────────────────────────────────────────── */
+  var modal   = document.getElementById('inquiryModal');
+  var openBtn = document.getElementById('openInquiry');
+  var form    = document.getElementById('inquiryForm');
+  var errEl   = document.getElementById('inqError');
+  var lastFocus = null;
+
+  function openModal() {
+    if (!modal) return;
+    lastFocus = document.activeElement;
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    var first = modal.querySelector('input,select,textarea');
+    if (first) first.focus();
+  }
+  function closeModal() {
+    if (!modal) return;
+    modal.hidden = true;
+    document.body.style.overflow = '';
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  if (openBtn) openBtn.addEventListener('click', openModal);
+  if (modal) {
+    modal.addEventListener('click', function (e) {
+      if (e.target.hasAttribute && e.target.hasAttribute('data-close')) closeModal();
+    });
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && modal && !modal.hidden) closeModal();
+  });
+
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var d = new FormData(form);
+      var name = (d.get('name') || '').toString().trim();
+      var contact = (d.get('contact') || '').toString().trim();
+      var message = (d.get('message') || '').toString().trim();
+
+      if (!name || !contact || !message) {
+        if (errEl) {
+          errEl.textContent = '이름 / 연락처 / 내용은 필수입니다.';
+          errEl.hidden = false;
+        }
+        return;
+      }
+      if (errEl) errEl.hidden = true;
+
+      var body = [
+        '이름 / 회사 : ' + name,
+        '연락처     : ' + contact,
+        '프로젝트 유형 : ' + (d.get('type') || '-'),
+        '예상 일정  : ' + ((d.get('schedule') || '').toString().trim() || '-'),
+        '예산 규모  : ' + ((d.get('budget') || '').toString().trim() || '-'),
+        '',
+        '── 내용 ──',
+        message,
+        '',
+        '— www.iddot.space 문의 폼'
+      ].join('\n');
+
+      window.location.href = 'mailto:ceo@iddot.space'
+        + '?subject=' + encodeURIComponent('[iddot 문의] ' + name)
+        + '&body=' + encodeURIComponent(body);
+    });
+  }
 })();

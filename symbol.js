@@ -205,23 +205,33 @@
     });
   }
 
+  /* 영상 → 캔버스 인계.
+     깜빡임의 원인은 (1) 영상이 페이드아웃하는 동안 currentTime 을 0 으로 되돌려
+     마지막 프레임 대신 첫 프레임이 잠깐 비치는 것, (2) 영상과 캔버스가 겹쳐
+     크로스페이드되며 밝기가 튀는 것.
+     그래서 텍스처를 올린 뒤 '동기적으로 한 번 그리고' 곧바로 맞바꾼다.
+     (렌더 루프를 기다리면 프레임 타이밍에 따라 교체가 누락될 수 있다.) */
   function settle(to) {
     if (state === to) return;          // 이미 도달한 상태면 무시
     clearTimeout(guard);
     state = to;
+    liveTarget = (to === 'flower') ? 1 : 0.35;   // 점 상태에서는 왜곡을 약하게
 
-    // 먼저 텍스처 교체 → 깜빡임 방지
     var img = (to === 'flower') ? finalImg : startImg;
-    if (img) upload(img);
+    if (img) {
+      upload(img);
+      draw();                          // 캔버스에 최종 프레임을 즉시 그려둔다
+    }
 
-    canvas.classList.remove('off');
+    canvas.classList.remove('off');    // 같은 그림이므로 즉시 교체해도 티가 안 남
     if (playingEl) {
-      playingEl.classList.remove('on');
-      playingEl.pause();
-      try { playingEl.currentTime = 0; } catch (e) {}
+      var el = playingEl;
+      el.pause();
+      el.classList.remove('on');
+      // 완전히 사라진 뒤에 되감는다 (되감는 순간이 보이면 그게 깜빡임이 된다)
+      setTimeout(function () { try { el.currentTime = 0; } catch (e) {} }, 260);
       playingEl = null;
     }
-    liveTarget = (to === 'flower') ? 1 : 0.35;   // 점 상태에서는 왜곡을 약하게
   }
 
   canvas.addEventListener('click', toggle);
@@ -245,6 +255,17 @@
   canvas.addEventListener('mouseleave', function () { hoverTarget = 0; });
   canvas.addEventListener('touchend',  function () { hoverTarget = 0; });
 
+  /* ── 그리기 ── */
+  function draw() {
+    gl.uniform1f(uTime,  (performance.now() - t0) * 0.001);
+    gl.uniform1f(uLive,  live);
+    gl.uniform1f(uHover, hover);
+    gl.uniform2f(uMouse, smooth.x, smooth.y);
+
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+  }
+
   /* ── 렌더 루프 ── */
   function frame() {
     requestAnimationFrame(frame);
@@ -256,13 +277,7 @@
     smooth.x += (mouse.x - smooth.x) * 0.12;
     smooth.y += (mouse.y - smooth.y) * 0.12;
 
-    gl.uniform1f(uTime,  (performance.now() - t0) * 0.001);
-    gl.uniform1f(uLive,  live);
-    gl.uniform1f(uHover, hover);
-    gl.uniform2f(uMouse, smooth.x, smooth.y);
-
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    draw();
   }
   requestAnimationFrame(frame);
 })();

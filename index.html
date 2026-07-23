@@ -10,13 +10,18 @@
 <meta property="og:image" content="assets/symbol_final.png">
 <link rel="icon" href="assets/symbol_final.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <script>document.documentElement.className+=' js';</script>
 </head>
 <body>
 
 <header class="nav">
-  <a href="#top" class="nav-mark">iddot</a>
+  <a href="#top" class="nav-mark" aria-label="iddot 홈">
+    <img src="assets/wordmark.png" alt="iddot">
+  </a>
   <nav class="nav-menu">
     <a href="#work">Work</a>
     <a href="#about">About</a>
@@ -46,16 +51,38 @@
   <!-- ── STATEMENT ────────────────────────────────────── -->
   <section class="statement" id="about">
     <p class="section-idx">01 — About</p>
-    <h2 class="display">
-      <span class="circled">id</span>entity + <span class="circled">dot</span>.
-    </h2>
+    <p class="wordplay">
+      <span class="circled">id<i class="stroke3" aria-hidden="true"></i></span>entity
+      <span class="plus">+</span>
+      <span class="circled">dot<i class="stroke3" aria-hidden="true"></i></span>
+    </p>
+
     <div class="statement-body">
       <p>
-        크리에이티브 그룹 iddot은 영상 콘텐츠를 주력으로,
-        클라이언트의 성장을 위한 다양한 콘텐츠와 워크를 진행합니다.
-        필름과 뮤직비디오부터 브랜드 콘텐츠, 유튜브 콘텐츠,
-        전시와 미술 세트까지 — 브랜드와 아티스트를 가리지 않고 함께합니다.
+        iddot은 영상을 중심으로 클라이언트의 성장을 설계하는 크리에이티브 그룹입니다.
+        시네마틱 필름과 뮤직비디오, 브랜드 콘텐츠, 비주얼 디렉팅까지
+        — 한 편이 완성되기까지의 모든 과정을 함께합니다.
       </p>
+      <p>
+        기획과 로케이션 섭외, 세트 제작, 모델과 스태프 구성, 프로덕션 디자인,
+        특수 촬영에 이르는 제작 전 과정을 직접 운영합니다.
+        AI 기반의 이미지·영상·모션·바이럴 콘텐츠 역시 가장 앞선 기술로 다룹니다.
+      </p>
+      <p>
+        무엇보다 먼저 브랜드의 본질을 읽습니다.
+        그 위에서 브랜딩과 디자인, 마케팅까지 하나의 방향으로 설계된 콘텐츠를 만듭니다.
+      </p>
+
+      <p class="statement-en">
+        iddot is a creative group built around film. From cinematic work and music
+        videos to brand content and visual direction, we stay with a project through
+        every stage it takes to finish. We run production end to end — concept,
+        location scouting, set construction, casting, crew, production design and
+        special photography — and work in AI-driven image, video, motion and viral
+        content with the most advanced tools available. Above all, we begin by reading
+        what a brand actually is, and build everything after that in one direction.
+      </p>
+
       <p class="statement-closing" data-split="words">무형의 공간에서 점으로부터 정체성을 창조합니다.</p>
     </div>
   </section>
@@ -144,9 +171,77 @@
         <p>서울 성동구 아차산로 104 스탈릿 성수, 8층 813-4호</p>
       </div>
     </div>
+
+    <div class="contact-cta">
+      <button type="button" class="spec-btn" id="openInquiry">
+        <span class="spec-btn__fx" aria-hidden="true"></span>
+        <span class="spec-btn__label">프로젝트 문의하기</span>
+      </button>
+    </div>
   </section>
 
 </main>
+
+<!-- ── INQUIRY MODAL ──────────────────────────────────── -->
+<div class="modal" id="inquiryModal" hidden>
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="inqTitle">
+    <button type="button" class="modal-x" data-close aria-label="닫기">&times;</button>
+
+    <p class="section-idx">Inquiry</p>
+    <h3 class="modal-title" id="inqTitle">프로젝트를 들려주세요</h3>
+
+    <form id="inquiryForm" class="inq-form" novalidate>
+      <div class="inq-row">
+        <label>
+          <span>이름 / 회사<i>*</i></span>
+          <input type="text" name="name" required autocomplete="organization">
+        </label>
+        <label>
+          <span>연락처<i>*</i></span>
+          <input type="text" name="contact" required placeholder="이메일 또는 전화번호">
+        </label>
+      </div>
+
+      <label>
+        <span>프로젝트 유형</span>
+        <select name="type">
+          <option>시네마틱 필름</option>
+          <option>뮤직비디오</option>
+          <option>브랜드 콘텐츠</option>
+          <option>유튜브 / 디지털 콘텐츠</option>
+          <option>전시 · 미술 세트</option>
+          <option>브랜딩 · 비주얼 디렉팅</option>
+          <option>기타</option>
+        </select>
+      </label>
+
+      <div class="inq-row">
+        <label>
+          <span>예상 일정</span>
+          <input type="text" name="schedule" placeholder="예: 3월 중 촬영">
+        </label>
+        <label>
+          <span>예산 규모</span>
+          <input type="text" name="budget" placeholder="예: 1,000만원대">
+        </label>
+      </div>
+
+      <label>
+        <span>내용<i>*</i></span>
+        <textarea name="message" rows="5" required placeholder="어떤 작업을 구상하고 계신가요?"></textarea>
+      </label>
+
+      <p class="inq-error" id="inqError" hidden></p>
+
+      <button type="submit" class="spec-btn spec-btn--sm">
+        <span class="spec-btn__fx" aria-hidden="true"></span>
+        <span class="spec-btn__label">보내기</span>
+      </button>
+      <p class="inq-note">보내기를 누르면 메일 앱이 열리며 작성한 내용이 담깁니다.</p>
+    </form>
+  </div>
+</div>
 
 <footer class="footer">
   <span>© 2026 iddot</span>
