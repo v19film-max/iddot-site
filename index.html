@@ -18,6 +18,8 @@
 </head>
 <body>
 
+<div id="raysBg" class="rays-bg" aria-hidden="true"></div>
+
 <header class="nav">
   <a href="#top" class="nav-mark" aria-label="iddot 홈">
     <img src="assets/wordmark.png" alt="iddot">
@@ -25,7 +27,7 @@
   <nav class="nav-menu">
     <a href="#work">Work</a>
     <a href="#about">About</a>
-    <a href="#contact">Contact</a>
+    <a href="contact.html">Contact</a>
   </nav>
 </header>
 
@@ -136,111 +138,43 @@
     <p class="work-empty" hidden>해당 분류의 작업이 아직 없습니다.</p>
   </section>
 
-  <!-- ── CONTACT ──────────────────────────────────────── -->
-  <section class="contact" id="contact">
-    <p class="section-idx">03 — Contact</p>
-    <h2 class="display contact-display">
-      당신의 첫 점을<br>
-      함께 찍겠습니다.
-    </h2>
+  <!-- ── TEAM ─────────────────────────────────────────── -->
+  <section class="team" id="team">
+    <p class="section-idx">03 — Team</p>
+    <h2 class="display" data-split="chars">사람이 만듭니다</h2>
 
-    <div class="contact-grid">
-      <div class="contact-person">
-        <span class="label">Director</span>
-        <p class="contact-name">임승민</p>
-        <p class="contact-name-en">Lim Seung Min</p>
+    <div class="team-grid">
+      <div class="pc-wrap" data-tilt>
+        <div class="pc-glow" aria-hidden="true"></div>
+        <div class="pc-card">
+          <div class="pc-shine" aria-hidden="true"></div>
+          <div class="pc-avatar" data-initial="임"></div>
+          <div class="pc-info">
+            <h3 class="pc-name">임승민</h3>
+            <p class="pc-role">Director</p>
+            <a class="pc-contact" href="mailto:ceo@iddot.space">ceo@iddot.space</a>
+          </div>
+        </div>
       </div>
 
-      <ul class="contact-lines">
-        <li>
-          <span class="label">Email</span>
-          <a href="mailto:ceo@iddot.space">ceo@iddot.space</a>
-        </li>
-        <li>
-          <span class="label">Mobile</span>
-          <a href="tel:+821040223465">+82 10 4022 3465</a>
-        </li>
-        <li>
-          <span class="label">Instagram</span>
-          <a href="https://instagram.com/iddot.works" target="_blank" rel="noopener">@iddot.works</a>
-        </li>
-      </ul>
-
-      <div class="contact-studio">
-        <span class="label">Studio</span>
-        <p>서울 성동구 아차산로 104 스탈릿 성수, 8층 813-4호</p>
+      <!-- 팀원 추가: .pc-wrap 블록을 복사해서 늘리면 됩니다 -->
+      <div class="pc-wrap pc-wrap--empty">
+        <div class="pc-glow" aria-hidden="true"></div>
+        <div class="pc-card pc-card--empty">
+          <p>Coming soon</p>
+        </div>
       </div>
-    </div>
-
-    <div class="contact-cta">
-      <button type="button" class="spec-btn" id="openInquiry">
-        <span class="spec-btn__fx" aria-hidden="true"></span>
-        <span class="spec-btn__label">프로젝트 문의하기</span>
-      </button>
     </div>
   </section>
 
 </main>
 
-<!-- ── INQUIRY MODAL ──────────────────────────────────── -->
-<div class="modal" id="inquiryModal" hidden>
-  <div class="modal-backdrop" data-close></div>
-  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="inqTitle">
-    <button type="button" class="modal-x" data-close aria-label="닫기">&times;</button>
-
-    <p class="section-idx">Inquiry</p>
-    <h3 class="modal-title" id="inqTitle">프로젝트를 들려주세요</h3>
-
-    <form id="inquiryForm" class="inq-form" novalidate>
-      <div class="inq-row">
-        <label>
-          <span>이름 / 회사<i>*</i></span>
-          <input type="text" name="name" required autocomplete="organization">
-        </label>
-        <label>
-          <span>연락처<i>*</i></span>
-          <input type="text" name="contact" required placeholder="이메일 또는 전화번호">
-        </label>
-      </div>
-
-      <label>
-        <span>프로젝트 유형</span>
-        <select name="type">
-          <option>시네마틱 필름</option>
-          <option>뮤직비디오</option>
-          <option>브랜드 콘텐츠</option>
-          <option>유튜브 / 디지털 콘텐츠</option>
-          <option>전시 · 미술 세트</option>
-          <option>브랜딩 · 비주얼 디렉팅</option>
-          <option>기타</option>
-        </select>
-      </label>
-
-      <div class="inq-row">
-        <label>
-          <span>예상 일정</span>
-          <input type="text" name="schedule" placeholder="예: 3월 중 촬영">
-        </label>
-        <label>
-          <span>예산 규모</span>
-          <input type="text" name="budget" placeholder="예: 1,000만원대">
-        </label>
-      </div>
-
-      <label>
-        <span>내용<i>*</i></span>
-        <textarea name="message" rows="5" required placeholder="어떤 작업을 구상하고 계신가요?"></textarea>
-      </label>
-
-      <p class="inq-error" id="inqError" hidden></p>
-
-      <button type="submit" class="spec-btn spec-btn--sm">
-        <span class="spec-btn__fx" aria-hidden="true"></span>
-        <span class="spec-btn__label">보내기</span>
-      </button>
-      <p class="inq-note">보내기를 누르면 메일 앱이 열리며 작성한 내용이 담깁니다.</p>
-    </form>
-  </div>
+<!-- ── 우측 하단 고정 연락처 ──────────────────────────── -->
+<div class="corner-contact">
+  <p class="corner-contact__title">Contact us!</p>
+  <a href="mailto:ceo@iddot.space">ceo@iddot.space</a>
+  <a href="tel:+821040223465">+82 10 4022 3465</a>
+  <p class="corner-contact__addr">서울 성동구 아차산로 104 스탈릿 성수</p>
 </div>
 
 <footer class="footer">
@@ -250,5 +184,8 @@
 
 <script src="symbol.js"></script>
 <script src="main.js"></script>
+<script src="scrollfloat.js"></script>
+<script src="gradualblur.js"></script>
+<script type="module" src="rays.js"></script>
 </body>
 </html>

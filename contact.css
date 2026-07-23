@@ -1,0 +1,113 @@
+/* contact.html — 별도 문의 페이지 (Stepper 다단계 폼) */
+
+.contact-page{overflow-x:hidden;}
+
+.c-hero{
+  max-width:var(--max);margin:0 auto;
+  padding:clamp(150px,18vw,220px) var(--pad) clamp(40px,6vw,70px);
+}
+.c-hero .display{margin:0 0 clamp(18px,2.4vw,26px);}
+.c-hero-sub{
+  margin:0;max-width:56ch;
+  font-size:clamp(14px,1.5vw,18px);color:#c9c7c3;
+}
+
+.c-form-wrap{
+  max-width:720px;margin:0 auto;
+  padding:0 var(--pad) clamp(120px,14vw,180px);
+}
+
+.stepper{
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:clamp(28px,4vw,48px);
+  background:#0d0d0f;
+}
+
+/* ── 스텝 인디케이터 ── */
+.stepper-dots{
+  display:flex;align-items:center;gap:0;
+  margin-bottom:clamp(32px,4.5vw,52px);
+}
+.stepper-dots .dot{
+  width:30px;height:30px;border-radius:50%;
+  display:grid;place-items:center;flex-shrink:0;
+  font-size:12px;font-weight:700;
+  border:1px solid #333336;color:var(--mute);
+  transition:all .3s ease;
+}
+.stepper-dots .dot.is-on{border-color:var(--fg);color:var(--fg);background:rgba(255,255,255,.06);}
+.stepper-dots .dot.is-done{border-color:var(--fg);background:var(--fg);color:var(--bg);}
+.stepper-dots i{
+  flex:1;height:1px;background:#2a2a2d;margin:0 6px;
+  position:relative;overflow:hidden;
+}
+.stepper-dots i::after{
+  content:'';position:absolute;inset:0;left:auto;right:100%;
+  background:var(--fg);transition:right .35s ease;
+}
+.stepper-dots i.is-done::after{right:0;}
+
+/* ── 스텝 콘텐츠 ── */
+.step{
+  border:none;margin:0;padding:0;
+  display:none;
+  flex-direction:column;gap:20px;
+  animation:stepIn .35s cubic-bezier(.2,.7,.2,1);
+}
+.step.is-on{display:flex;}
+@keyframes stepIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+
+.step-label{
+  margin:0 0 4px;font-size:11px;letter-spacing:.14em;
+  color:var(--mute);text-transform:uppercase;font-weight:700;
+}
+
+.step label{display:flex;flex-direction:column;gap:8px;}
+.step label>span{
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);
+}
+.step label>span i{color:#c98b52;font-style:normal;margin-left:4px;}
+.step input,.step textarea{
+  font-family:inherit;font-size:15px;font-weight:300;color:var(--fg);
+  background:#171719;border:1px solid #2a2a2e;border-radius:10px;
+  padding:13px 15px;width:100%;transition:border-color .2s ease;
+}
+.step textarea{resize:vertical;line-height:1.6;}
+.step input:focus,.step textarea:focus{outline:none;border-color:#5a5a62;}
+.step input::placeholder,.step textarea::placeholder{color:#5c5952;}
+
+.chip-group{display:flex;flex-wrap:wrap;gap:10px;}
+.chip{
+  appearance:none;cursor:pointer;font-family:inherit;
+  background:#171719;border:1px solid #2a2a2e;border-radius:999px;
+  color:#c9c7c3;font-size:13.5px;padding:11px 18px;
+  transition:all .2s ease;
+}
+.chip:hover{border-color:#454549;}
+.chip.is-on{background:var(--fg);color:var(--bg);border-color:var(--fg);font-weight:600;}
+
+.step-error{margin:10px 0 0;font-size:13px;color:#d98a6a;}
+
+.step-footer{
+  display:flex;align-items:center;justify-content:flex-end;gap:14px;
+  margin-top:clamp(28px,3.6vw,40px);
+}
+.step-back{
+  appearance:none;background:none;border:none;cursor:pointer;
+  font-family:inherit;font-size:13px;color:var(--mute);
+  padding:12px 6px;transition:color .2s ease;
+}
+.step-back:hover{color:var(--fg);}
+
+.inq-note{margin:14px 0 0;font-size:12px;color:var(--mute);text-align:right;}
+
+.stepper-done{text-align:center;padding:clamp(20px,4vw,40px) 0;}
+.stepper-done .display{margin:14px 0 16px;font-size:clamp(28px,4vw,44px);}
+.stepper-done p:last-child{color:#c9c7c3;font-size:15px;}
+
+@media (max-width:560px){
+  .stepper{border-radius:16px;padding:26px 20px;}
+  .stepper-dots .dot{width:26px;height:26px;font-size:11px;}
+  .step-footer{justify-content:space-between;}
+}

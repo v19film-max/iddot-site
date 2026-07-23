@@ -51,7 +51,7 @@
      2. REVEAL — 블록 단위 페이드업
      ──────────────────────────────────────────── */
   var BLOCK_SEL = '.statement .display, .statement-body p, .work-filter, .work-item, ' +
-                  '.contact-display, .contact-grid, .section-idx';
+                  '.team-grid, .section-idx';
   var blocks = Array.prototype.slice.call(document.querySelectorAll(BLOCK_SEL));
 
   // statement-closing 은 split 으로 따로 다루므로 블록 리스트에서 제외
@@ -129,6 +129,31 @@
   });
 
   /* ────────────────────────────────────────────
+     4b. TEAM PROFILE CARD — 커서 틸트 + 글로우
+     ──────────────────────────────────────────── */
+  var pcWraps = Array.prototype.slice.call(document.querySelectorAll('.pc-wrap[data-tilt]'));
+  pcWraps.forEach(function (wrap) {
+    var card = wrap.querySelector('.pc-card');
+    function onMove(e) {
+      var r = wrap.getBoundingClientRect();
+      var x = (e.clientX - r.left) / r.width;
+      var y = (e.clientY - r.top) / r.height;
+      wrap.style.setProperty('--mx', (x * 100).toFixed(1) + '%');
+      wrap.style.setProperty('--my', (y * 100).toFixed(1) + '%');
+      wrap.style.setProperty('--rx', ((0.5 - y) * 10).toFixed(2) + 'deg');
+      wrap.style.setProperty('--ry', ((x - 0.5) * 14).toFixed(2) + 'deg');
+      wrap.style.setProperty('--pglow', '1');
+    }
+    function onLeave() {
+      wrap.style.setProperty('--rx', '0deg');
+      wrap.style.setProperty('--ry', '0deg');
+      wrap.style.setProperty('--pglow', '0');
+    }
+    wrap.addEventListener('pointermove', onMove);
+    wrap.addEventListener('pointerleave', onLeave);
+  });
+
+  /* ────────────────────────────────────────────
      4. SPECULAR BUTTON — 커서를 따라 테두리가 빛남
      ──────────────────────────────────────────── */
   var specBtns = Array.prototype.slice.call(document.querySelectorAll('.spec-btn'));
@@ -149,73 +174,4 @@
     });
   }, { passive: true });
 
-  /* ────────────────────────────────────────────
-     5. INQUIRY MODAL
-     ──────────────────────────────────────────── */
-  var modal   = document.getElementById('inquiryModal');
-  var openBtn = document.getElementById('openInquiry');
-  var form    = document.getElementById('inquiryForm');
-  var errEl   = document.getElementById('inqError');
-  var lastFocus = null;
-
-  function openModal() {
-    if (!modal) return;
-    lastFocus = document.activeElement;
-    modal.hidden = false;
-    document.body.style.overflow = 'hidden';
-    var first = modal.querySelector('input,select,textarea');
-    if (first) first.focus();
-  }
-  function closeModal() {
-    if (!modal) return;
-    modal.hidden = true;
-    document.body.style.overflow = '';
-    if (lastFocus && lastFocus.focus) lastFocus.focus();
-  }
-
-  if (openBtn) openBtn.addEventListener('click', openModal);
-  if (modal) {
-    modal.addEventListener('click', function (e) {
-      if (e.target.hasAttribute && e.target.hasAttribute('data-close')) closeModal();
-    });
-  }
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && modal && !modal.hidden) closeModal();
-  });
-
-  if (form) {
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var d = new FormData(form);
-      var name = (d.get('name') || '').toString().trim();
-      var contact = (d.get('contact') || '').toString().trim();
-      var message = (d.get('message') || '').toString().trim();
-
-      if (!name || !contact || !message) {
-        if (errEl) {
-          errEl.textContent = '이름 / 연락처 / 내용은 필수입니다.';
-          errEl.hidden = false;
-        }
-        return;
-      }
-      if (errEl) errEl.hidden = true;
-
-      var body = [
-        '이름 / 회사 : ' + name,
-        '연락처     : ' + contact,
-        '프로젝트 유형 : ' + (d.get('type') || '-'),
-        '예상 일정  : ' + ((d.get('schedule') || '').toString().trim() || '-'),
-        '예산 규모  : ' + ((d.get('budget') || '').toString().trim() || '-'),
-        '',
-        '── 내용 ──',
-        message,
-        '',
-        '— www.iddot.space 문의 폼'
-      ].join('\n');
-
-      window.location.href = 'mailto:ceo@iddot.space'
-        + '?subject=' + encodeURIComponent('[iddot 문의] ' + name)
-        + '&body=' + encodeURIComponent(body);
-    });
-  }
 })();
