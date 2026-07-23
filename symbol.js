@@ -1,0 +1,235 @@
+/* iddot — interactive chrome symbol
+   점(sphere) → 클릭 → 꿈틀거리며 심볼 완성 → 이후 커서 주변이 꿈틀거림 */
+(function () {
+  'use strict';
+
+  var canvas = document.getElementById('symbol');
+  var video  = document.getElementById('bloom');
+  var hint   = document.getElementById('symbolHint');
+  if (!canvas || !video) return;
+
+  var gl = canvas.getContext('webgl', { alpha: true, premultipliedAlpha: false, antialias: true })
+        || canvas.getContext('experimental-webgl', { alpha: true, premultipliedAlpha: false });
+
+  /* ── WebGL 미지원 시 폴백: 영상만 재생 ── */
+  if (!gl) {
+    canvas.style.display = 'none';
+    video.style.cssText = 'position:absolute;width:100%;height:100%;opacity:1;';
+    video.setAttribute('poster', 'assets/symbol_start.png');
+    video.addEventListener('click', function () { video.play(); });
+    return;
+  }
+
+  var VERT = [
+    'attribute vec2 aPos;',
+    'varying vec2 vUv;',
+    'void main(){',
+    '  vUv = aPos * 0.5 + 0.5;',
+    '  vUv.y = 1.0 - vUv.y;',
+    '  gl_Position = vec4(aPos, 0.0, 1.0);',
+    '}'
+  ].join('\n');
+
+  var FRAG = [
+    'precision highp float;',
+    'uniform sampler2D uTex;',
+    'uniform vec2  uMouse;',
+    'uniform float uTime;',
+    'uniform float uLive;',   // 인터랙션 활성도 0..1
+    'uniform float uHover;',  // 커서 존재 0..1
+    'varying vec2 vUv;',
+
+    'void main(){',
+    '  vec2 uv = vUv;',
+
+    /* 상시 미세한 숨쉬기 왜곡 */
+    '  float w = 0.0016 * uLive;',
+    '  uv.x += sin(uv.y * 13.0 + uTime * 1.15) * w;',
+    '  uv.y += cos(uv.x * 15.0 + uTime * 0.95) * w;',
+
+    /* 커서 주변 꿈틀거림 */
+    '  vec2  d    = uv - uMouse;',
+    '  float dist = length(d);',
+    '  float fall = exp(-dist * 8.5);',
+    '  float rip  = sin(dist * 34.0 - uTime * 4.6) * 0.017;',
+    '  uv += normalize(d + 1e-5) * rip * fall * uHover * uLive;',
+
+    '  vec4 c = texture2D(uTex, uv);',
+
+    /* 검은 배경 → 투명 (어떤 배경에도 자연스럽게 합성) */
+    '  float lum = max(max(c.r, c.g), c.b);',
+    '  float a   = smoothstep(0.015, 0.14, lum);',
+    '  gl_FragColor = vec4(c.rgb, a);',
+    '}'
+  ].join('\n');
+
+  function compile(type, src) {
+    var s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+      console.error('[symbol] shader:', gl.getShaderInfoLog(s));
+      return null;
+    }
+    return s;
+  }
+
+  var vs = compile(gl.VERTEX_SHADER, VERT);
+  var fs = compile(gl.FRAGMENT_SHADER, FRAG);
+  if (!vs || !fs) return;
+
+  var prog = gl.createProgram();
+  gl.attachShader(prog, vs);
+  gl.attachShader(prog, fs);
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+    console.error('[symbol] link:', gl.getProgramInfoLog(prog));
+    return;
+  }
+  gl.useProgram(prog);
+
+  var buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+  var aPos = gl.getAttribLocation(prog, 'aPos');
+  gl.enableVertexAttribArray(aPos);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+  var uTex   = gl.getUniformLocation(prog, 'uTex');
+  var uMouse = gl.getUniformLocation(prog, 'uMouse');
+  var uTime  = gl.getUniformLocation(prog, 'uTime');
+  var uLive  = gl.getUniformLocation(prog, 'uLive');
+  var uHover = gl.getUniformLocation(prog, 'uHover');
+
+  var tex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0,0,0,0]));
+
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  gl.clearColor(0, 0, 0, 0);
+  gl.uniform1i(uTex, 0);
+
+  /* ── 상태 ── */
+  var state = 'start';           // start → playing → live
+  var startImg = null, finalImg = null;
+  var live = 0, liveTarget = 0;
+  var hover = 0, hoverTarget = 0;
+  var mouse = { x: 0.5, y: 0.5 };
+  var smooth = { x: 0.5, y: 0.5 };
+  var t0 = performance.now();
+
+  function upload(src) {
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src);
+  }
+
+  function loadImage(url, cb) {
+    var im = new Image();
+    im.onload = function () { cb(im); };
+    im.onerror = function () { console.error('[symbol] image failed:', url); };
+    im.src = url;
+  }
+
+  loadImage('assets/symbol_start.png', function (im) {
+    startImg = im;
+    if (state === 'start') upload(im);
+  });
+  loadImage('assets/symbol_final.png', function (im) { finalImg = im; });
+
+  function resize() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var r = canvas.getBoundingClientRect();
+    var w = Math.max(1, Math.round(r.width  * dpr));
+    var h = Math.max(1, Math.round(r.height * dpr));
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w; canvas.height = h;
+      gl.viewport(0, 0, w, h);
+    }
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  /* ── 클릭 → 개화 ──
+     재생 중에는 video 를 실제로 노출한다. 숨겨진(1px/opacity:0) 미디어는
+     브라우저가 재생을 억제해 첫 프레임에서 멈추기 때문. */
+  var guard = null;
+
+  function bloom() {
+    if (state !== 'start') return;
+    state = 'playing';
+    if (hint) hint.classList.add('gone');
+
+    video.classList.add('on');
+    canvas.classList.add('off');
+
+    var p = video.play();
+    if (p && p.catch) p.catch(function (e) {
+      // 자동재생 정책 등으로 정말 재생이 불가한 경우에만 즉시 마무리.
+      // (시크/버퍼링으로 인한 AbortError 는 재생이 이어지므로 무시)
+      console.warn('[symbol] play rejected:', e && e.name);
+      if (e && e.name === 'NotAllowedError') finish();
+    });
+
+    // 재생이 끝나지 않는 예외 상황 대비 (ended 미발화 등)
+    clearTimeout(guard);
+    guard = setTimeout(finish, ((video.duration || 8) + 2) * 1000);
+  }
+
+  function finish() {
+    if (state === 'live') return;
+    state = 'live';
+    clearTimeout(guard);
+    if (finalImg) upload(finalImg);   // 먼저 텍스처 교체 → 깜빡임 방지
+    canvas.classList.remove('off');
+    video.classList.remove('on');
+    video.pause();
+    liveTarget = 1;
+  }
+
+  canvas.addEventListener('click', bloom);
+  canvas.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); bloom(); }
+  });
+  video.addEventListener('ended', finish);
+
+  /* ── 커서 ── */
+  function pointer(e) {
+    var r = canvas.getBoundingClientRect();
+    var cx = (e.touches ? e.touches[0].clientX : e.clientX);
+    var cy = (e.touches ? e.touches[0].clientY : e.clientY);
+    mouse.x = (cx - r.left) / r.width;
+    mouse.y = (cy - r.top) / r.height;
+    hoverTarget = 1;
+  }
+  canvas.addEventListener('mousemove', pointer);
+  canvas.addEventListener('touchmove', pointer, { passive: true });
+  canvas.addEventListener('mouseleave', function () { hoverTarget = 0; });
+  canvas.addEventListener('touchend',  function () { hoverTarget = 0; });
+
+  /* ── 렌더 루프 ── */
+  function frame() {
+    requestAnimationFrame(frame);
+
+    if (state === 'playing' && video.readyState >= 2) upload(video);
+
+    live  += (liveTarget  - live)  * 0.04;
+    hover += (hoverTarget - hover) * 0.08;
+    smooth.x += (mouse.x - smooth.x) * 0.12;
+    smooth.y += (mouse.y - smooth.y) * 0.12;
+
+    gl.uniform1f(uTime,  (performance.now() - t0) * 0.001);
+    gl.uniform1f(uLive,  live);
+    gl.uniform1f(uHover, hover);
+    gl.uniform2f(uMouse, smooth.x, smooth.y);
+
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+  }
+  requestAnimationFrame(frame);
+})();

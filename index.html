@@ -3,80 +3,149 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>iddot — 임승민</title>
-<meta name="description" content="iddot. Creative Group. 임승민 · Director">
-<link rel="icon" href="data:,">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Pretendard:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>iddot — Creative Group</title>
+<meta name="description" content="iddot creative group. 모든 것은 점 하나에서 시작된다.">
+<meta property="og:title" content="iddot — Creative Group">
+<meta property="og:description" content="모든 것은 점 하나에서 시작된다.">
+<meta property="og:image" content="assets/symbol_final.png">
+<link rel="icon" href="assets/symbol_final.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
 <link rel="stylesheet" href="styles.css">
+<script>document.documentElement.className+=' js';</script>
 </head>
 <body>
 
-<header class="topbar">
-  <span class="wordmark">iddot</span>
-  <nav>
+<header class="nav">
+  <a href="#top" class="nav-mark">iddot</a>
+  <nav class="nav-menu">
+    <a href="#work">Work</a>
     <a href="#about">About</a>
-    <a href="#works">Works</a>
     <a href="#contact">Contact</a>
   </nav>
 </header>
 
-<main>
+<main id="top">
+
+  <!-- ── HERO ─────────────────────────────────────────── -->
   <section class="hero">
-    <p class="hero-eyebrow">Creative Group</p>
-    <h1 class="hero-title">iddot</h1>
-    <p class="hero-line">모든 예술은, 점 하나에서 시작된다</p>
-    <p class="hero-sub">Every identity starts as a dot.</p>
+    <div class="symbol-wrap">
+      <canvas id="symbol" aria-label="iddot 심볼. 클릭하면 점이 펼쳐집니다." role="img" tabindex="0"></canvas>
+      <video id="bloom" src="assets/bloom.mp4" muted playsinline preload="auto"></video>
+      <span class="symbol-hint" id="symbolHint">CLICK</span>
+    </div>
+
+    <div class="hero-copy">
+      <h1 class="hero-title">
+        <span>모든 것은</span>
+        <span>점 하나에서 시작된다</span>
+      </h1>
+      <p class="hero-sub">Every identity starts as a dot.</p>
+    </div>
+
+    <div class="scroll-cue"><span>SCROLL</span></div>
   </section>
 
-  <section id="about" class="about">
-    <div class="rule"></div>
-    <p class="about-text">
-      <em>identity</em>와 <em>dot</em>의 결합, iddot.<br>
-      정체성도, 이야기도, 결국 하나의 점에서 시작됩니다.<br>
-      우리는 그 점이 무엇으로 확장되는지를 기록하고 만듭니다.
-    </p>
-  </section>
-
-  <section id="works" class="works">
-    <h2 class="section-label">Works</h2>
-    <div class="work-grid">
-      <!-- 작업물 채우는 자리: 아래 .work-card를 복사해서 늘리면 됩니다 -->
-      <a class="work-card" href="#" target="_blank" rel="noopener">
-        <div class="work-thumb"></div>
-        <p class="work-title">Project Title</p>
-        <p class="work-meta">2026</p>
-      </a>
-      <a class="work-card" href="#" target="_blank" rel="noopener">
-        <div class="work-thumb"></div>
-        <p class="work-title">Project Title</p>
-        <p class="work-meta">2026</p>
-      </a>
-      <a class="work-card" href="#" target="_blank" rel="noopener">
-        <div class="work-thumb"></div>
-        <p class="work-title">Project Title</p>
-        <p class="work-meta">2026</p>
-      </a>
+  <!-- ── STATEMENT ────────────────────────────────────── -->
+  <section class="statement" id="about">
+    <p class="section-idx">01 — About</p>
+    <h2 class="display">
+      우리는 아직<br>
+      형태가 없는 것에서<br>
+      시작합니다.
+    </h2>
+    <div class="statement-body">
+      <p>
+        iddot은 <em>identity</em>와 <em>dot</em>의 결합입니다.
+        하나의 점은 그 자체로는 아무것도 아니지만,
+        모든 선과 면과 형태는 결국 거기서 태어납니다.
+      </p>
+      <p>
+        브랜드도, 이야기도, 이미지도 마찬가지입니다.
+        우리는 그 최초의 점을 찾아내고,
+        그것이 무엇으로 확장될 수 있는지를 설계합니다.
+      </p>
     </div>
   </section>
 
-  <section id="contact" class="contact">
-    <div class="rule"></div>
-    <p class="contact-name">임승민 <span>Lim Seung Min</span></p>
-    <p class="contact-role">Director</p>
-    <div class="contact-links">
-      <a href="mailto:ceo@iddot.space">ceo@iddot.space</a>
-      <a href="tel:+821040223465">+82 10 4022 3465</a>
-      <a href="https://instagram.com/iddot.works" target="_blank" rel="noopener">@iddot.works</a>
-    </div>
-    <p class="contact-address">서울 성동구 아차산로 104 스탈릿 성수, 8층 813-4호</p>
+  <!-- ── WORK ─────────────────────────────────────────── -->
+  <section class="work" id="work">
+    <p class="section-idx">02 — Work</p>
+
+    <!-- 작업물 추가: article.work-item 블록을 복사해서 늘리면 됩니다.
+         썸네일은 assets/ 에 넣고 data-media 에 경로를 지정하세요.
+         영상이면 <video>, 이미지면 <img> 로 교체하면 됩니다. -->
+
+    <article class="work-item">
+      <a class="work-link" href="#" target="_blank" rel="noopener">
+        <div class="work-media" data-placeholder="Project 01"></div>
+        <div class="work-meta">
+          <h3>프로젝트 타이틀</h3>
+          <p class="work-tags">Film · Direction<span class="work-year">2026</span></p>
+        </div>
+      </a>
+    </article>
+
+    <article class="work-item">
+      <a class="work-link" href="#" target="_blank" rel="noopener">
+        <div class="work-media" data-placeholder="Project 02"></div>
+        <div class="work-meta">
+          <h3>프로젝트 타이틀</h3>
+          <p class="work-tags">Branding · Content<span class="work-year">2026</span></p>
+        </div>
+      </a>
+    </article>
+
+    <article class="work-item">
+      <a class="work-link" href="#" target="_blank" rel="noopener">
+        <div class="work-media" data-placeholder="Project 03"></div>
+        <div class="work-meta">
+          <h3>프로젝트 타이틀</h3>
+          <p class="work-tags">Film · Editing<span class="work-year">2026</span></p>
+        </div>
+      </a>
+    </article>
   </section>
+
+  <!-- ── CONTACT ──────────────────────────────────────── -->
+  <section class="contact" id="contact">
+    <p class="section-idx">03 — Contact</p>
+    <h2 class="display contact-display">
+      당신의 첫 점을<br>
+      함께 찍겠습니다.
+    </h2>
+
+    <div class="contact-grid">
+      <div class="contact-block">
+        <span class="label">Director</span>
+        <p class="contact-name">임승민 <em>Lim Seung Min</em></p>
+      </div>
+      <div class="contact-block">
+        <span class="label">Email</span>
+        <a href="mailto:ceo@iddot.space">ceo@iddot.space</a>
+      </div>
+      <div class="contact-block">
+        <span class="label">Mobile</span>
+        <a href="tel:+821040223465">+82 10 4022 3465</a>
+      </div>
+      <div class="contact-block">
+        <span class="label">Instagram</span>
+        <a href="https://instagram.com/iddot.works" target="_blank" rel="noopener">@iddot.works</a>
+      </div>
+      <div class="contact-block wide">
+        <span class="label">Studio</span>
+        <p>서울 성동구 아차산로 104 스탈릿 성수, 8층 813-4호</p>
+      </div>
+    </div>
+  </section>
+
 </main>
 
-<footer>
-  <p>© 2026 iddot</p>
+<footer class="footer">
+  <span>© 2026 iddot</span>
+  <span>Creative Group</span>
 </footer>
 
+<script src="symbol.js"></script>
+<script src="main.js"></script>
 </body>
 </html>
