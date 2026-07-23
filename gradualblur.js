@@ -71,6 +71,8 @@
 
   // backdrop-filter 미지원 브라우저에서는 아예 생략 (장식 요소이므로 안전하게 skip)
   if (!CSS || !CSS.supports || !CSS.supports('backdrop-filter', 'blur(1px)')) return;
+  // iOS Safari에서는 고정 블러 레이어가 본문 전체를 흐리게 합성하는 경우가 있어 모바일에서는 끈다.
+  if (window.matchMedia && window.matchMedia('(max-width: 640px)').matches) return;
 
   document.addEventListener('DOMContentLoaded', function () {
     document.body.appendChild(buildGradualBlur({
