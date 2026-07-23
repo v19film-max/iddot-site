@@ -81,6 +81,7 @@ a{color:inherit;text-decoration:none;}
      (페이드를 주면 두 레이어가 겹치며 밝기가 튀어 깜빡임으로 보임) */
 }
 #symbolFallback{
+  display:none;
   position:absolute;inset:0;z-index:0;
   width:100%;height:100%;object-fit:contain;
   pointer-events:none;
