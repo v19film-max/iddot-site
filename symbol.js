@@ -4,7 +4,8 @@
   'use strict';
 
   var canvas = document.getElementById('symbol');
-  var video  = document.getElementById('bloom');
+  var video  = document.getElementById('bloom');   // 점 → 꽃
+  var rvideo = document.getElementById('fold');    // 꽃 → 점
   var hint   = document.getElementById('symbolHint');
   if (!canvas || !video) return;
 
@@ -14,7 +15,7 @@
   /* ── WebGL 미지원 시 폴백: 영상만 재생 ── */
   if (!gl) {
     canvas.style.display = 'none';
-    video.style.cssText = 'position:absolute;width:100%;height:100%;opacity:1;';
+    video.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:1;mix-blend-mode:screen;';
     video.setAttribute('poster', 'assets/symbol_start.png');
     video.addEventListener('click', function () { video.play(); });
     return;
@@ -114,8 +115,9 @@
   gl.clearColor(0, 0, 0, 0);
   gl.uniform1i(uTex, 0);
 
-  /* ── 상태 ── */
-  var state = 'start';           // start → playing → live
+  /* ── 상태 ──
+     dot ⇄ flower 를 클릭으로 토글. playing 중에는 클릭 무시. */
+  var state = 'dot';             // dot | playing | flower
   var startImg = null, finalImg = null;
   var live = 0, liveTarget = 0;
   var hover = 0, hoverTarget = 0;
@@ -138,7 +140,7 @@
 
   loadImage('assets/symbol_start.png', function (im) {
     startImg = im;
-    if (state === 'start') upload(im);
+    if (state === 'dot') upload(im);
   });
   loadImage('assets/symbol_final.png', function (im) { finalImg = im; });
 
@@ -155,48 +157,79 @@
   window.addEventListener('resize', resize);
   resize();
 
-  /* ── 클릭 → 개화 ──
+  /* ── 클릭 → 개화 / 다시 클릭 → 접힘 ──
      재생 중에는 video 를 실제로 노출한다. 숨겨진(1px/opacity:0) 미디어는
      브라우저가 재생을 억제해 첫 프레임에서 멈추기 때문. */
   var guard = null;
+  var playingEl = null;   // 지금 재생 중인 video 엘리먼트
+  var nextState = null;   // 재생이 끝난 뒤 도달할 상태
 
-  function bloom() {
-    if (state !== 'start') return;
+  function toggle() {
+    if (state === 'playing') return;
+    if (state === 'dot')      run(video,  'flower');
+    else if (state === 'flower') run(rvideo || video, 'dot');
+  }
+
+  function run(el, to) {
+    if (!el) { settle(to); return; }
     state = 'playing';
+    nextState = to;
+    playingEl = el;
     if (hint) hint.classList.add('gone');
 
-    video.classList.add('on');
+    el.classList.add('on');
     canvas.classList.add('off');
 
-    var p = video.play();
+    var p = el.play();
     if (p && p.catch) p.catch(function (e) {
       // 자동재생 정책 등으로 정말 재생이 불가한 경우에만 즉시 마무리.
       // (시크/버퍼링으로 인한 AbortError 는 재생이 이어지므로 무시)
       console.warn('[symbol] play rejected:', e && e.name);
-      if (e && e.name === 'NotAllowedError') finish();
+      if (e && e.name === 'NotAllowedError') settle(to);
     });
 
-    // 재생이 끝나지 않는 예외 상황 대비 (ended 미발화 등)
+    // 최후의 보루. ended / timeupdate 가 모두 실패해도 반드시 빠져나온다.
     clearTimeout(guard);
-    guard = setTimeout(finish, ((video.duration || 8) + 2) * 1000);
+    guard = setTimeout(function () { settle(to); }, ((el.duration || 8) + 1.2) * 1000);
   }
 
-  function finish() {
-    if (state === 'live') return;
-    state = 'live';
+  /* 'ended' 는 브라우저에 따라 누락되는 경우가 있어 timeupdate 로도 종료를 감지한다.
+     (누락 시 가드 타임아웃까지 클릭이 먹통이 되는 문제를 막기 위함) */
+  function watchEnd(el, to) {
+    if (!el) return;
+    el.addEventListener('ended', function () { settle(to); });
+    el.addEventListener('timeupdate', function () {
+      if (state !== 'playing' || playingEl !== el) return;
+      var d = el.duration;
+      if (d && isFinite(d) && el.currentTime >= d - 0.06) settle(to);
+    });
+  }
+
+  function settle(to) {
+    if (state === to) return;          // 이미 도달한 상태면 무시
     clearTimeout(guard);
-    if (finalImg) upload(finalImg);   // 먼저 텍스처 교체 → 깜빡임 방지
+    state = to;
+
+    // 먼저 텍스처 교체 → 깜빡임 방지
+    var img = (to === 'flower') ? finalImg : startImg;
+    if (img) upload(img);
+
     canvas.classList.remove('off');
-    video.classList.remove('on');
-    video.pause();
-    liveTarget = 1;
+    if (playingEl) {
+      playingEl.classList.remove('on');
+      playingEl.pause();
+      try { playingEl.currentTime = 0; } catch (e) {}
+      playingEl = null;
+    }
+    liveTarget = (to === 'flower') ? 1 : 0.35;   // 점 상태에서는 왜곡을 약하게
   }
 
-  canvas.addEventListener('click', bloom);
+  canvas.addEventListener('click', toggle);
   canvas.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); bloom(); }
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
   });
-  video.addEventListener('ended', finish);
+  watchEnd(video,  'flower');
+  watchEnd(rvideo, 'dot');
 
   /* ── 커서 ── */
   function pointer(e) {
@@ -216,7 +249,7 @@
   function frame() {
     requestAnimationFrame(frame);
 
-    if (state === 'playing' && video.readyState >= 2) upload(video);
+    if (state === 'playing' && playingEl && playingEl.readyState >= 2) upload(playingEl);
 
     live  += (liveTarget  - live)  * 0.04;
     hover += (hoverTarget - hover) * 0.08;

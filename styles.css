@@ -69,7 +69,7 @@ a{color:inherit;text-decoration:none;}
 
 /* 재생 중에는 실제로 보여야 브라우저가 재생을 억제하지 않음.
    검정 배경은 screen 블렌드로 페이지 배경과 합성됨. */
-#bloom{
+#bloom,#fold{
   position:absolute;inset:0;
   width:100%;height:100%;
   object-fit:contain;
@@ -77,7 +77,7 @@ a{color:inherit;text-decoration:none;}
   opacity:0;pointer-events:none;
   transition:opacity .18s ease;
 }
-#bloom.on{opacity:1;}
+#bloom.on,#fold.on{opacity:1;}
 
 .symbol-hint{
   position:absolute;bottom:-26px;left:50%;transform:translateX(-50%);
@@ -143,6 +143,39 @@ a{color:inherit;text-decoration:none;}
 .statement-body p{margin:0;font-size:clamp(14px,1.4vw,17px);color:#c9c7c3;}
 .statement-body em{font-style:normal;color:var(--fg);border-bottom:1px solid #45443f;}
 
+/* 손그림 동그라미 — 분필로 친 듯한 러프 서클 */
+.circled{
+  position:relative;
+  display:inline-block;
+  white-space:nowrap;
+}
+.circled::after{
+  content:'';
+  position:absolute;
+  left:-.24em; right:-.24em;
+  top:-.22em; bottom:-.22em;
+  border:2px solid var(--fg);
+  /* 불규칙한 반지름 → 손으로 그린 타원 느낌 */
+  border-radius:52% 47% 49% 53% / 58% 55% 45% 42%;
+  transform:rotate(-2.2deg);
+  opacity:.85;
+  pointer-events:none;
+}
+.circled:nth-of-type(2)::after{
+  border-radius:48% 53% 52% 47% / 44% 57% 43% 56%;
+  transform:rotate(1.8deg);
+}
+
+/* 클로징 한 줄 — tts-studio 의 "we create whatever..." 위치 */
+.statement-closing{
+  grid-column:1/-1;
+  margin-top:clamp(28px,4vw,52px)!important;
+  font-size:clamp(17px,2.1vw,26px)!important;
+  line-height:1.5;
+  color:var(--fg)!important;
+  letter-spacing:-.01em;
+}
+
 /* ── WORK ────────────────────────────── */
 .work{
   max-width:var(--max);margin:0 auto;
@@ -183,6 +216,29 @@ a{color:inherit;text-decoration:none;}
   display:flex;gap:22px;
 }
 
+/* ── WORK FILTER ─────────────────────── */
+.work-filter{
+  display:flex;flex-wrap:wrap;gap:8px;
+  margin:0 0 clamp(28px,4vw,48px);
+}
+.filter-btn{
+  appearance:none;background:none;cursor:pointer;
+  border:1px solid var(--line);border-radius:999px;
+  color:var(--mute);
+  font-family:inherit;font-weight:400;
+  font-size:12px;letter-spacing:.1em;
+  padding:9px 20px;
+  transition:color .25s ease,border-color .25s ease,background .25s ease;
+}
+.filter-btn:hover{color:var(--fg);border-color:#3a3a3d;}
+.filter-btn.is-on{color:var(--bg);background:var(--fg);border-color:var(--fg);}
+
+.work-item[hidden]{display:none;}
+.work-empty{
+  margin:0;padding:40px 0;
+  font-size:13px;letter-spacing:.06em;color:var(--mute);
+}
+
 /* ── CONTACT ─────────────────────────── */
 .contact{
   max-width:var(--max);margin:0 auto;
@@ -191,20 +247,56 @@ a{color:inherit;text-decoration:none;}
 }
 .contact-grid{
   margin-top:clamp(48px,7vw,90px);
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:clamp(26px,3vw,44px);
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:clamp(30px,5vw,64px);
+  align-items:start;
 }
-.contact-block.wide{grid-column:1/-1;}
 .label{
   display:block;font-size:10px;letter-spacing:.26em;
   color:var(--mute);text-transform:uppercase;margin-bottom:9px;
 }
-.contact-block p,.contact-block a{
-  margin:0;font-size:clamp(14px,1.5vw,18px);
+
+.contact-person .contact-name{
+  margin:0;
+  font-size:clamp(26px,4vw,48px);
+  font-weight:500;letter-spacing:-.02em;line-height:1.15;
 }
-.contact-block a{border-bottom:1px solid transparent;transition:border-color .25s ease;}
-.contact-block a:hover{border-color:var(--fg);}
-.contact-name em{font-style:normal;color:var(--mute);margin-left:8px;font-size:.8em;}
+.contact-person .contact-name-en{
+  margin:6px 0 0;
+  font-size:clamp(12px,1.2vw,15px);
+  letter-spacing:.14em;color:var(--mute);text-transform:uppercase;
+}
+
+.contact-lines{list-style:none;margin:0;padding:0;}
+.contact-lines li{margin-bottom:clamp(18px,2.4vw,28px);}
+.contact-lines li:last-child{margin-bottom:0;}
+.contact-lines a{
+  font-size:clamp(14px,1.5vw,18px);
+  border-bottom:1px solid transparent;transition:border-color .25s ease;
+}
+.contact-lines a:hover{border-color:var(--fg);}
+
+.contact-studio{
+  grid-column:1/-1;
+  padding-top:clamp(24px,3vw,40px);
+  border-top:1px solid var(--line);
+}
+.contact-studio p{margin:0;font-size:clamp(13px,1.4vw,16px);color:#c9c7c3;}
+
+/* ── SPLIT REVEAL (ScrollFloat / SplitText 대응, 바닐라 구현) ── */
+.js [data-split] .sp{
+  display:inline-block;
+  opacity:0;
+  transform:translateY(.75em) scaleY(1.25) scaleX(.94);
+  transform-origin:50% 0%;
+  transition:opacity .62s cubic-bezier(.22,.68,.24,1),
+             transform .72s cubic-bezier(.22,.68,.24,1);
+  will-change:opacity,transform;
+}
+.js [data-split].in .sp{opacity:1;transform:none;}
+[data-split] .sp-sp{display:inline-block;width:.28em;}
+[data-split] .sp-w{display:inline-block;white-space:nowrap;}
 
 /* ── FOOTER ──────────────────────────── */
 .footer{
@@ -229,4 +321,6 @@ a{color:inherit;text-decoration:none;}
   .nav-mark{font-size:17px;}
   .work-meta{flex-direction:column;gap:8px;}
   .work-tags{gap:14px;}
+  .contact-grid{grid-template-columns:1fr;}
+  .filter-btn{padding:8px 16px;font-size:11px;}
 }

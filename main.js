@@ -1,24 +1,73 @@
-/* iddot — scroll reveal
+/* iddot — scroll reveal · split text · work filter
    원칙: 어떤 이유로든 콘텐츠가 영구히 숨겨지면 안 된다.
    관찰자가 발화하지 않는 환경(구형 브라우저, 프린트, 헤드리스 등)에서도
    안전망 타이머가 전부 드러내도록 한다. */
 (function () {
   'use strict';
 
-  var SEL = '.statement .display, .statement-body, .work-item, .contact-display, .contact-grid, .section-idx';
-  var targets = Array.prototype.slice.call(document.querySelectorAll(SEL));
-  if (!targets.length) return;
+  /* ────────────────────────────────────────────
+     1. SPLIT TEXT — 글자/단어 단위로 쪼개 스태거 등장
+        (React Bits 의 SplitText / ScrollFloat 를 바닐라로)
+     ──────────────────────────────────────────── */
+  var splitEls = Array.prototype.slice.call(document.querySelectorAll('[data-split]'));
+
+  function splitInto(el) {
+    var mode = el.getAttribute('data-split') === 'words' ? 'words' : 'chars';
+    var text = el.textContent.trim();
+    if (!text) return [];
+
+    el.setAttribute('aria-label', text);   // 스크린리더용 원문 보존
+    el.textContent = '';
+
+    var units = mode === 'words' ? text.split(/(\s+)/) : text.split('');
+    var pieces = [];
+
+    units.forEach(function (u) {
+      if (/^\s+$/.test(u)) {
+        var gap = document.createElement('span');
+        gap.className = 'sp-sp';
+        gap.setAttribute('aria-hidden', 'true');
+        el.appendChild(gap);
+        return;
+      }
+      var s = document.createElement('span');
+      s.className = 'sp' + (mode === 'words' ? ' sp-w' : '');
+      s.setAttribute('aria-hidden', 'true');
+      s.textContent = u;
+      el.appendChild(s);
+      pieces.push(s);
+    });
+
+    // 스태거
+    pieces.forEach(function (p, i) {
+      p.style.transitionDelay = (i * (mode === 'words' ? 60 : 26)) + 'ms';
+    });
+    return pieces;
+  }
+
+  splitEls.forEach(splitInto);
+
+  /* ────────────────────────────────────────────
+     2. REVEAL — 블록 단위 페이드업
+     ──────────────────────────────────────────── */
+  var BLOCK_SEL = '.statement .display, .statement-body p, .work-filter, .work-item, ' +
+                  '.contact-display, .contact-grid, .section-idx';
+  var blocks = Array.prototype.slice.call(document.querySelectorAll(BLOCK_SEL));
+
+  // statement-closing 은 split 으로 따로 다루므로 블록 리스트에서 제외
+  blocks = blocks.filter(function (el) { return !el.hasAttribute('data-split'); });
+
+  var watched = blocks.concat(splitEls);
 
   function show(el) { el.classList.add('in'); }
-  function showAll() { targets.forEach(show); }
+  function showAll() { watched.forEach(show); }
 
-  // 프린트 시에는 애니메이션 없이 전부 표시
   if (window.matchMedia && window.matchMedia('print').matches) { showAll(); return; }
   window.addEventListener('beforeprint', showAll);
 
   if (!('IntersectionObserver' in window)) { showAll(); return; }
 
-  targets.forEach(function (el, i) {
+  blocks.forEach(function (el, i) {
     el.classList.add('reveal');
     el.style.transitionDelay = (i % 4) * 70 + 'ms';
   });
@@ -29,12 +78,17 @@
     });
   }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
 
-  targets.forEach(function (el) { io.observe(el); });
+  watched.forEach(function (el) { io.observe(el); });
 
-  // 안전망 1: 뷰포트 안에 들어와 있는데 아직 안 드러난 요소는 즉시 표시
+  // 히어로 카피는 스크롤 전에 보이는 자리이므로 로드 직후 등장
+  setTimeout(function () {
+    document.querySelectorAll('.hero [data-split]').forEach(show);
+  }, 260);
+
+  /* 안전망 1: 뷰포트 안인데 아직 안 드러난 요소는 즉시 표시 */
   function sweep() {
     var vh = window.innerHeight || document.documentElement.clientHeight;
-    targets.forEach(function (el) {
+    watched.forEach(function (el) {
       if (el.classList.contains('in')) return;
       var r = el.getBoundingClientRect();
       if (r.top < vh && r.bottom > 0) show(el);
@@ -43,6 +97,34 @@
   window.addEventListener('load', sweep);
   setTimeout(sweep, 600);
 
-  // 안전망 2: 5초 뒤에는 무조건 전부 표시 (관찰자 미발화 대비)
+  /* 안전망 2: 5초 뒤에는 무조건 전부 표시 */
   setTimeout(showAll, 5000);
+
+  /* ────────────────────────────────────────────
+     3. WORK FILTER
+     ──────────────────────────────────────────── */
+  var btns  = Array.prototype.slice.call(document.querySelectorAll('.filter-btn'));
+  var items = Array.prototype.slice.call(document.querySelectorAll('.work-item'));
+  var empty = document.querySelector('.work-empty');
+
+  function applyFilter(cat) {
+    var shown = 0;
+    items.forEach(function (it) {
+      var cats = (it.getAttribute('data-cat') || '').split(/\s+/);
+      var match = (cat === 'all') || cats.indexOf(cat) !== -1;
+      it.hidden = !match;
+      if (match) { shown++; show(it); }   // 필터로 다시 나타날 때 숨은 채 남지 않도록
+    });
+    if (empty) empty.hidden = shown !== 0;
+  }
+
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      btns.forEach(function (o) {
+        o.classList.toggle('is-on', o === b);
+        o.setAttribute('aria-selected', o === b ? 'true' : 'false');
+      });
+      applyFilter(b.getAttribute('data-filter') || 'all');
+    });
+  });
 })();
