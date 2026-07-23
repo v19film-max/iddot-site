@@ -106,6 +106,25 @@
 .stepper-done .display{margin:14px 0 16px;font-size:clamp(28px,4vw,44px);}
 .stepper-done p:last-child{color:#c9c7c3;font-size:15px;}
 
+/* 메인 Contact와 같은 넓은 정보 구조를 유지한다. */
+.c-hero{max-width:var(--max);padding-bottom:clamp(84px,11vw,150px);}
+.c-hero .display{font-size:clamp(56px,12vw,190px);line-height:.82;letter-spacing:-.075em;}
+.c-hero-sub{max-width:28ch;color:#c9c7c3;}
+.c-form-wrap{max-width:var(--max);padding-bottom:clamp(120px,16vw,220px);}
+.stepper{border:0;border-radius:0;padding:0;background:transparent;}
+.stepper-dots{max-width:460px;margin-bottom:clamp(56px,7vw,100px);}
+.stepper-dots .dot{width:26px;height:26px;background:transparent;}
+.step label{padding:18px 0 26px;border-top:1px solid var(--line);}
+.step input,.step textarea{background:transparent;border:0;border-bottom:1px solid #4a4a4d;border-radius:0;padding:15px 0 10px;font-size:clamp(16px,1.5vw,20px);}
+.chip-group{gap:8px;}
+.chip{background:transparent;border-radius:0;padding:13px 0;margin-right:26px;border:0;border-bottom:1px solid #37373a;}
+.chip.is-on{background:transparent;color:var(--fg);border-color:var(--fg);}
+.inq-note{text-align:left;}
+
+@media (max-width:560px){
+  .c-hero .display{font-size:clamp(56px,18vw,84px);}
+}
+
 @media (max-width:560px){
   .stepper{border-radius:16px;padding:26px 20px;}
   .stepper-dots .dot{width:26px;height:26px;font-size:11px;}

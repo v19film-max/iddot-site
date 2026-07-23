@@ -16,11 +16,11 @@
       position: 'top',
       height: '8rem',
       strength: 2,
-      divCount: 6,
+      divCount: 10,
       curve: 'bezier',
       exponential: false,
       opacity: 1,
-      zIndex: 30
+      zIndex: 49
     }, opts || {});
 
     var root = document.createElement('div');
@@ -61,7 +61,8 @@
         'mask-image:' + mask,
         '-webkit-backdrop-filter:blur(' + blurRem.toFixed(3) + 'rem)',
         'backdrop-filter:blur(' + blurRem.toFixed(3) + 'rem)',
-        'opacity:' + cfg.opacity
+        'opacity:' + cfg.opacity,
+        'background:rgba(8,8,9,.12)'
       ].join(';');
       root.appendChild(layer);
     }
@@ -73,8 +74,8 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     document.body.appendChild(buildGradualBlur({
-      position: 'top', height: '8.5rem', strength: 2.2,
-      divCount: 6, curve: 'bezier', opacity: 0.9, zIndex: 30
+      position: 'top', height: '10rem', strength: 3.4,
+      divCount: 10, curve: 'bezier', exponential: true, opacity: 0.96, zIndex: 49
     }));
   });
 })();

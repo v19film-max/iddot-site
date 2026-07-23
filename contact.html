@@ -28,8 +28,8 @@
 
 <main>
   <section class="c-hero">
-    <p class="section-idx">Let's talk</p>
-    <h1 class="display" data-split="chars">함께 만들어요</h1>
+    <p class="section-idx">03 — Contact</p>
+    <h1 class="display" data-split="chars">CONTACT</h1>
     <p class="c-hero-sub">프로젝트를 들려주시면, 가장 좋은 방향을 찾아 답합니다.</p>
   </section>
 
@@ -44,6 +44,7 @@
       </div>
 
       <form id="inquiryForm" novalidate>
+        <input type="hidden" name="_subject" value="[iddot 문의] 새 프로젝트">
 
         <!-- STEP 1 : 누구신가요 -->
         <fieldset class="step is-on" data-step="1">
@@ -80,10 +81,6 @@
             <span>예상 일정</span>
             <input type="text" name="schedule" placeholder="예: 3월 중 촬영">
           </label>
-          <label>
-            <span>예산 규모</span>
-            <input type="text" name="budget" placeholder="예: 1,000만원대">
-          </label>
         </fieldset>
 
         <!-- STEP 4 : 내용 -->
@@ -108,13 +105,13 @@
             <span class="spec-btn__label">보내기</span>
           </button>
         </div>
-        <p class="inq-note">보내기를 누르면 메일 앱이 열리며 작성한 내용이 담깁니다.</p>
+        <p class="inq-note">보내주신 내용은 확인 후 빠르게 답변드리겠습니다.</p>
       </form>
 
       <div class="stepper-done" id="stepDone" hidden>
         <p class="section-idx">Thank you</p>
         <h2 class="display">잘 받았습니다</h2>
-        <p>메일 앱에서 내용을 확인하고 보내주세요. 빠르게 답 드리겠습니다.</p>
+        <p>문의가 정상적으로 접수되었습니다. 빠르게 답 드리겠습니다.</p>
       </div>
     </div>
   </section>

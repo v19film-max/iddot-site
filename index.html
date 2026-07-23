@@ -5,9 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>iddot — Creative Group</title>
 <meta name="description" content="iddot creative group. 모든 것은 점 하나에서 시작된다.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.iddot.space/">
 <meta property="og:title" content="iddot — Creative Group">
 <meta property="og:description" content="모든 것은 점 하나에서 시작된다.">
-<meta property="og:image" content="assets/symbol_final.png">
+<meta property="og:url" content="https://www.iddot.space/">
+<meta property="og:image" content="https://www.iddot.space/assets/symbol_final.png">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="assets/symbol_final.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,12 +26,12 @@
 
 <header class="nav">
   <a href="#top" class="nav-mark" aria-label="iddot 홈">
-    <img src="assets/wordmark.png" alt="iddot">
+    <img src="assets/logo-original.png" alt="iddot">
   </a>
   <nav class="nav-menu">
     <a href="#work">Work</a>
     <a href="#about">About</a>
-    <a href="contact.html">Contact</a>
+    <a href="#contact">Contact</a>
   </nav>
 </header>
 
@@ -37,14 +41,15 @@
   <section class="hero">
     <div class="symbol-wrap">
       <canvas id="symbol" aria-label="iddot 심볼. 클릭하면 점이 펼쳐지고, 다시 누르면 점으로 돌아갑니다." role="img" tabindex="0"></canvas>
+      <img id="symbolFallback" src="assets/symbol_start.png" alt="" aria-hidden="true">
       <video id="bloom" src="assets/bloom.mp4" muted playsinline preload="auto"></video>
       <video id="fold"  src="assets/fold.mp4"  muted playsinline preload="auto"></video>
-      <span class="symbol-hint" id="symbolHint">CLICK</span>
+      <span class="symbol-hint" id="symbolHint">CLICK HERE</span>
     </div>
 
     <div class="hero-copy">
       <h1 class="hero-title" data-split="chars">점으로 시작합니다</h1>
-      <p class="hero-sub" data-split="chars">Every identity starts as a dot.</p>
+    <p class="hero-sub" data-split="chars">Every identity starts as a dot</p>
     </div>
 
     <div class="scroll-cue"><span>SCROLL</span></div>
@@ -53,25 +58,18 @@
   <!-- ── STATEMENT ────────────────────────────────────── -->
   <section class="statement" id="about">
     <p class="section-idx">01 — About</p>
-    <p class="wordplay">
-      <span class="circled">id<i class="stroke3" aria-hidden="true"></i></span>entity
-      <span class="plus">+</span>
-      <span class="circled">dot<i class="stroke3" aria-hidden="true"></i></span>
-    </p>
+    <h2 class="wordplay">IDENTITY + DOT</h2>
 
     <div class="statement-body">
       <p>
-        iddot은 영상을 중심으로 클라이언트의 성장을 설계하는 크리에이티브 그룹입니다.
-        시네마틱 필름과 뮤직비디오, 브랜드 콘텐츠, 비주얼 디렉팅까지
-        — 한 편이 완성되기까지의 모든 과정을 함께합니다.
+        <strong>iddot은 영상을 기반으로 클라이언트의 성장을 위한 모든 과정을 함께합니다.</strong>
+        <strong>브랜드 콘텐츠, 바이럴 콘텐츠, 비주얼 디렉팅, 시네마틱 필름과 뮤직비디오까지 브랜드와 아티스트의 성장을 설계합니다.</strong>
       </p>
       <p>
-        기획과 로케이션 섭외, 세트 제작, 모델과 스태프 구성, 프로덕션 디자인,
-        특수 촬영에 이르는 제작 전 과정을 직접 운영합니다.
-        AI 기반의 이미지·영상·모션·바이럴 콘텐츠 역시 가장 앞선 기술로 다룹니다.
+        기획과 로케이션 섭외, 모델과 스태프 구성, 프로덕션 디자인, 촬영과 후반 작업까지 제작 전 과정을 직접 운영합니다.
       </p>
       <p>
-        무엇보다 먼저 브랜드의 본질을 읽습니다.
+        <strong>무엇보다 먼저 브랜드의 본질을 읽습니다.</strong>
         그 위에서 브랜딩과 디자인, 마케팅까지 하나의 방향으로 설계된 콘텐츠를 만듭니다.
       </p>
 
@@ -85,7 +83,7 @@
         what a brand actually is, and build everything after that in one direction.
       </p>
 
-      <p class="statement-closing" data-split="words">무형의 공간에서 점으로부터 정체성을 창조합니다.</p>
+      <p class="statement-closing" data-split="words">무형의 공간에서 점으로부터 정체성을 만듭니다.</p>
     </div>
   </section>
 
@@ -95,53 +93,129 @@
 
     <div class="work-filter" role="tablist" aria-label="작업 분류">
       <button class="filter-btn is-on" data-filter="all"       role="tab" aria-selected="true">All</button>
-      <button class="filter-btn"       data-filter="film"      role="tab" aria-selected="false">Film</button>
-      <button class="filter-btn"       data-filter="branding"  role="tab" aria-selected="false">Branding</button>
-      <button class="filter-btn"       data-filter="exhibition" role="tab" aria-selected="false">Exhibition</button>
+      <button class="filter-btn"       data-filter="mv"        role="tab" aria-selected="false">M/V</button>
+      <button class="filter-btn"       data-filter="digital"   role="tab" aria-selected="false">Digital Content</button>
+      <button class="filter-btn"       data-filter="film"      role="tab" aria-selected="false">FILM</button>
+      <button class="filter-btn"       data-filter="art"       role="tab" aria-selected="false">Art</button>
     </div>
 
-    <!-- 작업물 추가: article.work-item 블록을 복사해서 늘리면 됩니다.
-         · data-cat 에 film / branding / exhibition 중 해당 분류를 넣으세요(복수 가능, 공백 구분).
-         · 썸네일은 assets/ 에 넣고 .work-media 안에 <img> 또는 <video> 를 넣으면 됩니다.
-         · 설명은 "클라이언트명 + 무엇을 만들었는지" 한 줄로 구체적으로. -->
+    <article class="work-item" data-cat="mv">
+      <div class="work-link work-link--native" tabindex="0" aria-label="KEYVITUP BEST ONE Performance Video 미리보기. 마우스를 올리면 재생됩니다.">
+        <div class="work-media">
+          <img class="work-poster" src="assets/keyvitup-best-one.jpg" alt="" aria-hidden="true" loading="lazy">
+          <video class="work-preview" muted playsinline preload="metadata" aria-hidden="true">
+            <source src="assets/keyvitup-best-one-preview.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="work-meta">
+          <h3>KEYVITUP ‘BEST ONE’ Performance Video</h3>
+          <p class="work-tags">M/V · Performance Video</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="work-item" data-cat="mv">
+      <div class="work-link work-link--native" tabindex="0" aria-label="HUI Fan Concert VCR 미리보기. 마우스를 올리면 재생됩니다.">
+        <div class="work-media">
+          <img class="work-poster" src="assets/hui-fan-concert-vcr.jpg" alt="" aria-hidden="true" loading="lazy">
+          <video class="work-preview" muted playsinline preload="metadata" aria-hidden="true">
+            <source src="assets/hui-fan-concert-vcr-preview.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="work-meta">
+          <h3>HUI Fan Concert VCR</h3>
+          <p class="work-tags">M/V · Fan Concert VCR</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="work-item" data-cat="mv">
+      <div class="work-link work-link--native" tabindex="0" aria-label="임현식 나의 대답 뮤직비디오 미리보기. 마우스를 올리면 재생됩니다.">
+        <div class="work-media">
+          <img class="work-poster" src="assets/limhyunsik-the-answer.jpg" alt="" aria-hidden="true" loading="lazy">
+          <video class="work-preview" muted playsinline preload="metadata" aria-hidden="true">
+            <source src="assets/limhyunsik-the-answer-preview.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="work-meta">
+          <h3>임현식 (LIMHYUNSIK) ‘나의 대답 (The Answer)’ MV</h3>
+          <p class="work-tags">M/V · Music Video</p>
+        </div>
+      </div>
+    </article>
 
     <article class="work-item" data-cat="film">
-      <a class="work-link" href="#" target="_blank" rel="noopener">
-        <div class="work-media" data-placeholder="Project 01"></div>
-        <div class="work-meta">
-          <h3>프로젝트 타이틀</h3>
-          <p class="work-tags">Film · Direction<span class="work-year">2026</span></p>
+      <div class="work-link work-link--native" tabindex="0" aria-label="ART FILM BORDERLESS 미리보기. 마우스를 올리면 재생됩니다.">
+        <div class="work-media">
+          <img class="work-poster" src="assets/borderless.jpg" alt="" aria-hidden="true" loading="lazy">
+          <video class="work-preview" muted playsinline preload="metadata" aria-hidden="true">
+            <source src="assets/borderless-preview.mp4" type="video/mp4">
+          </video>
         </div>
-      </a>
-    </article>
-
-    <article class="work-item" data-cat="branding">
-      <a class="work-link" href="#" target="_blank" rel="noopener">
-        <div class="work-media" data-placeholder="Project 02"></div>
         <div class="work-meta">
-          <h3>프로젝트 타이틀</h3>
-          <p class="work-tags">Branding · Content<span class="work-year">2026</span></p>
+          <h3>ART FILM ‘BORDERLESS’</h3>
+          <p class="work-tags">FILM · Director / Editor</p>
         </div>
-      </a>
-    </article>
-
-    <article class="work-item" data-cat="film exhibition">
-      <a class="work-link" href="#" target="_blank" rel="noopener">
-        <div class="work-media" data-placeholder="Project 03"></div>
-        <div class="work-meta">
-          <h3>프로젝트 타이틀</h3>
-          <p class="work-tags">Exhibition · Set<span class="work-year">2026</span></p>
-        </div>
-      </a>
+      </div>
     </article>
 
     <p class="work-empty" hidden>해당 분류의 작업이 아직 없습니다.</p>
   </section>
 
+  <!-- ── CONTACT ──────────────────────────────────────── -->
+  <section class="contact-section" id="contact">
+    <p class="section-idx">03 — Contact</p>
+    <div class="contact-heading">
+      <h2 class="contact-title" data-split="chars">CONTACT</h2>
+      <p>새로운 프로젝트와 협업에 대해 들려주세요.</p>
+    </div>
+
+    <form id="mainInquiryForm" class="contact-form" novalidate>
+      <input type="hidden" name="_subject" value="[iddot 문의] 새 프로젝트">
+      <div class="contact-form__grid">
+        <label>
+          <span>이름 / 회사<i>*</i></span>
+          <input type="text" name="name" required autocomplete="organization" placeholder="예: 홍길동 / OO브랜드">
+        </label>
+        <label>
+          <span>연락처<i>*</i></span>
+          <input type="text" name="contact" required placeholder="이메일 또는 전화번호">
+        </label>
+        <label>
+          <span>프로젝트 유형</span>
+          <select name="type">
+            <option value="">선택해주세요</option>
+            <option>시네마틱 필름</option>
+            <option>뮤직비디오</option>
+            <option>브랜드 콘텐츠</option>
+            <option>유튜브 · 디지털</option>
+            <option>전시 · 미술 세트</option>
+            <option>브랜딩 · 비주얼 디렉팅</option>
+            <option>기타</option>
+          </select>
+        </label>
+        <label>
+          <span>예상 일정</span>
+          <input type="text" name="schedule" placeholder="예: 3월 중 촬영">
+        </label>
+      </div>
+      <label class="contact-form__message">
+        <span>내용<i>*</i></span>
+        <textarea name="message" rows="7" required placeholder="구상하신 작업을 편하게 적어주세요."></textarea>
+      </label>
+      <div class="contact-form__bottom">
+        <p id="mainInquiryStatus" class="contact-form__status" aria-live="polite"></p>
+        <button class="spec-btn" type="submit" id="mainInquirySubmit">
+          <span class="spec-btn__fx" aria-hidden="true"></span>
+          <span class="spec-btn__label">보내기</span>
+        </button>
+      </div>
+    </form>
+  </section>
+
   <!-- ── TEAM ─────────────────────────────────────────── -->
   <section class="team" id="team">
-    <p class="section-idx">03 — Team</p>
-    <h2 class="display" data-split="chars">사람이 만듭니다</h2>
+    <p class="section-idx">04 — Team</p>
 
     <div class="team-grid">
       <div class="pc-wrap" data-tilt>
@@ -156,14 +230,6 @@
           </div>
         </div>
       </div>
-
-      <!-- 팀원 추가: .pc-wrap 블록을 복사해서 늘리면 됩니다 -->
-      <div class="pc-wrap pc-wrap--empty">
-        <div class="pc-glow" aria-hidden="true"></div>
-        <div class="pc-card pc-card--empty">
-          <p>Coming soon</p>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -174,12 +240,18 @@
   <p class="corner-contact__title">Contact us!</p>
   <a href="mailto:ceo@iddot.space">ceo@iddot.space</a>
   <a href="tel:+821040223465">+82 10 4022 3465</a>
-  <p class="corner-contact__addr">서울 성동구 아차산로 104 스탈릿 성수</p>
 </div>
 
-<footer class="footer">
-  <span>© 2026 iddot</span>
-  <span>Creative Group</span>
+<footer class="site-footer">
+  <div class="site-footer__logo" aria-label="iddot">
+    <img src="assets/logo-original.png" alt="iddot">
+  </div>
+  <div class="site-footer__info">
+    <p>Every identity starts as a dot.</p>
+    <p>Copyright ⓒ 2026 iddot. 브이나인틴필름</p>
+    <p>대표 임승민&nbsp;&nbsp;사업자 등록번호 141-16-01636</p>
+    <p>서울 성동구 아차산로 104 스탈릿 성수, 8층 813-4호</p>
+  </div>
 </footer>
 
 <script src="symbol.js"></script>

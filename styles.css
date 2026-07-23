@@ -80,6 +80,12 @@ a{color:inherit;text-decoration:none;}
   /* 캔버스와 영상은 같은 프레임을 보여주므로 크로스페이드 없이 즉시 맞바꾼다.
      (페이드를 주면 두 레이어가 겹치며 밝기가 튀어 깜빡임으로 보임) */
 }
+#symbolFallback{
+  position:absolute;inset:0;z-index:0;
+  width:100%;height:100%;object-fit:contain;
+  pointer-events:none;
+}
+#symbol{z-index:1;}
 #symbol.off{opacity:0;pointer-events:none;}
 #symbol:focus-visible{filter:drop-shadow(0 0 14px rgba(255,255,255,.35));}
 
@@ -95,7 +101,7 @@ a{color:inherit;text-decoration:none;}
 #bloom.on,#fold.on{opacity:1;}
 
 .symbol-hint{
-  position:absolute;bottom:-26px;left:50%;transform:translateX(-50%);
+  position:absolute;top:calc(50% + 34px);bottom:auto;left:50%;transform:translateX(-50%);
   font-size:10px;letter-spacing:.34em;
   color:var(--mute);
   pointer-events:none;
@@ -407,7 +413,7 @@ a{color:inherit;text-decoration:none;}
 .js [data-split] .sp{
   display:inline-block;
   opacity:0;
-  transform:translateY(.75em) scaleY(1.25) scaleX(.94);
+  transform:translateY(.75em);
   transform-origin:50% 0%;
   transition:opacity .62s cubic-bezier(.22,.68,.24,1),
              transform .72s cubic-bezier(.22,.68,.24,1);
@@ -534,6 +540,54 @@ a{color:inherit;text-decoration:none;}
   font-size:11px;letter-spacing:.16em;color:var(--mute);
 }
 
+/* ── CONTACT / FOOTER REBUILD ─────────── */
+.nav-mark{width:132px;height:22px;overflow:hidden;position:relative;}
+.nav-mark img{position:absolute;width:312px;max-width:none;height:auto;left:-93px;top:-88px;}
+.wordplay{margin:0 0 clamp(24px,3.4vw,42px);font-family:inherit;font-size:clamp(28px,4.2vw,58px);font-weight:900;letter-spacing:-.055em;line-height:1;}
+.statement-body{max-width:70ch;gap:clamp(18px,2vw,28px);}
+.statement-body p{color:var(--fg);font-size:clamp(15px,1.5vw,19px);line-height:1.78;}
+.statement-body strong{font-weight:800;}
+.statement-en{color:#8f8b84!important;font-weight:300;}
+.work-link--video{appearance:none;border:0;background:none;color:inherit;cursor:pointer;font-family:inherit;text-align:left;width:100%;}
+.work-link--native{cursor:pointer;outline:0;}
+.work-link--native:focus-visible{outline:1px solid var(--fg);outline-offset:5px;}
+.work-link--native:hover .work-media video,
+.work-link--native:hover .work-media .work-poster{transform:none;}
+.work-media{position:relative;}
+.work-poster{position:absolute;inset:0;z-index:2;transition:opacity .3s ease,visibility .3s ease!important;}
+.work-link--native.is-playing .work-poster{opacity:0;visibility:hidden;}
+.work-play{position:absolute;left:20px;bottom:18px;z-index:2;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#fff;opacity:0;transform:translateY(7px);transition:.28s ease;}
+.work-media::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(to top,rgba(0,0,0,.48),transparent 45%);opacity:0;transition:opacity .28s ease;}
+.work-link--video:hover .work-media::before,.work-link--video:focus-visible .work-media::before{opacity:1;}
+.work-link--video:hover .work-play,.work-link--video:focus-visible .work-play{opacity:1;transform:none;}
+.contact-section{max-width:var(--max);margin:0 auto;padding:clamp(90px,14vw,190px) var(--pad);border-top:1px solid var(--line);}
+.contact-heading{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(220px,.7fr);gap:30px;align-items:end;}
+.contact-title{margin:0;font-size:clamp(54px,12vw,190px);line-height:.82;letter-spacing:-.075em;font-weight:900;}
+.contact-heading p{margin:0 0 8px;max-width:22ch;color:#c9c7c3;font-size:clamp(14px,1.4vw,18px);}
+.contact-form{margin-top:clamp(76px,10vw,150px);}
+.contact-form__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 clamp(28px,5vw,88px);}
+.contact-form label{display:flex;flex-direction:column;padding:18px 0 24px;border-top:1px solid var(--line);}
+.contact-form label span{font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:800;color:var(--fg);}
+.contact-form label span i{font-style:normal;color:#c98b52;margin-left:4px;}
+.contact-form input,.contact-form select,.contact-form textarea{appearance:none;width:100%;border:0;outline:0;background:transparent;color:var(--fg);border-bottom:1px solid #4a4a4d;border-radius:0;padding:15px 0 10px;font:300 clamp(16px,1.5vw,20px)/1.5 inherit;transition:border-color .2s ease;}
+.contact-form select{color:#c9c7c3;cursor:pointer;}
+.contact-form option{color:#111;}
+.contact-form textarea{resize:vertical;min-height:160px;}
+.contact-form input:focus,.contact-form select:focus,.contact-form textarea:focus{border-color:var(--fg);}
+.contact-form input::placeholder,.contact-form textarea::placeholder{color:#66635e;}
+.contact-form__message{margin-top:clamp(34px,5vw,70px);}
+.contact-form__bottom{display:flex;justify-content:space-between;align-items:center;gap:24px;margin-top:32px;}
+.contact-form__status{margin:0;color:#c9c7c3;font-size:14px;}
+.contact-form__status.is-error{color:#d98a6a;}
+.team{padding-bottom:clamp(90px,13vw,170px);}
+.team-grid{margin-top:0;}
+.corner-contact__addr{display:none;}
+.site-footer{border-top:1px solid var(--line);padding:var(--pad);}
+.site-footer__logo{height:clamp(180px,34vw,510px);overflow:hidden;background:var(--bg);}
+.site-footer__logo img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;filter:contrast(500%) brightness(75%);mix-blend-mode:screen;}
+.site-footer__info{display:grid;grid-template-columns:2fr 1fr 1fr 1.4fr;gap:18px;padding-top:24px;color:#aaa7a1;font-size:11px;line-height:1.6;letter-spacing:.03em;}
+.site-footer__info p{margin:0;}
+.site-footer__info p:first-child{color:var(--fg);font-weight:800;}
 /* ── REVEAL ──────────────────────────────
    JS 가 살아있을 때만 숨긴다. 스크립트가 실패해도 내용은 항상 보이도록. */
 .js .reveal{opacity:0;transform:translateY(22px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.7,.2,1);}
@@ -546,7 +600,8 @@ a{color:inherit;text-decoration:none;}
 
 @media (max-width:640px){
   .nav{padding:16px 18px;}
-  .nav-mark img{height:16px;}
+  .nav-mark{width:94px;height:16px;}
+  .nav-mark img{width:222px;left:-66px;top:-63px;max-width:none;height:auto;}
   .nav-menu{gap:12px;}
   .nav-menu a{font-size:10.5px;letter-spacing:.04em;}
   .work-meta{flex-direction:column;gap:8px;}
@@ -562,4 +617,11 @@ a{color:inherit;text-decoration:none;}
     text-align:center;
     font-size:11px;
   }
+  .contact-heading,.contact-form__grid{grid-template-columns:1fr;}
+  .contact-heading{gap:24px;}
+  .contact-title{font-size:clamp(56px,18vw,84px);}
+  .contact-form{margin-top:58px;}
+  .contact-form__bottom{align-items:flex-start;flex-direction:column-reverse;}
+  .site-footer__logo{height:180px;}
+  .site-footer__info{grid-template-columns:1fr;gap:7px;font-size:10.5px;}
 }

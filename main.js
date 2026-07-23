@@ -129,6 +129,43 @@
   });
 
   /* ────────────────────────────────────────────
+     4. WORK PREVIEW — 호버 시 무음 자동재생
+     ──────────────────────────────────────────── */
+  Array.prototype.slice.call(document.querySelectorAll('.work-link--native')).forEach(function (card) {
+    var video = card.querySelector('.work-preview');
+    if (!video) return;
+    var previewToken = 0;
+    video.muted = true;
+    video.playsInline = true;
+
+    function playPreview() {
+      var token = ++previewToken;
+      var playback = video.play();
+      if (playback && typeof playback.then === 'function') {
+        playback.then(function () {
+          if (token === previewToken) card.classList.add('is-playing');
+        }).catch(function () {
+          if (token === previewToken) card.classList.remove('is-playing');
+        });
+      } else {
+        card.classList.add('is-playing');
+      }
+    }
+
+    function stopPreview() {
+      previewToken++;
+      video.pause();
+      try { video.currentTime = 0; } catch (e) { /* metadata 로드 전에는 건너뜀 */ }
+      card.classList.remove('is-playing');
+    }
+
+    card.addEventListener('pointerenter', playPreview);
+    card.addEventListener('pointerleave', stopPreview);
+    card.addEventListener('focusin', playPreview);
+    card.addEventListener('focusout', stopPreview);
+  });
+
+  /* ────────────────────────────────────────────
      4b. TEAM PROFILE CARD — 커서 틸트 + 글로우
      ──────────────────────────────────────────── */
   var pcWraps = Array.prototype.slice.call(document.querySelectorAll('.pc-wrap[data-tilt]'));
@@ -173,5 +210,49 @@
       btn.style.setProperty('--my', (e.clientY - r.top) + 'px');
     });
   }, { passive: true });
+
+  /* ────────────────────────────────────────────
+     5. MAIN CONTACT — Formspree 제출
+     ──────────────────────────────────────────── */
+  var inquiry = document.getElementById('mainInquiryForm');
+  var inquirySubmit = document.getElementById('mainInquirySubmit');
+  var inquiryStatus = document.getElementById('mainInquiryStatus');
+  if (inquiry && inquirySubmit) {
+    inquiry.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!inquiry.checkValidity()) {
+        inquiry.reportValidity();
+        return;
+      }
+
+      var label = inquirySubmit.querySelector('.spec-btn__label');
+      inquirySubmit.disabled = true;
+      if (label) label.textContent = '보내는 중...';
+      if (inquiryStatus) {
+        inquiryStatus.textContent = '';
+        inquiryStatus.classList.remove('is-error');
+      }
+
+      fetch('https://formspree.io/f/xlgqpjez', {
+        method: 'POST',
+        body: new FormData(inquiry),
+        headers: { Accept: 'application/json' }
+      })
+        .then(function (response) {
+          if (!response.ok) throw new Error('Formspree submission failed');
+          inquiry.reset();
+          if (inquiryStatus) inquiryStatus.textContent = '문의가 정상적으로 접수되었습니다. 빠르게 답 드리겠습니다.';
+          if (label) label.textContent = '보냈습니다';
+        })
+        .catch(function () {
+          inquirySubmit.disabled = false;
+          if (label) label.textContent = '다시 보내기';
+          if (inquiryStatus) {
+            inquiryStatus.textContent = '전송에 실패했습니다. 잠시 후 다시 시도해주세요.';
+            inquiryStatus.classList.add('is-error');
+          }
+        });
+    });
+  }
 
 })();

@@ -27,10 +27,10 @@
 
       gsap.fromTo(
         chars,
-        { opacity: 0, yPercent: 120, scaleY: 2.3, scaleX: 0.7, transformOrigin: '50% 0%' },
+        { opacity: 0, yPercent: 100 },
         {
-          opacity: 1, yPercent: 0, scaleY: 1, scaleX: 1,
-          duration: 1, ease: 'back.inOut(2)', stagger: 0.03,
+          opacity: 1, yPercent: 0,
+          duration: .8, ease: 'power3.out', stagger: 0.03,
           scrollTrigger: {
             trigger: el,
             start: 'center bottom+=50%',

@@ -85,30 +85,32 @@
     if (!validateStep(total)) return;
 
     var d = new FormData(form);
-    var name    = (d.get('name') || '').toString().trim();
-    var contact = (d.get('contact') || '').toString().trim();
-    var message = (d.get('message') || '').toString().trim();
+    var name = (d.get('name') || '').toString().trim();
+    var submitLabel = submitBtn.querySelector('.spec-btn__label');
 
-    var body = [
-      '이름 / 회사 : ' + name,
-      '연락처     : ' + contact,
-      '프로젝트 유형 : ' + ((d.get('type') || '').toString().trim() || '-'),
-      '예상 일정  : ' + ((d.get('schedule') || '').toString().trim() || '-'),
-      '예산 규모  : ' + ((d.get('budget') || '').toString().trim() || '-'),
-      '',
-      '── 내용 ──',
-      message,
-      '',
-      '— www.iddot.space 문의 폼'
-    ].join('\n');
+    submitBtn.disabled = true;
+    if (submitLabel) submitLabel.textContent = '보내는 중...';
+    if (errEl) errEl.hidden = true;
 
-    window.location.href = 'mailto:ceo@iddot.space'
-      + '?subject=' + encodeURIComponent('[iddot 문의] ' + name)
-      + '&body=' + encodeURIComponent(body);
-
-    form.hidden = true;
-    root.querySelector('.stepper-dots').hidden = true;
-    if (doneEl) doneEl.hidden = false;
+    fetch('https://formspree.io/f/xlgqpjez', {
+      method: 'POST',
+      body: d,
+      headers: { Accept: 'application/json' }
+    })
+      .then(function (response) {
+        if (!response.ok) throw new Error('Formspree submission failed');
+        form.hidden = true;
+        root.querySelector('.stepper-dots').hidden = true;
+        if (doneEl) doneEl.hidden = false;
+      })
+      .catch(function () {
+        submitBtn.disabled = false;
+        if (submitLabel) submitLabel.textContent = '다시 보내기';
+        if (errEl) {
+          errEl.textContent = '전송에 실패했습니다. 잠시 후 다시 시도해주세요.';
+          errEl.hidden = false;
+        }
+      });
   });
 
   showStep(1);
