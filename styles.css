@@ -564,9 +564,9 @@ a{color:inherit;text-decoration:none;}
 .work-link--video:hover .work-media::before,.work-link--video:focus-visible .work-media::before{opacity:1;}
 .work-link--video:hover .work-play,.work-link--video:focus-visible .work-play{opacity:1;transform:none;}
 .contact-section{max-width:var(--max);margin:0 auto;padding:clamp(90px,14vw,190px) var(--pad);border-top:1px solid var(--line);}
-.contact-heading{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(220px,.7fr);gap:30px;align-items:end;}
+.contact-heading{position:relative;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(220px,.7fr);gap:30px;align-items:end;}
 .contact-title{margin:0;font-size:clamp(54px,12vw,190px);line-height:.82;letter-spacing:-.075em;font-weight:900;}
-.contact-heading p{margin:0 0 8px;max-width:none;white-space:nowrap;color:#c9c7c3;font-size:clamp(14px,1.4vw,18px);}
+.contact-heading p{position:absolute;right:0;bottom:8px;margin:0;max-width:none;white-space:nowrap;color:#c9c7c3;font-size:clamp(14px,1.4vw,18px);}
 .contact-form{margin-top:clamp(76px,10vw,150px);}
 .contact-form__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 clamp(28px,5vw,88px);}
 .contact-form label{display:flex;flex-direction:column;padding:18px 0 24px;border-top:1px solid var(--line);}
@@ -627,6 +627,7 @@ a{color:inherit;text-decoration:none;}
   /* 문의 폼 입력칸을 가리지 않도록 모바일에서는 고정 연락처를 숨긴다. */
   .corner-contact{display:none;}
   .contact-heading{display:block;}
+  .contact-heading p{position:static;}
   .contact-heading > p{margin:0;max-width:24ch;white-space:normal;}
   .contact-form__grid{grid-template-columns:1fr;}
   .contact-title{margin:0 0 28px;font-size:clamp(52px,15vw,68px);line-height:1;letter-spacing:-.065em;}
