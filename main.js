@@ -208,16 +208,14 @@
     card.addEventListener('focusout', stopPreview);
   });
 
-  // Make YouTube destinations reliable even when a browser starts the click
-  // on the nested video element or blocks the target=_blank navigation.
+  // Make YouTube destinations reliable without opening a second window.
   Array.prototype.slice.call(document.querySelectorAll('.work-link[data-youtube="true"]')).forEach(function (card) {
     card.addEventListener('click', function (e) {
       if (e.defaultPrevented) return;
       var href = card.getAttribute('href');
       if (!href) return;
       e.preventDefault();
-      var opened = window.open(href, '_blank', 'noopener,noreferrer');
-      if (!opened) window.location.assign(href);
+      window.location.assign(href);
     });
   });
 
