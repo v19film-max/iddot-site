@@ -57,9 +57,9 @@
   /* ────────────────────────────────────────────
      2. REVEAL — 블록 단위 페이드업
      ──────────────────────────────────────────── */
-  // 블록형 등장 효과는 포트폴리오에만 적용한다. 나머지 일반 콘텐츠는
-  // 첫 화면부터 표시해 늦게 튀어나오거나 스크롤 복귀 때 깜빡이지 않게 한다.
-  var BLOCK_SEL = '.work .section-idx, .work .work-filter, .work .work-item';
+  // 설명문·Contact·Team도 기존처럼 블록 등장 효과를 유지한다.
+  var BLOCK_SEL = '.statement .display, .statement-body p, .work-filter, .work-item, ' +
+                  '.team-grid, .section-idx';
   var blocks = Array.prototype.slice.call(document.querySelectorAll(BLOCK_SEL));
 
   // statement-closing 은 split 으로 따로 다루므로 블록 리스트에서 제외
@@ -84,6 +84,10 @@
     entries.forEach(function (e) {
       if (e.isIntersecting) {
         show(e.target);
+      } else if (!e.target.closest('.work') && !e.target.closest('.hero')) {
+        // 포트폴리오만 재진입 시 이미 보이는 상태를 유지하고,
+        // 나머지 섹션은 다시 들어올 때 기존 등장 효과를 재생한다.
+        e.target.classList.remove('in');
       }
     });
   }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });

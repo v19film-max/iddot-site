@@ -273,8 +273,11 @@
 
   /* ── 렌더 루프 ── */
   var lastFrame = 0;
+  var symbolVisible = true;
+  var frameId = null;
   function frame(now) {
-    requestAnimationFrame(frame);
+    if (!symbolVisible) { frameId = null; return; }
+    frameId = requestAnimationFrame(frame);
     if (now - lastFrame < 32) return;
     lastFrame = now;
 
@@ -287,5 +290,12 @@
 
     draw();
   }
-  requestAnimationFrame(frame);
+  if ('IntersectionObserver' in window) {
+    var symbolObserver = new IntersectionObserver(function (entries) {
+      symbolVisible = entries[0].isIntersecting;
+      if (symbolVisible && !frameId) frameId = requestAnimationFrame(frame);
+    }, { threshold: 0.01 });
+    symbolObserver.observe(canvas);
+  }
+  frameId = requestAnimationFrame(frame);
 })();
