@@ -456,6 +456,7 @@ a{color:inherit;text-decoration:none;}
 .page-blur span:nth-child(4){-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);}
 .page-blur span:nth-child(5){-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);}
 .page-blur.is-bottom{opacity:0;}
+.page-blur.is-footer{visibility:hidden;}
 
 /* ── SPECULAR BUTTON ─────────────────── */
 .contact-cta{
@@ -597,8 +598,8 @@ a{color:inherit;text-decoration:none;}
 .work-link--video:hover .work-media::before,.work-link--video:focus-visible .work-media::before{opacity:1;}
 .work-link--video:hover .work-play,.work-link--video:focus-visible .work-play{opacity:1;transform:none;}
 .work-link--youtube .work-media::before{background:rgba(0,0,0,.48);}
-.work-link--youtube .work-play{left:50%;top:50%;bottom:auto;font-size:clamp(15px,1.65vw,22px);font-weight:900;letter-spacing:.01em;text-transform:uppercase;white-space:nowrap;transform:translate(-50%,-50%);}
-.work-link--youtube:hover .work-play,.work-link--youtube:focus-visible .work-play{transform:translate(-50%,-50%);}
+.work-link--youtube .work-play{inset:0;display:grid;place-items:center;font-size:clamp(15px,1.65vw,22px);font-weight:900;letter-spacing:.01em;text-transform:uppercase;white-space:nowrap;transform:none;}
+.work-link--youtube:hover .work-play,.work-link--youtube:focus-visible .work-play{transform:none;}
 .contact-section{max-width:var(--max);margin:0 auto;padding:clamp(90px,14vw,190px) var(--pad);border-top:1px solid var(--line);}
 .contact-heading{display:flex;align-items:flex-end;gap:clamp(18px,2vw,36px);}
 .contact-title{margin:0;font-size:clamp(54px,12vw,190px);line-height:.82;letter-spacing:-.075em;font-weight:900;}

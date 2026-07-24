@@ -113,14 +113,21 @@
      2b. PAGE EDGE BLUR — 하단에서 자연스럽게 사라짐
      ──────────────────────────────────────────── */
   var pageBlur = document.querySelector('.page-blur');
+  var siteFooter = document.querySelector('.site-footer');
   function updatePageBlur() {
     if (!pageBlur) return;
-    var maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-    var progress = maxScroll ? window.scrollY / maxScroll : 1;
-    // 푸터가 들어오기 시작하는 구간부터 투명하게 풀어 하단 정보가 선명하게 보이게 한다.
-    var fade = 1 - Math.max(0, Math.min(1, (progress - 0.68) / 0.22));
+    var fade = 1;
+    var footerTop = Infinity;
+    if (siteFooter) {
+      footerTop = siteFooter.getBoundingClientRect().top;
+      // 실제 푸터 로고가 화면 아래에서 올라오는 순간부터 서서히 풀린다.
+      var fadeStart = window.innerHeight * 0.92;
+      var fadeEnd = window.innerHeight * 0.15;
+      fade = Math.max(0, Math.min(1, (footerTop - fadeEnd) / (fadeStart - fadeEnd)));
+    }
     pageBlur.style.setProperty('--page-blur-opacity', fade.toFixed(3));
-    pageBlur.classList.toggle('is-bottom', progress > 0.92);
+    pageBlur.classList.toggle('is-bottom', fade <= 0.001);
+    pageBlur.classList.toggle('is-footer', footerTop <= window.innerHeight * 0.15);
   }
   window.addEventListener('scroll', updatePageBlur, { passive: true });
   window.addEventListener('resize', updatePageBlur);
