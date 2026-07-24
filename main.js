@@ -57,8 +57,9 @@
   /* ────────────────────────────────────────────
      2. REVEAL — 블록 단위 페이드업
      ──────────────────────────────────────────── */
-  var BLOCK_SEL = '.statement .display, .statement-body p, .work-filter, .work-item, ' +
-                  '.team-grid, .section-idx';
+  // 블록형 등장 효과는 포트폴리오에만 적용한다. 나머지 일반 콘텐츠는
+  // 첫 화면부터 표시해 늦게 튀어나오거나 스크롤 복귀 때 깜빡이지 않게 한다.
+  var BLOCK_SEL = '.work .section-idx, .work .work-filter, .work .work-item';
   var blocks = Array.prototype.slice.call(document.querySelectorAll(BLOCK_SEL));
 
   // statement-closing 은 split 으로 따로 다루므로 블록 리스트에서 제외
@@ -112,8 +113,8 @@
   window.addEventListener('load', sweep);
   setTimeout(sweep, 600);
 
-  /* 안전망 2: 5초 뒤에는 무조건 전부 표시 */
-  setTimeout(showAll, 5000);
+  /* 안전망 2: 지연 로딩이나 느린 기기에서도 현재 화면만 보정한다. */
+  setTimeout(sweep, 1800);
 
   /* ────────────────────────────────────────────
      2b. PAGE EDGE BLUR — 하단에서 자연스럽게 사라짐
@@ -132,7 +133,6 @@
       fade = Math.max(0, Math.min(1, (footerTop - fadeEnd) / (fadeStart - fadeEnd)));
     }
     pageBlur.style.setProperty('--page-blur-opacity', fade.toFixed(3));
-    pageBlur.classList.toggle('is-bottom', fade <= 0.001);
   }
   window.addEventListener('scroll', updatePageBlur, { passive: true });
   window.addEventListener('resize', updatePageBlur);
