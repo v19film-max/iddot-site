@@ -5,6 +5,13 @@
 (function () {
   'use strict';
 
+  // 새로고침은 항상 첫 화면에서 시작하도록 브라우저의 스크롤 복원을 끈다.
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  var navigationEntry = window.performance && performance.getEntriesByType
+    ? performance.getEntriesByType('navigation')[0] : null;
+  var isReload = navigationEntry && navigationEntry.type === 'reload';
+  if (isReload) window.scrollTo(0, 0);
+
   /* ────────────────────────────────────────────
      1. SPLIT TEXT — 글자/단어 단위로 쪼개 스태거 등장
         (React Bits 의 SplitText / ScrollFloat 를 바닐라로)
@@ -60,7 +67,6 @@
   var watched = blocks.concat(splitEls);
 
   function show(el) { el.classList.add('in'); }
-  function hide(el) { el.classList.remove('in'); }
   function showAll() { watched.forEach(show); }
 
   if (window.matchMedia && window.matchMedia('print').matches) { showAll(); return; }
@@ -77,9 +83,6 @@
     entries.forEach(function (e) {
       if (e.isIntersecting) {
         show(e.target);
-      } else if (!e.target.closest('.hero')) {
-        // 화면을 벗어나면 상태를 되돌려 다시 들어올 때 등장 효과를 재생한다.
-        hide(e.target);
       }
     });
   }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
@@ -92,6 +95,9 @@
   // 브라우저가 bfcache에서 페이지를 복원할 때도 분할 문자가 다시 숨지 않게 한다.
   window.addEventListener('pageshow', function (event) {
     if (event.persisted) showAll();
+  });
+  window.addEventListener('load', function () {
+    if (isReload) window.scrollTo(0, 0);
   });
 
   /* 안전망 1: 뷰포트 안인데 아직 안 드러난 요소는 즉시 표시 */
@@ -127,7 +133,6 @@
     }
     pageBlur.style.setProperty('--page-blur-opacity', fade.toFixed(3));
     pageBlur.classList.toggle('is-bottom', fade <= 0.001);
-    pageBlur.classList.toggle('is-footer', footerTop <= window.innerHeight * 0.15);
   }
   window.addEventListener('scroll', updatePageBlur, { passive: true });
   window.addEventListener('resize', updatePageBlur);

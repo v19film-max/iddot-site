@@ -272,8 +272,11 @@
   }
 
   /* ── 렌더 루프 ── */
-  function frame() {
+  var lastFrame = 0;
+  function frame(now) {
     requestAnimationFrame(frame);
+    if (now - lastFrame < 32) return;
+    lastFrame = now;
 
     if (state === 'playing' && playingEl && playingEl.readyState >= 2) upload(playingEl);
 

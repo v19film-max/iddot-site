@@ -90,7 +90,7 @@
     .then(function (ogl) {
       var Renderer = ogl.Renderer, Program = ogl.Program, Mesh = ogl.Mesh, Triangle = ogl.Triangle;
 
-      var renderer = new Renderer({ alpha: true, dpr: Math.min(window.devicePixelRatio || 1, 1.75) });
+      var renderer = new Renderer({ alpha: true, dpr: Math.min(window.devicePixelRatio || 1, 1.25) });
       var gl = renderer.gl;
       gl.canvas.style.cssText = 'width:100%;height:100%;display:block;';
       mount.appendChild(gl.canvas);
@@ -123,8 +123,11 @@
       resize();
 
       var raf;
+      var lastFrame = 0;
       function loop(t) {
         raf = requestAnimationFrame(loop);
+        if (t - lastFrame < 32) return;
+        lastFrame = t;
         uniforms.iTime.value = t * 0.001;
         renderer.render({ scene: mesh });
       }

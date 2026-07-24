@@ -76,8 +76,8 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     document.body.appendChild(buildGradualBlur({
-      position: 'top', height: '10rem', strength: 3.4,
-      divCount: 10, curve: 'bezier', exponential: true, opacity: 0.96, zIndex: 49
+      position: 'top', height: '10rem', strength: 2.2,
+      divCount: 6, curve: 'bezier', exponential: false, opacity: 0.78, zIndex: 49
     }));
   });
 })();
