@@ -154,7 +154,9 @@
     var shown = 0;
     items.forEach(function (it) {
       var cats = (it.getAttribute('data-cat') || '').split(/\s+/);
-      var match = (cat === 'all') || cats.indexOf(cat) !== -1;
+      var match = (cat === 'all')
+        ? !it.classList.contains('digital-only')
+        : cats.indexOf(cat) !== -1;
       it.hidden = !match;
       if (match) { shown++; show(it); }   // 필터로 다시 나타날 때 숨은 채 남지 않도록
     });
