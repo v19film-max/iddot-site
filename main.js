@@ -80,10 +80,13 @@
 
   watched.forEach(function (el) { io.observe(el); });
 
-  // 히어로 카피는 스크롤 전에 보이는 자리이므로 로드 직후 등장
-  setTimeout(function () {
-    document.querySelectorAll('.hero [data-split]').forEach(show);
-  }, 260);
+  // 히어로 카피는 첫 페인트부터 존재해야 스크롤 복귀 때 한 글자씩 깜빡이지 않는다.
+  document.querySelectorAll('.hero [data-split]').forEach(show);
+
+  // 브라우저가 bfcache에서 페이지를 복원할 때도 분할 문자가 다시 숨지 않게 한다.
+  window.addEventListener('pageshow', function (event) {
+    if (event.persisted) showAll();
+  });
 
   /* 안전망 1: 뷰포트 안인데 아직 안 드러난 요소는 즉시 표시 */
   function sweep() {
