@@ -172,6 +172,7 @@
       applyFilter(b.getAttribute('data-filter') || 'all');
     });
   });
+  applyFilter('all');
 
   /* ────────────────────────────────────────────
      4. WORK PREVIEW — 호버 시 무음 자동재생
