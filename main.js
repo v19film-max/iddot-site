@@ -244,9 +244,7 @@
       if (angle < 0) angle += 360;
       wrap.style.setProperty('--rx', ((0.5 - y) * 10).toFixed(2) + 'deg');
       wrap.style.setProperty('--ry', ((x - 0.5) * 14).toFixed(2) + 'deg');
-      card.style.setProperty('--spot-x', px.toFixed(1) + 'px');
-      card.style.setProperty('--spot-y', py.toFixed(1) + 'px');
-      card.style.setProperty('--edge-glow-opacity', Math.max(0, Math.min(1, (edge - 30) / 70)).toFixed(3));
+      card.style.setProperty('--edge-proximity', edge.toFixed(3));
       card.style.setProperty('--cursor-angle', angle.toFixed(2) + 'deg');
     }
     function onMove(e) {
@@ -258,7 +256,8 @@
       pendingEvent = null;
       wrap.style.setProperty('--rx', '0deg');
       wrap.style.setProperty('--ry', '0deg');
-      card.style.setProperty('--edge-glow-opacity', '0');
+      card.style.setProperty('--edge-proximity', '0');
+      card.style.setProperty('--cursor-angle', '45deg');
     }
     wrap.addEventListener('pointerenter', refreshRect);
     wrap.addEventListener('pointermove', onMove, { passive:true });
