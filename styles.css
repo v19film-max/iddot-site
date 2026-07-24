@@ -363,7 +363,7 @@ a{color:inherit;text-decoration:none;}
   overflow:hidden;border-radius:inherit;
 }
 .border-glow-card::before{
-  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;
+  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:0;
   border:1px solid transparent;
   background:
     linear-gradient(var(--card-bg) 0 100%) padding-box,
