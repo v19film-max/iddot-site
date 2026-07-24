@@ -58,7 +58,7 @@
      2. REVEAL — 블록 단위 페이드업
      ──────────────────────────────────────────── */
   // 설명문·Contact·Team도 기존처럼 블록 등장 효과를 유지한다.
-  var BLOCK_SEL = '.statement .display, .statement-body p, .work-filter, .work-item, ' +
+  var BLOCK_SEL = '.statement .display, .statement .wordplay, .statement-body p, .work-filter, .work-item, ' +
                   '.team-grid, .section-idx';
   var blocks = Array.prototype.slice.call(document.querySelectorAll(BLOCK_SEL));
 
@@ -173,6 +173,31 @@
     });
   });
   applyFilter('all');
+
+  /* 필터 버튼의 가벼운 스페큘러 림. WebGL 없이 포인터 주변에서만 동작한다. */
+  var filterFrame = 0;
+  var filterPointer = null;
+  function renderFilterSpecular() {
+    filterFrame = 0;
+    if (!filterPointer) return;
+    btns.forEach(function (btn) {
+      var r = btn.getBoundingClientRect();
+      if (!r.width) return;
+      var dx = Math.max(r.left - filterPointer.clientX, 0, filterPointer.clientX - r.right);
+      var dy = Math.max(r.top - filterPointer.clientY, 0, filterPointer.clientY - r.bottom);
+      var distance = Math.hypot(dx, dy);
+      var t = Math.max(0, 1 - distance / 170);
+      var glow = t * t * (3 - 2 * t);
+      btn.style.setProperty('--filter-glow', glow.toFixed(3));
+      btn.style.setProperty('--filter-x', (filterPointer.clientX - r.left) + 'px');
+      btn.style.setProperty('--filter-y', (filterPointer.clientY - r.top) + 'px');
+    });
+  }
+  window.addEventListener('pointermove', function (e) {
+    if (e.pointerType && e.pointerType !== 'mouse' && e.pointerType !== 'pen') return;
+    filterPointer = e;
+    if (!filterFrame) filterFrame = requestAnimationFrame(renderFilterSpecular);
+  }, { passive:true });
 
   /* ────────────────────────────────────────────
      4. WORK PREVIEW — 호버 시 무음 자동재생
