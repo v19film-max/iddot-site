@@ -13,11 +13,18 @@
    body 배경(단색)보다는 위, 나머지 모든 콘텐츠보다는 아래에 오도록 z-index:-1.
    (position:fixed + z-index:0 이면 static 콘텐츠보다 오히려 위에 그려진다.) */
 .rays-bg{
-  position:fixed;inset:0;z-index:-1;
+  position:fixed;inset:0;z-index:0;
   pointer-events:none;
   mix-blend-mode:screen;
+  /* WebGL이 차단되거나 로드되지 않아도 Chrome·모바일에서 보이는 CSS 안전망 */
+  background:
+    radial-gradient(ellipse 52% 78% at 106% 20%,rgba(232,226,216,.14),transparent 68%),
+    radial-gradient(ellipse 42% 60% at 104% 78%,rgba(122,150,205,.11),transparent 70%),
+    radial-gradient(ellipse 35% 54% at -8% 62%,rgba(213,188,226,.07),transparent 72%);
 }
 .rays-bg canvas{display:block;}
+
+main{position:relative;z-index:1;}
 
 html{scroll-behavior:smooth;}
 
@@ -531,11 +538,13 @@ a{color:inherit;text-decoration:none;}
 .page-blur{
   position:fixed;left:0;right:0;bottom:0;height:clamp(100px,14vw,190px);
   z-index:30;pointer-events:none;opacity:var(--page-blur-opacity,1);
-  transition:opacity .7s ease;
+  transition:opacity .9s ease;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 32%,#000 100%);
+  mask-image:linear-gradient(to bottom,transparent 0%,#000 32%,#000 100%);
 }
 .page-blur span{
   position:absolute;inset:0;
-  background:transparent;
+  background:linear-gradient(to bottom,transparent,rgba(8,8,9,.025));
   -webkit-mask-image:linear-gradient(to bottom,transparent 0%,black 52%,black 100%);
   mask-image:linear-gradient(to bottom,transparent 0%,black 52%,black 100%);
 }
@@ -727,8 +736,8 @@ a{color:inherit;text-decoration:none;}
 
 @media (max-width:640px){
   html,body{background:#080809;}
-  /* iOS에서는 fixed WebGL/blur 합성이 회색 막처럼 보일 수 있어 모바일 배경 효과를 제거한다. */
-  .rays-bg,.gradual-blur{display:none!important;}
+  /* WebGL은 모바일에서 끄되, .rays-bg의 CSS 안전망은 유지한다. */
+  .gradual-blur{display:none!important;}
   /* 본문이 고정 네비 뒤로 지나갈 때 읽기 어려워지지 않도록 상단에만 블러 스크림을 둔다. */
   .nav{
     padding:16px 18px 42px;
@@ -758,7 +767,17 @@ a{color:inherit;text-decoration:none;}
   }
   .corner-contact::before{inset:-16px -24px -16px -24px;filter:blur(16px);}
   .corner-contact__title{font-size:11px;margin-bottom:1px;}
-  .page-blur{height:84px;opacity:calc(var(--page-blur-opacity,1) * .72);}
+  .page-blur{
+    height:clamp(88px,20vw,132px);
+    opacity:var(--page-blur-opacity,1);
+    -webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 28%,#000 100%);
+    mask-image:linear-gradient(to bottom,transparent 0%,#000 28%,#000 100%);
+  }
+  .page-blur span:nth-child(1){-webkit-backdrop-filter:blur(1px);backdrop-filter:blur(1px);}
+  .page-blur span:nth-child(2){-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);}
+  .page-blur span:nth-child(3){-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);}
+  .page-blur span:nth-child(4){-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);}
+  .page-blur span:nth-child(5){-webkit-backdrop-filter:blur(11px);backdrop-filter:blur(11px);}
   .contact-heading{display:flex;flex-direction:column;align-items:flex-start;gap:0;}
   .contact-heading p{position:static;margin:0;max-width:none;white-space:nowrap;font-size:clamp(12px,3.7vw,16px);letter-spacing:-.04em;}
   .contact-form__grid{grid-template-columns:1fr;}

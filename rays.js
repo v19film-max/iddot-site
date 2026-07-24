@@ -9,6 +9,9 @@
 
   // prefers-reduced-motion 환경에서는 정적 배경으로 대체
   if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // 모바일은 WebGL 대신 styles.css의 CSS 레이 fallback을 사용해 배터리와
+  // 스크롤 성능을 지키면서도 Chrome·Safari 양쪽에서 같은 분위기를 유지한다.
+  if (window.matchMedia && window.matchMedia('(max-width: 640px)').matches) return;
 
   function hexToRgb(hex) {
     var m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
