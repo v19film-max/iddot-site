@@ -426,7 +426,7 @@ a{color:inherit;text-decoration:none;}
              transform .72s cubic-bezier(.22,.68,.24,1);
   will-change:opacity,transform;
 }
-.js [data-split].in .sp{opacity:1;transform:none;}
+.js [data-split].in .sp{opacity:1;transform:none;will-change:auto;}
 [data-split] .sp-sp{display:inline-block;width:.28em;}
 [data-split] .sp-w{display:inline-block;white-space:nowrap;}
 
@@ -568,10 +568,13 @@ a{color:inherit;text-decoration:none;}
 .work-media::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(to top,rgba(0,0,0,.48),transparent 45%);opacity:0;transition:opacity .28s ease;}
 .work-link--video:hover .work-media::before,.work-link--video:focus-visible .work-media::before{opacity:1;}
 .work-link--video:hover .work-play,.work-link--video:focus-visible .work-play{opacity:1;transform:none;}
+.work-link--youtube .work-media::before{background:rgba(0,0,0,.48);}
+.work-link--youtube .work-play{left:50%;top:50%;bottom:auto;font-size:clamp(15px,1.65vw,22px);font-weight:900;letter-spacing:.01em;text-transform:uppercase;white-space:nowrap;transform:translate(-50%,calc(-50% + 10px));}
+.work-link--youtube:hover .work-play,.work-link--youtube:focus-visible .work-play{transform:translate(-50%,-50%);}
 .contact-section{max-width:var(--max);margin:0 auto;padding:clamp(90px,14vw,190px) var(--pad);border-top:1px solid var(--line);}
-.contact-heading{position:relative;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(220px,.7fr);gap:30px;align-items:end;}
+.contact-heading{display:flex;align-items:flex-end;gap:clamp(18px,2vw,36px);}
 .contact-title{margin:0;font-size:clamp(54px,12vw,190px);line-height:.82;letter-spacing:-.075em;font-weight:900;}
-.contact-heading p{position:absolute;right:0;bottom:clamp(18px,2vw,30px);margin:0;max-width:none;white-space:nowrap;color:#c9c7c3;font-size:clamp(14px,1.4vw,18px);}
+.contact-heading p{position:static;margin:0 0 clamp(14px,1.5vw,24px);max-width:none;white-space:nowrap;color:#c9c7c3;font-size:clamp(14px,1.4vw,18px);}
 .contact-form{margin-top:clamp(76px,10vw,150px);}
 .contact-form__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 clamp(28px,5vw,88px);}
 .contact-form label{display:flex;flex-direction:column;padding:18px 0 24px;border-top:1px solid var(--line);}
