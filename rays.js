@@ -1,17 +1,12 @@
 /* iddot — SideRays 배경 (React Bits, ogl 기반을 바닐라로 이식)
-   전체 페이지 뒤에 은은하게 까는 조명 효과. 브랜드 톤에 맞춰
-   원색(주황/파랑) 대신 화이트/실버 계열로 채도를 낮췄다. */
+   React Bits 원본의 광원 위치와 레이 계산을 그대로 사용한다. */
 (function () {
   'use strict';
 
   var mount = document.getElementById('raysBg');
   if (!mount) return;
 
-  // prefers-reduced-motion 환경에서는 정적 배경으로 대체
   if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  // 모바일은 WebGL 대신 styles.css의 CSS 레이 fallback을 사용해 배터리와
-  // 스크롤 성능을 지키면서도 Chrome·Safari 양쪽에서 같은 분위기를 유지한다.
-  if (window.matchMedia && window.matchMedia('(max-width: 640px)').matches) return;
 
   function hexToRgb(hex) {
     var m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -19,19 +14,24 @@
   }
 
   var CONFIG = {
-    speed: 0.6,
-    rayColor1: '#e9e6df',   // 웜 실버 (심볼 크롬 톤)
-    rayColor2: '#8fa3c8',   // 아주 옅은 콜드 블루
+    speed: 2.5,
+    rayColor1: '#e9e6df',
+    rayColor2: '#96c8ff',
     intensity: 0.55,
-    spread: 2.1,
-    tilt: 6,
-    saturation: 0.35,
-    blend: 0.62,
-    falloff: 1.8,
-    opacity: 0.34            // 전체적으로 매우 은은하게
+    spread: 2,
+    tilt: 0,
+    saturation: 0.85,
+    blend: 0.75,
+    falloff: 1.6,
+    opacity: 0.34
   };
 
-  var VERT = 'attribute vec2 position;\nvoid main(){gl_Position=vec4(position,0.0,1.0);}';
+  var VERT = [
+    'attribute vec2 position;',
+    'void main() {',
+    '  gl_Position = vec4(position, 0.0, 1.0);',
+    '}'
+  ].join('\n');
 
   var FRAG = [
     'precision highp float;',
@@ -42,12 +42,14 @@
     'uniform vec3 iRayColor2;',
     'uniform float iIntensity;',
     'uniform float iSpread;',
+    'uniform float iFlipX;',
+    'uniform float iFlipY;',
     'uniform float iTilt;',
     'uniform float iSaturation;',
     'uniform float iBlend;',
     'uniform float iFalloff;',
     'uniform float iOpacity;',
-
+    '',
     'float rayStrength(vec2 raySource, vec2 rayRefDirection, vec2 coord, float seedA, float seedB, float speed) {',
     '  vec2 sourceToCoord = coord - raySource;',
     '  float cosAngle = dot(normalize(sourceToCoord), rayRefDirection);',
@@ -57,33 +59,36 @@
     '    0.0, 1.0) *',
     '    clamp((iResolution.x - length(sourceToCoord)) / iResolution.x, 0.5, 1.0);',
     '}',
-
+    '',
     'void main() {',
     '  vec2 fragCoord = gl_FragCoord.xy;',
+    '  if (iFlipX > 0.5) fragCoord.x = iResolution.x - fragCoord.x;',
+    '  if (iFlipY > 0.5) fragCoord.y = iResolution.y - fragCoord.y;',
     '  vec2 coord = vec2(fragCoord.x, iResolution.y - fragCoord.y);',
-    '  vec2 rayPos = vec2(iResolution.x * 1.08, -0.4 * iResolution.y);',
-
+    '  vec2 rayPos = vec2(iResolution.x * 1.1, -0.5 * iResolution.y);',
+    '',
     '  float tiltRad = iTilt * 3.14159265 / 180.0;',
-    '  float cs = cos(tiltRad); float sn = sin(tiltRad);',
+    '  float cs = cos(tiltRad);',
+    '  float sn = sin(tiltRad);',
     '  vec2 rel = coord - rayPos;',
-    '  vec2 tiltedCoord = vec2(rel.x*cs - rel.y*sn, rel.x*sn + rel.y*cs) + rayPos;',
-
+    '  vec2 tiltedCoord = vec2(rel.x * cs - rel.y * sn, rel.x * sn + rel.y * cs) + rayPos;',
+    '',
     '  float halfSpread = iSpread * 0.275;',
-    '  vec2 rayRefDir1 = normalize(vec2(cos(0.785398+halfSpread), sin(0.785398+halfSpread)));',
-    '  vec2 rayRefDir2 = normalize(vec2(cos(0.785398-halfSpread), sin(0.785398-halfSpread)));',
-
-    '  vec4 rays1 = vec4(iRayColor1,1.0) * rayStrength(rayPos, rayRefDir1, tiltedCoord, 36.2214, 21.11349, iSpeed);',
-    '  vec4 rays2 = vec4(iRayColor2,1.0) * rayStrength(rayPos, rayRefDir2, tiltedCoord, 22.3991, 18.0234, iSpeed*0.2);',
-
-    '  vec4 color = rays1 * (1.0-iBlend) * 0.9 + rays2 * iBlend * 0.9;',
-
+    '  vec2 rayRefDir1 = normalize(vec2(cos(0.785398 + halfSpread), sin(0.785398 + halfSpread)));',
+    '  vec2 rayRefDir2 = normalize(vec2(cos(0.785398 - halfSpread), sin(0.785398 - halfSpread)));',
+    '',
+    '  vec4 rays1 = vec4(iRayColor1, 1.0) * rayStrength(rayPos, rayRefDir1, tiltedCoord, 36.2214, 21.11349, iSpeed);',
+    '  vec4 rays2 = vec4(iRayColor2, 1.0) * rayStrength(rayPos, rayRefDir2, tiltedCoord, 22.3991, 18.0234, iSpeed * 0.2);',
+    '',
+    '  vec4 color = rays1 * (1.0 - iBlend) * 0.9 + rays2 * iBlend * 0.9;',
+    '',
     '  float distanceToLight = length(fragCoord.xy - vec2(rayPos.x, iResolution.y - rayPos.y)) / iResolution.y;',
     '  float brightness = iIntensity * 0.4 / pow(max(distanceToLight, 0.001), iFalloff);',
     '  color.rgb *= brightness;',
-
-    '  float gray = dot(color.rgb, vec3(0.299,0.587,0.114));',
+    '',
+    '  float gray = dot(color.rgb, vec3(0.299, 0.587, 0.114));',
     '  color.rgb = mix(vec3(gray), color.rgb, iSaturation);',
-
+    '',
     '  color.a = max(color.r, max(color.g, color.b)) * iOpacity;',
     '  gl_FragColor = color;',
     '}'
@@ -92,11 +97,11 @@
   import('https://cdn.jsdelivr.net/npm/ogl@1.0.11/+esm')
     .then(function (ogl) {
       var Renderer = ogl.Renderer, Program = ogl.Program, Mesh = ogl.Mesh, Triangle = ogl.Triangle;
-
       var renderer = new Renderer({ alpha: true, dpr: Math.min(window.devicePixelRatio || 1, 1.25) });
       var gl = renderer.gl;
+      gl.clearColor(0, 0, 0, 0);
       gl.canvas.style.cssText = 'width:100%;height:100%;display:block;';
-      mount.appendChild(gl.canvas);
+      mount.replaceChildren(gl.canvas);
 
       var uniforms = {
         iTime: { value: 0 },
@@ -106,6 +111,8 @@
         iRayColor2: { value: hexToRgb(CONFIG.rayColor2) },
         iIntensity: { value: CONFIG.intensity },
         iSpread: { value: CONFIG.spread },
+        iFlipX: { value: 0 },
+        iFlipY: { value: 0 },
         iTilt: { value: CONFIG.tilt },
         iSaturation: { value: CONFIG.saturation },
         iBlend: { value: CONFIG.blend },
@@ -127,22 +134,21 @@
 
       var raf;
       var lastFrame = 0;
+      var running = true;
       function loop(t) {
         raf = requestAnimationFrame(loop);
-        if (t - lastFrame < 32) return;
+        if (!running || t - lastFrame < 32) return;
         lastFrame = t;
         uniforms.iTime.value = t * 0.001;
         renderer.render({ scene: mesh });
       }
       raf = requestAnimationFrame(loop);
 
-      // 탭이 안 보일 때는 렌더를 멈춰 배터리/CPU 절약
       document.addEventListener('visibilitychange', function () {
-        if (document.hidden) { cancelAnimationFrame(raf); }
-        else { raf = requestAnimationFrame(loop); }
+        running = !document.hidden;
       });
     })
     .catch(function (e) {
-      console.warn('[rays] ogl 로드 실패, 배경 효과 생략:', e);
+      console.warn('[rays] ogl 로드 실패, 정적 안전망을 사용합니다:', e);
     });
 })();
