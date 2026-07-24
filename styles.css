@@ -13,17 +13,13 @@
 .rays-bg{
   position:fixed;inset:0;z-index:0;
   pointer-events:none;
-  mix-blend-mode:screen;
-  opacity:.72;
-  -webkit-mask-image:radial-gradient(ellipse 64% 72% at 104% -4%,#000 0%,rgba(0,0,0,.82) 35%,rgba(0,0,0,.25) 66%,transparent 88%);
-  mask-image:radial-gradient(ellipse 64% 72% at 104% -4%,#000 0%,rgba(0,0,0,.82) 35%,rgba(0,0,0,.25) 66%,transparent 88%);
-  /* WebGL이 지연되거나 차단될 때도 레이 방향만 유지하는 정적 안전망 */
+  /* WebGL과 브라우저의 합성 차이 없이 같은 레이를 보여주는 CSS 레이어 */
   background:
-    linear-gradient(116deg,transparent 0 61%,rgba(232,226,216,.035) 67%,transparent 76%),
-    linear-gradient(132deg,transparent 0 68%,rgba(150,200,255,.028) 73%,transparent 82%),
-    radial-gradient(ellipse 52% 66% at 108% -7%,rgba(232,226,216,.105),transparent 70%);
+    linear-gradient(138deg,transparent 0 58%,rgba(196,211,231,.035) 72%,transparent 88%),
+    linear-gradient(154deg,transparent 0 67%,rgba(217,225,239,.024) 78%,transparent 91%),
+    radial-gradient(ellipse 48% 64% at 104% -5%,rgba(223,229,238,.13) 0%,rgba(163,185,220,.06) 38%,transparent 74%);
 }
-.rays-bg canvas{display:block;}
+.rays-bg canvas{display:none!important;}
 
 main{position:relative;z-index:1;}
 
@@ -98,16 +94,15 @@ a{color:inherit;text-decoration:none;}
 #symbol.off{opacity:0;pointer-events:none;}
 #symbol:focus-visible{filter:drop-shadow(0 0 14px rgba(255,255,255,.35));}
 
-/* 재생 중에는 실제로 보여야 브라우저가 재생을 억제하지 않음.
-   검정 배경은 screen 블렌드로 페이지 배경과 합성됨. */
+/* 원본 영상은 오프스크린에서 재생하고 WebGL 텍스처로만 출력한다.
+   iOS Safari의 video 검정 배경 사각형을 차단한다. */
 #bloom,#fold{
-  position:absolute;inset:0;
-  width:100%;height:100%;
-  object-fit:contain;
-  mix-blend-mode:screen;
-  opacity:0;pointer-events:none;
+  position:absolute;left:-9999px;top:0;
+  width:1px;height:1px;
+  object-fit:cover;
+  opacity:0!important;pointer-events:none;
 }
-#bloom.on,#fold.on{opacity:1;}
+#bloom.on,#fold.on{opacity:0!important;}
 
 .symbol-hint{
   position:absolute;top:calc(50% + 34px);bottom:auto;left:50%;transform:translateX(-50%);
@@ -736,20 +731,29 @@ a{color:inherit;text-decoration:none;}
 
 @media (max-width:640px){
   html,body{background:#080809;}
-  /* 모바일에서도 같은 SideRays를 사용하되 렌더러 DPR은 낮게 제한한다. */
+  /* 레이는 우측 상단에만 은은하게 남긴다. */
   .rays-bg{
-    opacity:.34;
-    -webkit-mask-image:radial-gradient(ellipse 70% 58% at 106% -3%,#000 0%,rgba(0,0,0,.62) 38%,transparent 82%);
-    mask-image:radial-gradient(ellipse 70% 58% at 106% -3%,#000 0%,rgba(0,0,0,.62) 38%,transparent 82%);
+    background:
+      linear-gradient(142deg,transparent 0 64%,rgba(196,211,231,.02) 78%,transparent 92%),
+      radial-gradient(ellipse 56% 38% at 106% -5%,rgba(223,229,238,.095) 0%,rgba(163,185,220,.035) 40%,transparent 76%);
   }
   .gradual-blur{display:none!important;}
   /* 본문이 고정 네비 뒤로 지나갈 때 읽기 어려워지지 않도록 상단에만 블러 스크림을 둔다. */
   .nav{
-    padding:16px 18px 42px;
+    padding:16px 18px 70px;
     mix-blend-mode:normal;
-    background:linear-gradient(to bottom,rgba(8,8,9,.98),rgba(8,8,9,.88) 58%,rgba(8,8,9,.5) 82%,rgba(8,8,9,0));
+    background:transparent;
+    isolation:isolate;
+  }
+  .nav::before{
+    content:'';
+    position:absolute;inset:0 0 -34px;
+    z-index:-1;pointer-events:none;
+    background:linear-gradient(to bottom,rgba(8,8,9,.98) 0%,rgba(8,8,9,.88) 42%,rgba(8,8,9,.38) 68%,transparent 100%);
     -webkit-backdrop-filter:blur(14px);
     backdrop-filter:blur(14px);
+    -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 42%,rgba(0,0,0,.72) 64%,rgba(0,0,0,.18) 82%,transparent 100%);
+    mask-image:linear-gradient(to bottom,#000 0%,#000 42%,rgba(0,0,0,.72) 64%,rgba(0,0,0,.18) 82%,transparent 100%);
   }
   .nav-mark{width:94px;height:16px;}
   .nav-mark img{width:222px;left:-66px;top:-63px;max-width:none;height:auto;}

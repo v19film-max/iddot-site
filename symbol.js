@@ -13,12 +13,10 @@
   var gl = canvas.getContext('webgl', { alpha: true, premultipliedAlpha: false, antialias: true })
         || canvas.getContext('experimental-webgl', { alpha: true, premultipliedAlpha: false });
 
-  /* ── WebGL 미지원 시 폴백: 영상만 재생 ── */
+  /* ── WebGL 미지원 시 폴백: 정지 이미지 유지 ── */
   if (!gl) {
     canvas.style.display = 'none';
-    video.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:1;mix-blend-mode:screen;';
-    video.setAttribute('poster', 'assets/symbol_start.png');
-    video.addEventListener('click', function () { video.play(); });
+    if (fallback) fallback.style.display = 'block';
     return;
   }
 
@@ -166,8 +164,8 @@
   resize();
 
   /* ── 클릭 → 개화 / 다시 클릭 → 접힘 ──
-     재생 중에는 video 를 실제로 노출한다. 숨겨진(1px/opacity:0) 미디어는
-     브라우저가 재생을 억제해 첫 프레임에서 멈추기 때문. */
+     영상은 오프스크린에서 재생하고 캔버스 텍스처로만 출력한다.
+     iOS가 video 태그의 검은 배경을 사각형으로 합성하는 문제를 막는다. */
   var guard = null;
   var playingEl = null;   // 지금 재생 중인 video 엘리먼트
   var nextState = null;   // 재생이 끝난 뒤 도달할 상태
@@ -186,7 +184,7 @@
     if (hint) hint.classList.add('gone');
 
     el.classList.add('on');
-    canvas.classList.add('off');
+    canvas.classList.remove('off');
 
     var p = el.play();
     if (p && p.catch) p.catch(function (e) {
