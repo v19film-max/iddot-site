@@ -169,6 +169,11 @@
      4b. TEAM PROFILE CARD — 커서 틸트 + 글로우
      ──────────────────────────────────────────── */
   var pcWraps = Array.prototype.slice.call(document.querySelectorAll('.pc-wrap[data-tilt]'));
+  Array.prototype.slice.call(document.querySelectorAll('.pc-card')).forEach(function (card) {
+    // 일반적인 우클릭/드래그 저장을 막는다. 화면 캡처나 개발자 도구까지 막을 수는 없다.
+    card.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    card.addEventListener('dragstart', function (e) { e.preventDefault(); });
+  });
   pcWraps.forEach(function (wrap) {
     var card = wrap.querySelector('.pc-card');
     function onMove(e) {

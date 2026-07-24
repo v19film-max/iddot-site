@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260724-5">
+<link rel="stylesheet" href="styles.css?v=20260724-6">
 <script>document.documentElement.className+=' js';</script>
 </head>
 <body>
@@ -58,7 +58,7 @@
   <!-- ── STATEMENT ────────────────────────────────────── -->
   <section class="statement" id="about">
     <p class="section-idx">01 — About</p>
-    <h2 class="wordplay">IDENTITY + DOT</h2>
+    <h2 class="wordplay" data-split="chars">IDENTITY + DOT</h2>
 
     <div class="statement-body">
       <p>
@@ -158,16 +158,18 @@
     </article>
 
     <article class="work-item" data-cat="mv">
-      <a class="work-link work-link--video work-link--youtube" href="https://youtu.be/gEcWhvyMhKI" target="_blank" rel="noopener noreferrer" aria-label="DANCE FILM VICTOR 유튜브에서 열기">
+      <div class="work-link work-link--native" tabindex="0" aria-label="DANCE FILM VICTOR 미리보기. 마우스를 올리면 재생됩니다.">
         <div class="work-media">
-          <img src="https://i.ytimg.com/vi/gEcWhvyMhKI/hqdefault.jpg" alt="DANCE FILM VICTOR 썸네일" loading="lazy">
-          <span class="work-play" aria-hidden="true">Watch on YouTube</span>
+          <img class="work-poster" src="assets/victor.jpg" alt="" aria-hidden="true" loading="lazy">
+          <video class="work-preview" muted playsinline preload="metadata" aria-hidden="true">
+            <source src="assets/victor-preview.mp4" type="video/mp4">
+          </video>
         </div>
         <div class="work-meta">
           <h3>DANCE FILM ‘VICTOR’</h3>
           <p class="work-tags">M/V · Dance Film</p>
         </div>
-      </a>
+      </div>
     </article>
 
     <article class="work-item" data-cat="film">
@@ -298,10 +300,10 @@
     <div class="team-grid">
       <div class="pc-wrap" data-tilt>
         <div class="pc-glow" aria-hidden="true"></div>
-        <div class="pc-card">
+        <div class="pc-card" oncontextmenu="return false">
           <div class="pc-shine" aria-hidden="true"></div>
           <div class="pc-avatar">
-            <img src="assets/profile-orb.png" alt="iddot 크롬 오브 심볼">
+            <img src="assets/profile-card.png" alt="임승민 프로필 사진" draggable="false">
           </div>
           <div class="pc-info">
             <h3 class="pc-name">임승민</h3>
