@@ -184,16 +184,6 @@ a{color:inherit;text-decoration:none;}
 }
 .wordplay .plus{opacity:.45;letter-spacing:0;}
 .wordplay-word{display:inline-block;white-space:nowrap;}
-.chrome-type{
-  display:inline-block;
-  color:transparent;
-  -webkit-text-fill-color:transparent;
-  -webkit-background-clip:text;
-  background-clip:text;
-  background-image:linear-gradient(108deg,#202226 0%,#f7f8fb 16%,#777b83 27%,#f4f5f6 39%,#2b2d31 53%,#d7d9de 68%,#4a4d54 82%,#fafafa 100%);
-  -webkit-text-stroke:1px rgba(255,255,255,.28);
-  filter:drop-shadow(0 1px 0 rgba(255,255,255,.4)) drop-shadow(0 6px 10px rgba(0,0,0,.58));
-}
 
 .circled{
   position:relative;
