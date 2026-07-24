@@ -448,11 +448,6 @@ a{color:inherit;text-decoration:none;}
   font-family:var(--serif);font-size:64px;color:#4a4a4e;
 }
 .pc-avatar::before{content:attr(data-initial);}
-.pc-avatar::after{
-  content:'';position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(to top,rgba(0,0,0,.72) 0%,rgba(0,0,0,.4) 22%,rgba(0,0,0,.06) 45%,transparent 65%);
-  z-index:2;
-}
 .pc-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:58% 30%;transform:scale(1.08);transform-origin:58% 34%;display:block;pointer-events:none;user-select:none;-webkit-user-drag:none;}
 .pc-avatar img.pc-avatar-blur{
   z-index:1;opacity:.9;filter:blur(9px);transform:scale(1.12);transform-origin:58% 36%;
@@ -463,7 +458,8 @@ a{color:inherit;text-decoration:none;}
 .pc-info{
   position:relative;z-index:5;
   padding:18px 20px 22px;
-  background:linear-gradient(to top,rgba(0,0,0,.76),rgba(0,0,0,.33) 70%,transparent);
+  background:transparent;
+  text-shadow:0 1px 8px rgba(0,0,0,.88);
 }
 .pc-name{margin:0;font-size:20px;font-weight:800;letter-spacing:-.02em;}
 .pc-role{
