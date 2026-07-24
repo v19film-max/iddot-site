@@ -621,7 +621,7 @@ a{color:inherit;text-decoration:none;}
 .corner-contact__addr{display:none;}
 .site-footer{position:relative;z-index:35;border-top:1px solid var(--line);padding:var(--pad);background:var(--bg);}
 .site-footer__logo{height:clamp(180px,34vw,510px);overflow:hidden;background:var(--bg);}
-.site-footer__logo img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;filter:contrast(500%) brightness(75%);mix-blend-mode:screen;}
+.site-footer__logo img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;filter:contrast(500%) brightness(75%);mix-blend-mode:screen;user-select:none;-webkit-user-drag:none;-webkit-touch-callout:none;pointer-events:none;}
 .site-footer__info{display:grid;grid-template-columns:2fr 1fr 1fr 1.4fr;gap:18px;padding-top:24px;color:#aaa7a1;font-size:11px;line-height:1.6;letter-spacing:.03em;}
 .site-footer__info p{margin:0;}
 .site-footer__info p:first-child{color:var(--fg);font-weight:800;}

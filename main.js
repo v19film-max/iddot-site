@@ -217,6 +217,10 @@
     card.addEventListener('contextmenu', function (e) { e.preventDefault(); });
     card.addEventListener('dragstart', function (e) { e.preventDefault(); });
   });
+  Array.prototype.slice.call(document.querySelectorAll('.site-footer__logo')).forEach(function (logo) {
+    logo.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    logo.addEventListener('dragstart', function (e) { e.preventDefault(); });
+  });
   pcWraps.forEach(function (wrap) {
     var card = wrap.querySelector('.pc-card');
     function onMove(e) {
