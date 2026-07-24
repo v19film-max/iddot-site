@@ -223,20 +223,42 @@
   });
   pcWraps.forEach(function (wrap) {
     var card = wrap.querySelector('.pc-card');
+    function edgeProximity(el, x, y) {
+      var rect = el.getBoundingClientRect();
+      var cx = rect.width / 2;
+      var cy = rect.height / 2;
+      var dx = x - cx;
+      var dy = y - cy;
+      var kx = dx ? cx / Math.abs(dx) : Infinity;
+      var ky = dy ? cy / Math.abs(dy) : Infinity;
+      return Math.min(Math.max(1 / Math.min(kx, ky), 0), 1);
+    }
+    function cursorAngle(el, x, y) {
+      var rect = el.getBoundingClientRect();
+      var radians = Math.atan2(y - rect.height / 2, x - rect.width / 2);
+      var degrees = radians * (180 / Math.PI) + 90;
+      return degrees < 0 ? degrees + 360 : degrees;
+    }
     function onMove(e) {
-      var r = wrap.getBoundingClientRect();
+      var r = card.getBoundingClientRect();
       var x = (e.clientX - r.left) / r.width;
       var y = (e.clientY - r.top) / r.height;
+      var px = e.clientX - r.left;
+      var py = e.clientY - r.top;
+      var edge = edgeProximity(card, px, py) * 100;
       wrap.style.setProperty('--mx', (x * 100).toFixed(1) + '%');
       wrap.style.setProperty('--my', (y * 100).toFixed(1) + '%');
       wrap.style.setProperty('--rx', ((0.5 - y) * 10).toFixed(2) + 'deg');
       wrap.style.setProperty('--ry', ((x - 0.5) * 14).toFixed(2) + 'deg');
-      wrap.style.setProperty('--pglow', '1');
+      card.style.setProperty('--spot-x', px.toFixed(1) + 'px');
+      card.style.setProperty('--spot-y', py.toFixed(1) + 'px');
+      card.style.setProperty('--edge-glow-opacity', Math.max(0, Math.min(1, (edge - 30) / 70)).toFixed(3));
+      card.style.setProperty('--cursor-angle', cursorAngle(card, px, py).toFixed(2) + 'deg');
     }
     function onLeave() {
       wrap.style.setProperty('--rx', '0deg');
       wrap.style.setProperty('--ry', '0deg');
-      wrap.style.setProperty('--pglow', '0');
+      card.style.setProperty('--edge-glow-opacity', '0');
     }
     wrap.addEventListener('pointermove', onMove);
     wrap.addEventListener('pointerleave', onLeave);
