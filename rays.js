@@ -23,7 +23,7 @@
     saturation: 0.85,
     blend: 0.75,
     falloff: 1.6,
-    opacity: 0.34
+    opacity: 0.24
   };
 
   var VERT = [
@@ -89,7 +89,11 @@
     '  float gray = dot(color.rgb, vec3(0.299, 0.587, 0.114));',
     '  color.rgb = mix(vec3(gray), color.rgb, iSaturation);',
     '',
-    '  color.a = max(color.r, max(color.g, color.b)) * iOpacity;',
+    '  vec2 cornerUv = fragCoord / iResolution;',
+    '  float cornerDistance = length((cornerUv - vec2(1.0, 0.0)) / vec2(0.78, 0.88));',
+    '  float cornerFade = 1.0 - smoothstep(0.18, 1.02, cornerDistance);',
+    '  color.rgb *= cornerFade;',
+    '  color.a = max(color.r, max(color.g, color.b)) * iOpacity * cornerFade;',
     '  gl_FragColor = color;',
     '}'
   ].join('\n');
