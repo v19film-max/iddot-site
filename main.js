@@ -117,7 +117,10 @@
     if (!pageBlur) return;
     var maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
     var progress = maxScroll ? window.scrollY / maxScroll : 1;
-    pageBlur.classList.toggle('is-bottom', progress > 0.9);
+    // 푸터가 들어오기 시작하는 구간부터 투명하게 풀어 하단 정보가 선명하게 보이게 한다.
+    var fade = 1 - Math.max(0, Math.min(1, (progress - 0.68) / 0.22));
+    pageBlur.style.setProperty('--page-blur-opacity', fade.toFixed(3));
+    pageBlur.classList.toggle('is-bottom', progress > 0.92);
   }
   window.addEventListener('scroll', updatePageBlur, { passive: true });
   window.addEventListener('resize', updatePageBlur);
