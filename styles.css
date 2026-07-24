@@ -275,7 +275,7 @@ a{color:inherit;text-decoration:none;}
   gap:20px;margin-top:20px;flex-wrap:wrap;
 }
 .work-meta h3{
-  margin:0;font-size:clamp(17px,2vw,26px);font-weight:500;letter-spacing:-.01em;
+  margin:0;font-family:'Pretendard Variable',Pretendard,inherit;font-size:clamp(17px,2vw,26px);font-weight:800;letter-spacing:-.025em;
 }
 .work-tags{
   margin:0;font-size:12px;letter-spacing:.12em;color:var(--mute);
@@ -398,12 +398,18 @@ a{color:inherit;text-decoration:none;}
   font-size:12px;line-height:1.85;
   color:#9a9791;
   pointer-events:auto;
-  padding:12px 16px 13px;
-  border-radius:12px;
-  background:rgba(8,8,9,.72);
-  -webkit-backdrop-filter:blur(10px);
-  backdrop-filter:blur(10px);
-  box-shadow:0 8px 30px rgba(0,0,0,.35);
+  isolation:isolate;
+  filter:drop-shadow(0 2px 12px rgba(0,0,0,.42));
+}
+.corner-contact::before{
+  content:'';
+  position:absolute;
+  z-index:-1;
+  inset:-30px -44px -28px -44px;
+  border-radius:50%;
+  background:radial-gradient(ellipse at 72% 55%,rgba(8,8,9,.76) 0%,rgba(8,8,9,.48) 34%,rgba(8,8,9,.18) 61%,transparent 80%);
+  filter:blur(18px);
+  pointer-events:none;
 }
 .corner-contact__title{
   margin:0 0 2px;font-weight:800;color:var(--fg);
@@ -429,6 +435,29 @@ a{color:inherit;text-decoration:none;}
 .js [data-split].in .sp{opacity:1;transform:none;will-change:auto;}
 [data-split] .sp-sp{display:inline-block;width:.28em;}
 [data-split] .sp-w{display:inline-block;white-space:nowrap;}
+
+/* ── PAGE EDGE BLUR ────────────────────
+   React Bits GradualBlur의 다층 backdrop 방식. 고정 카드 대신
+   화면 하단을 통과하는 콘텐츠만 점진적으로 흐리게 하고, 푸터에서는 사라진다. */
+.page-blur{
+  position:fixed;left:0;right:0;bottom:0;height:clamp(100px,14vw,190px);
+  z-index:30;pointer-events:none;opacity:1;
+  transition:opacity .55s ease;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0%,black 48%,black 100%);
+  mask-image:linear-gradient(to bottom,transparent 0%,black 48%,black 100%);
+}
+.page-blur span{
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom,transparent 0%,rgba(8,8,9,.08) 38%,rgba(8,8,9,.34) 100%);
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0%,black 56%,transparent 100%);
+  mask-image:linear-gradient(to bottom,transparent 0%,black 56%,transparent 100%);
+}
+.page-blur span:nth-child(1){-webkit-backdrop-filter:blur(1px);backdrop-filter:blur(1px);}
+.page-blur span:nth-child(2){-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);}
+.page-blur span:nth-child(3){-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);}
+.page-blur span:nth-child(4){-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);}
+.page-blur span:nth-child(5){-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);}
+.page-blur.is-bottom{opacity:0;}
 
 /* ── SPECULAR BUTTON ─────────────────── */
 .contact-cta{
@@ -556,6 +585,7 @@ a{color:inherit;text-decoration:none;}
 .statement-body p{color:var(--fg);font-size:clamp(15px,1.5vw,19px);line-height:1.78;}
 .statement-body strong{font-weight:800;}
 .statement-en{color:#8f8b84!important;font-weight:300;}
+.statement-en strong{color:var(--fg);font-weight:800;}
 .work-link--video{appearance:none;border:0;background:none;color:inherit;cursor:pointer;font-family:inherit;text-align:left;width:100%;}
 .work-link--native{cursor:pointer;outline:0;}
 .work-link--native:focus-visible{outline:1px solid var(--fg);outline-offset:5px;}
@@ -569,7 +599,7 @@ a{color:inherit;text-decoration:none;}
 .work-link--video:hover .work-media::before,.work-link--video:focus-visible .work-media::before{opacity:1;}
 .work-link--video:hover .work-play,.work-link--video:focus-visible .work-play{opacity:1;transform:none;}
 .work-link--youtube .work-media::before{background:rgba(0,0,0,.48);}
-.work-link--youtube .work-play{left:50%;top:50%;bottom:auto;font-size:clamp(15px,1.65vw,22px);font-weight:900;letter-spacing:.01em;text-transform:uppercase;white-space:nowrap;transform:translate(-50%,calc(-50% + 10px));}
+.work-link--youtube .work-play{left:50%;top:50%;bottom:auto;font-size:clamp(15px,1.65vw,22px);font-weight:900;letter-spacing:.01em;text-transform:uppercase;white-space:nowrap;transform:translate(-50%,-50%);}
 .work-link--youtube:hover .work-play,.work-link--youtube:focus-visible .work-play{transform:translate(-50%,-50%);}
 .contact-section{max-width:var(--max);margin:0 auto;padding:clamp(90px,14vw,190px) var(--pad);border-top:1px solid var(--line);}
 .contact-heading{display:flex;align-items:flex-end;gap:clamp(18px,2vw,36px);}
@@ -593,7 +623,7 @@ a{color:inherit;text-decoration:none;}
 .team{padding-bottom:clamp(90px,13vw,170px);}
 .team-grid{margin-top:0;}
 .corner-contact__addr{display:none;}
-.site-footer{border-top:1px solid var(--line);padding:var(--pad);}
+.site-footer{position:relative;z-index:35;border-top:1px solid var(--line);padding:var(--pad);background:var(--bg);}
 .site-footer__logo{height:clamp(180px,34vw,510px);overflow:hidden;background:var(--bg);}
 .site-footer__logo img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;filter:contrast(500%) brightness(75%);mix-blend-mode:screen;}
 .site-footer__info{display:grid;grid-template-columns:2fr 1fr 1fr 1.4fr;gap:18px;padding-top:24px;color:#aaa7a1;font-size:11px;line-height:1.6;letter-spacing:.03em;}
@@ -634,6 +664,8 @@ a{color:inherit;text-decoration:none;}
 
   /* 문의 폼 입력칸을 가리지 않도록 모바일에서는 고정 연락처를 숨긴다. */
   .corner-contact{display:none;}
+  .page-blur{height:84px;opacity:.72;}
+  .page-blur.is-bottom{opacity:0;}
   .contact-heading{display:flex;flex-direction:column;align-items:flex-start;gap:0;}
   .contact-heading p{position:static;margin:0;max-width:none;white-space:nowrap;font-size:clamp(12px,3.7vw,16px);letter-spacing:-.04em;}
   .contact-form__grid{grid-template-columns:1fr;}

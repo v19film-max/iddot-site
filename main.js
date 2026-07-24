@@ -60,6 +60,7 @@
   var watched = blocks.concat(splitEls);
 
   function show(el) { el.classList.add('in'); }
+  function hide(el) { el.classList.remove('in'); }
   function showAll() { watched.forEach(show); }
 
   if (window.matchMedia && window.matchMedia('print').matches) { showAll(); return; }
@@ -74,7 +75,12 @@
 
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (e) {
-      if (e.isIntersecting) { show(e.target); io.unobserve(e.target); }
+      if (e.isIntersecting) {
+        show(e.target);
+      } else if (!e.target.closest('.hero')) {
+        // 화면을 벗어나면 상태를 되돌려 다시 들어올 때 등장 효과를 재생한다.
+        hide(e.target);
+      }
     });
   }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
 
@@ -102,6 +108,21 @@
 
   /* 안전망 2: 5초 뒤에는 무조건 전부 표시 */
   setTimeout(showAll, 5000);
+
+  /* ────────────────────────────────────────────
+     2b. PAGE EDGE BLUR — 하단에서 자연스럽게 사라짐
+     ──────────────────────────────────────────── */
+  var pageBlur = document.querySelector('.page-blur');
+  function updatePageBlur() {
+    if (!pageBlur) return;
+    var maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    var progress = maxScroll ? window.scrollY / maxScroll : 1;
+    pageBlur.classList.toggle('is-bottom', progress > 0.9);
+  }
+  window.addEventListener('scroll', updatePageBlur, { passive: true });
+  window.addEventListener('resize', updatePageBlur);
+  window.addEventListener('load', updatePageBlur);
+  updatePageBlur();
 
   /* ────────────────────────────────────────────
      3. WORK FILTER
