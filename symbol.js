@@ -23,10 +23,6 @@
   // 매 프레임 캔버스를 완전 투명하게 지워야 모바일에서 검은 사각형이 생기지 않는다.
   gl.clearColor(0, 0, 0, 0);
 
-  // WebGL이 정상 동작하면 검은 배경을 가진 폴백 이미지는 숨긴다.
-  // 그렇지 않으면 투명한 캔버스 아래로 폴백의 사각형이 비쳐 보인다.
-  if (fallback) fallback.style.display = 'none';
-
   var VERT = [
     'attribute vec2 aPos;',
     'varying vec2 vUv;',
@@ -146,7 +142,12 @@
 
   loadImage('assets/symbol_start.png', function (im) {
     startImg = im;
-    if (state === 'dot') upload(im);
+    if (state === 'dot') {
+      upload(im);
+      draw();
+      // WebGL 텍스처가 준비된 뒤에만 폴백을 숨겨 초기 점이 사라지지 않게 한다.
+      if (fallback) fallback.style.display = 'none';
+    }
   });
   loadImage('assets/symbol_final.png', function (im) { finalImg = im; });
 

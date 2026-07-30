@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260724-27">
+<link rel="stylesheet" href="styles.css?v=20260730-28">
 <script>document.documentElement.className+=' js';</script>
 </head>
 <body>
@@ -90,11 +90,11 @@
     <p class="section-idx">Work</p>
 
     <div class="work-filter" role="tablist" aria-label="작업 분류">
-      <button class="filter-btn is-on" data-filter="all"       role="tab" aria-selected="true"><span class="filter-btn__label">All</span></button>
       <button class="filter-btn"       data-filter="mv"        role="tab" aria-selected="false"><span class="filter-btn__label">M/V</span></button>
       <button class="filter-btn"       data-filter="digital"   role="tab" aria-selected="false"><span class="filter-btn__label">Digital Content</span></button>
       <button class="filter-btn"       data-filter="film"      role="tab" aria-selected="false"><span class="filter-btn__label">FILM</span></button>
       <button class="filter-btn"       data-filter="art"       role="tab" aria-selected="false"><span class="filter-btn__label">Art</span></button>
+      <button class="filter-btn is-on" data-filter="all"       role="tab" aria-selected="true"><span class="filter-btn__label">All</span></button>
     </div>
 
     <article class="work-item" data-cat="mv">
@@ -250,6 +250,19 @@
       </a>
     </article>
 
+    <article class="work-item" data-cat="digital">
+      <a class="work-link work-link--video work-link--youtube" href="https://youtu.be/hFIOsapDEr8" target="_blank" rel="noopener noreferrer" aria-label="세계적인 동기부여 강사의 충격적인 고백 유튜브에서 열기">
+        <div class="work-media">
+          <img src="https://i.ytimg.com/vi/hFIOsapDEr8/hq720.jpg" alt="세계적인 동기부여 강사의 충격적인 고백 썸네일" loading="lazy">
+          <span class="work-play" aria-hidden="true">Watch on YouTube</span>
+        </div>
+        <div class="work-meta">
+          <h3>세계적인 동기부여 강사의 충격적인 고백</h3>
+          <p class="work-tags">Digital Content · YouTube</p>
+        </div>
+      </a>
+    </article>
+
     <article class="work-item" data-cat="art">
       <a class="work-link work-link--video work-link--youtube" href="https://youtu.be/NIL4fZ_6Rtg" target="_blank" rel="noopener noreferrer" aria-label="KEYVITUP SBS 무대 영상 유튜브에서 열기">
         <div class="work-media">
@@ -370,7 +383,7 @@
   </div>
 </footer>
 
-<script src="symbol.js?v=20260724-6"></script>
+<script src="symbol.js?v=20260730-7"></script>
 <script src="main.js?v=20260724-17"></script>
 <script src="gradualblur.js?v=20260724-2"></script>
 <script src="dither.js?v=20260724-1"></script>
