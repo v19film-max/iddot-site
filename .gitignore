@@ -1,1 +1,7 @@
 .DS_Store
+
+# 원본 대용량 영상(100MB 초과 가능) — 사이트에는 *-preview.mp4만 올린다
+assets/borderless.mp4
+assets/hui-fan-concert-vcr.mp4
+assets/keyvitup-best-one.mp4
+assets/limhyunsik-the-answer.mp4

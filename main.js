@@ -337,9 +337,14 @@
         inquiryStatus.classList.remove('is-error');
       }
 
+      var payload = new FormData(inquiry);
+      // 연락처가 이메일이면 받은 메일에서 '답장'이 문의자에게 바로 가도록 한다.
+      var contactValue = (payload.get('contact') || '').toString().trim();
+      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactValue)) payload.append('_replyto', contactValue);
+
       fetch('https://formspree.io/f/xlgqpjez', {
         method: 'POST',
-        body: new FormData(inquiry),
+        body: payload,
         headers: { Accept: 'application/json' }
       })
         .then(function (response) {
@@ -347,6 +352,11 @@
           inquiry.reset();
           if (inquiryStatus) inquiryStatus.textContent = '문의가 정상적으로 접수되었습니다. 빠르게 답 드리겠습니다.';
           if (label) label.textContent = '보냈습니다';
+          // 추가 문의를 보낼 수 있도록 잠시 뒤 버튼을 원래대로 돌린다.
+          setTimeout(function () {
+            inquirySubmit.disabled = false;
+            if (label) label.textContent = '보내기';
+          }, 4000);
         })
         .catch(function () {
           inquirySubmit.disabled = false;
