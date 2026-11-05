@@ -470,6 +470,63 @@
     }, { passive: true });
   }
 
+  /* ── 5e. About 손글씨: 필름 입자처럼 알갱이로 번지며 떠오르고, 영사기처럼 두어 번 깜빡인다 ── */
+  var sigMark = $('.sig__mark');
+  if (sigMark && !reduceMotion && 'IntersectionObserver' in window) {
+    var sigBox = sigMark.closest('.sig');
+    sigBox.classList.add('sig--anim');
+    var playSig = function () {
+      var w = sigMark.naturalWidth, h = sigMark.naturalHeight;
+      if (!w) { sigBox.classList.remove('sig--anim'); return; }
+      var cv = document.createElement('canvas');
+      cv.className = 'sig__mark sig__mark--cv';
+      cv.setAttribute('aria-hidden', 'true');
+      cv.width = w; cv.height = h;
+      sigMark.parentNode.insertBefore(cv, sigMark);
+      var ctx = cv.getContext('2d');
+      var B = 3, cols = Math.ceil(w / B), rows = Math.ceil(h / B);
+      var mask = document.createElement('canvas'); mask.width = cols; mask.height = rows;
+      var mctx = mask.getContext('2d'), md = mctx.createImageData(cols, rows);
+      var th = new Float32Array(cols * rows);
+      for (var y = 0; y < rows; y++) for (var x = 0; x < cols; x++) {
+        th[y * cols + x] = 0.5 * (x / cols) + 0.5 * Math.random();
+      }
+      var DUR = 2600, t0 = performance.now();
+      var frame = function (now) {
+        var k = Math.min(1, (now - t0) / DUR);
+        var e = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+        var p = -0.2 + 1.4 * e;
+        for (var i = 0; i < th.length; i++) {
+          var a = (p - th[i]) / 0.2;
+          md.data[i * 4 + 3] = a <= 0 ? 0 : a >= 1 ? 255 : (a * 255 * (0.6 + 0.4 * Math.random())) | 0;
+        }
+        mctx.putImageData(md, 0, 0);
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.clearRect(0, 0, w, h);
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(mask, 0, 0, cols * B, rows * B);
+        ctx.globalCompositeOperation = 'source-in';
+        ctx.imageSmoothingEnabled = true;
+        ctx.drawImage(sigMark, 0, 0, w, h);
+        if (k < 1) { requestAnimationFrame(frame); return; }
+        var done = function () { sigBox.classList.remove('sig--anim'); cv.remove(); };
+        if (cv.animate) {
+          cv.animate([{ opacity: .32 }, { opacity: .12 }, { opacity: .36 }, { opacity: .2 }, { opacity: .32 }],
+            { duration: 520, easing: 'steps(5, end)' }).onfinish = done;
+        } else done();
+      };
+      requestAnimationFrame(frame);
+    };
+    var sigIO = new IntersectionObserver(function (es) {
+      if (!es[0].isIntersecting) return;
+      sigIO.disconnect();
+      var go = function () { setTimeout(playSig, 350); };
+      if (sigMark.complete && sigMark.naturalWidth) go();
+      else sigMark.addEventListener('load', go, { once: true });
+    }, { threshold: 0.25 });
+    sigIO.observe(sigBox);
+  }
+
   /* ── 6. 문의 폼 ────────────────────────────── */
   var form = $('#inquiryForm');
   if (form) {
@@ -503,7 +560,10 @@
       }).catch(function () {
         submit.disabled = false;
         if (label) label.textContent = '다시 보내기';
-        status.textContent = '전송에 실패했습니다. 잠시 후 다시 시도하거나 메일로 보내주세요.';
+        var body = ['이름 / 회사: ' + (payload.get('name') || ''), '연락처: ' + contact, '분류: ' + (payload.get('type') || ''),
+          '예상 일정: ' + (payload.get('schedule') || ''), '', (payload.get('message') || '')].join('\n');
+        var mail = 'mailto:ceo@iddot.space?subject=' + encodeURIComponent('[iddot 문의] 새 프로젝트') + '&body=' + encodeURIComponent(body);
+        status.innerHTML = '전송에 실패했습니다. <a href="' + mail + '">작성한 내용 그대로 메일로 보내기</a>';
         status.classList.add('is-error');
       });
     });

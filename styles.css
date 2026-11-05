@@ -573,3 +573,9 @@ body::after{content:'';position:fixed;inset:-50%;z-index:400;pointer-events:none
   0%{transform:translate(0,0)}12%{transform:translate(-7%,4%)}25%{transform:translate(5%,-9%)}38%{transform:translate(-10%,-3%)}
   50%{transform:translate(8%,7%)}62%{transform:translate(-4%,10%)}75%{transform:translate(10%,-5%)}88%{transform:translate(-8%,8%)}100%{transform:translate(0,0)}}
 @media (prefers-reduced-motion:reduce){body::after{animation:none;}}
+
+/* ═══ About 손글씨 등장: 잘라 여는 효과 대신 입자로 번지며 떠오른다 (app.js 5e) ═══ */
+.js .sig.reveal .sig__mark{clip-path:none;transition:none;}
+.sig--anim img.sig__mark{visibility:hidden;}
+.sig__mark--cv{height:auto;}
+.form__status a{color:var(--fg);text-decoration:underline;text-underline-offset:3px;}
