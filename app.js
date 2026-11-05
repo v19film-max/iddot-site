@@ -548,7 +548,7 @@
       var send = IS_LOCAL
         // 시안(내 컴퓨터)에서는 실제 메일이 가지 않게 막는다
         ? new Promise(function (res) { setTimeout(function () { res({ ok: true, local: true }); }, 700); })
-        : fetch('https://formspree.io/f/xlgqpjez', { method: 'POST', body: payload, headers: { Accept: 'application/json' } });
+        : fetch('https://formspree.io/f/mvkklygw', { method: 'POST', body: payload, headers: { Accept: 'application/json' } });
 
       send.then(function (r) {
         if (!r.ok) throw new Error('send failed');
