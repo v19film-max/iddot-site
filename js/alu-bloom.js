@@ -258,7 +258,7 @@ export function mountAluSphere(el, opts = {}) {
     squash: new Spring(70, 12, 1), lean: new Spring(22, 7), droop: new Spring(8, 5), wobble: new Spring(30, 7),
     dent: new Spring(150, 5), shake: new Spring(260, 9), pitch: new Spring(5, 3.4), born: new Spring(12, 4.2),
   };
-  let rest = 0, restOn = false, restSpin = 0, restFlow = 0, restCb = null, paused = false;   // 제자리 서기(영상으로 넘어가기 직전)·멈춤(영상이 덮는 동안)
+  let rest = 0, restOn = false, restSpin = 0, restFlow = 0, restCb = null, paused = false, restT0 = -1, restS0 = 0, restM0 = 0, restDur = .5;   // 제자리 서기(영상으로 넘어가기 직전)·멈춤(영상이 덮는 동안)
   let wobbleT = 0, lastActive = 0, nodAt = 0, nodPhase = 0, rippleT = 9, dentDir = [0, 0, 1];
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -374,7 +374,14 @@ export function mountAluSphere(el, opts = {}) {
     const held = grab?.moved;
     if (!held) spinVel += (spinTarget - spinVel) * Math.min(1, dt * (Math.abs(spinTarget) > Math.abs(spinVel) ? 1.6 : .6));
     if (!still && !held) spin += dt * spinVel;
-    if (restOn) { spin += (restSpin - spin) * (still ? 1 : Math.min(1, dt * 13)); if (Math.abs(restSpin - spin) < .002) spin = restSpin; spinVel = 0; }
+    // 제자리 서기: 돌던 방향·속도 그대로 이어 돌다가 부드럽게 감속해 원래 렌더 자세에서 멈춘다(에르미트 곡선, 넘침 없음)
+    if (restOn) {
+      if (restT0 < 0) restT0 = time;
+      const k = still ? 1 : Math.min(1, (time - restT0) / restDur), k2 = k * k, k3 = k2 * k;
+      spin = (2 * k3 - 3 * k2 + 1) * restS0 + (k3 - 2 * k2 + k) * restM0 + (3 * k2 - 2 * k3) * restSpin;
+      if (k >= 1) spin = restSpin;
+      spinVel = 0;
+    }
     turn.rotation.y = spin - iw * 2.4;
     if (!grab?.moved) sp.pitch.step(Math.round(sp.pitch.x / (Math.PI * 2)) * Math.PI * 2, dt);
     // 제자리 서기 중엔 끌어 넘긴 자세·흔들림도 원래 렌더 자세로 모은다(영상 첫 장면과 어긋나 튀지 않게)
@@ -454,7 +461,14 @@ export function mountAluSphere(el, opts = {}) {
     restOn = on;
     if (on) {
       const T = Math.PI * 2;
-      restSpin = Math.round(spin / T) * T; restFlow = Math.round(flowPhase / T) * T; grab = null;
+      // 돌던 방향의 다음 원래 자세까지(거의 멈춰 있으면 가까운 쪽). 남은 각도가 클수록 조금 더 오래 돈다.
+      const v = Math.abs(spinVel) > .05 ? spinVel : 0;
+      restSpin = v > 0 ? Math.ceil(spin / T) * T : v < 0 ? Math.floor(spin / T) * T : Math.round(spin / T) * T;
+      const d = restSpin - spin;
+      restDur = .35 + .65 * Math.abs(d) / T;
+      restM0 = Math.sign(v) === Math.sign(d) ? Math.sign(d) * Math.min(Math.abs(v) * restDur, 3 * Math.abs(d)) : 0;
+      restS0 = spin; restT0 = -1;
+      restFlow = Math.round(flowPhase / T) * T; grab = null;
       restCb = res; wake(); if (!body) { restCb = null; res(); }
     } else { restCb = null; wake(); res(); }
   });

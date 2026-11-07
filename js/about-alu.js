@@ -4,7 +4,7 @@
    거친 알루 표면이 녹아 매끈한 액체 구가 되고, 닦이며 앞면부터 펼쳐져 iddot 크롬 꽃이 된다.
    다시 누르면 거꾸로 접혀(fold-*.mp4) 알루로 돌아오고, 그 자리에서 다시 돈다.
    그림 파일이 커서 About 근처에 왔을 때 불러온다. */
-import { mountAluSphere } from './alu-bloom.js?v=s2';
+import { mountAluSphere } from './alu-bloom.js?v=s3';
 
 const stage = document.getElementById('stage');
 const box = document.getElementById('aluBox');
@@ -34,15 +34,17 @@ const atStart = (v) => new Promise((res) => {
   setTimeout(fin, 700);
   v.pause();
   if (v.readyState >= 2 && v.currentTime === 0) return fin();
+  // 되감은 첫 장면이 실제로 그려지면(지원 브라우저) 바로, 아니면 seeked 뒤 두 프레임 기다린다
+  if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(() => fin());
   v.addEventListener('seeked', fin, { once: true });
   v.currentTime = 0;
 });
-// 멈춰 둔 자리에서 그대로 재생(다시 되감지 않음)
-const playHere = (v) => new Promise((res) => {
-  const go = () => { v.removeEventListener('playing', go); res(); };
-  v.addEventListener('playing', go);
-  const p = v.play(); if (p && p.catch) p.catch(() => { v.removeEventListener('playing', go); res(); });
-});
+// 이미 그려 둔 멈춘 첫 장면(= 제자리 선 알루와 같은 자세)으로 겹침 없이 한 번에 바꾼 뒤 그 자리에서 재생한다.
+// (겹치면 밝아져 깜빡이고, 재생부터 걸고 바꾸면 영상이 앞서 나가 튄다)
+const swapPlay = (v) => {
+  show(v, true); stage.classList.add('is-vid');
+  const p = v.play(); if (p && p.catch) p.catch(() => {});
+};
 const playFrom0 = (v) => new Promise((res) => {
   v.currentTime = 0;
   const go = () => { v.removeEventListener('playing', go); res(); };
@@ -73,17 +75,13 @@ async function run() {
   while (want !== open) {
     const v = want;
     if (v) {
-      // 펼치기: 알루가 원래 렌더 자세로 모인 뒤(최대 0.7초) 영상 첫 장면 위로 살며시 넘어간다.
-      await Promise.race([alu.rest(true), wait(900)]);
+      // 펼치기: 알루가 돌던 방향으로 이어 돌다 원래 렌더 자세에서 멈추면(최대 약 1초) 같은 자세에서 시작하는 영상으로 넘어간다.
+      const ready = atStart(bloomV);
+      await Promise.race([alu.rest(true), wait(1400)]);
       if (reduced.matches) { await toEnd(bloomV); show(bloomV, true); stage.classList.add('is-vid'); }
       else {
-        // 멈춘 첫 장면(= 제자리 선 알루와 같은 자세)을 알루 위로 짧게 겹쳐 바꾼 뒤 재생한다.
-        // 둘 다 멈춘 같은 자세라 잔상은 없고, 실시간 렌더↔블렌더 렌더 질감 차이만 부드럽게 넘어간다.
-        await atStart(bloomV);
-        bloomV.classList.add('is-fade'); show(bloomV, true); stage.classList.add('is-swap');
-        await wait(170);
-        stage.classList.add('is-vid'); bloomV.classList.remove('is-fade');
-        await playHere(bloomV);
+        await ready;
+        swapPlay(bloomV);
         await wait(300); if (bloomV.classList.contains('is-on')) alu.pause?.(true);   // 영상이 덮는 동안 알루는 쉰다(끊김 방지)
         await ended(bloomV);
       }
@@ -91,7 +89,7 @@ async function run() {
       open = true;
     } else {
       // 접기: 꽃(펼침 영상 마지막 장면 = 접힘 영상 첫 장면)에서 거꾸로 접혀 알루로, 그다음 실시간 알루로 넘어간다.
-      if (reduced.matches) { alu.pause?.(false); stage.classList.remove('is-vid', 'is-swap'); show(bloomV, false); }
+      if (reduced.matches) { alu.pause?.(false); stage.classList.remove('is-vid'); show(bloomV, false); }
       else {
         await playFrom0(foldV);
         // 같은 장면끼리 바꿔 끼우기: 겹쳐 흐려지지 않게 전환 없이 한 번에
@@ -102,7 +100,7 @@ async function run() {
         await ended(foldV);
         // 접힘 영상 끝 장면 = 알루 원래 자세: 전환 없이 한 번에 알루로 바꿔 끼운다
         box.style.transition = 'none';
-        stage.classList.remove('is-vid', 'is-swap'); show(foldV, false); void box.offsetWidth;
+        stage.classList.remove('is-vid'); show(foldV, false); void box.offsetWidth;
         box.style.transition = '';
         bloomV.pause(); bloomV.currentTime = 0;                   // 다음 펼침을 위해 첫 장면을 미리 준비
         await wait(220);
