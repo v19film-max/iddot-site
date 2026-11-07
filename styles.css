@@ -739,3 +739,18 @@ body::after{content:'';position:fixed;inset:-50%;z-index:400;pointer-events:none
 /* 원래 사이트 임시판: 알루 구만, 더 작게 */
 .ab .stage{width:min(38%,240px);}
 @media (max-width:860px){.ab .stage{width:min(46%,200px);}}
+/* 알루 구 뒤 공간감: 뒤에서 은은히 비추는 빛 + 아래로 번지는 바닥 빛(알루 화면의 검정은 섞기로 투명처럼) */
+.ab .stage{overflow:visible;isolation:isolate;}
+.ab .stage::before{display:block;content:'';position:absolute;inset:-75%;z-index:0;pointer-events:none;
+  background:radial-gradient(50% 50% at 50% 47%,rgba(150,158,172,.17) 0%,rgba(110,118,132,.08) 34%,rgba(60,64,74,.03) 58%,transparent 74%);}
+.ab .stage::after{content:'';position:absolute;left:-30%;right:-30%;bottom:-22%;height:34%;z-index:0;pointer-events:none;
+  background:radial-gradient(50% 50% at 50% 50%,rgba(190,196,210,.08) 0%,transparent 70%);}
+.ab .stage__alu,.ab .stage__still{z-index:1;mix-blend-mode:screen;}
+/* 소개글: 훨씬 작게 */
+.ab__label{font-size:9px;margin-bottom:12px;}
+.ab__en{font-size:clamp(11px,.82vw,12px);line-height:1.55;}
+.ab__ko{margin-top:12px;font-size:10.5px;line-height:1.75;}
+.ab__ko p{margin-bottom:5px;}
+.ab__list{margin-top:14px;padding-top:10px;font-size:8.5px;}
+.ab__contact{margin-top:16px;font-size:10px;}
+.ab__body{max-width:340px;}
