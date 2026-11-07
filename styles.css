@@ -781,19 +781,13 @@ body::after{content:'';position:fixed;inset:-50%;z-index:400;pointer-events:none
 .ab .stage__vid{transition:none;}
 /* 영상 첫 프레임이 실제로 그려진 순간 알루를 숨긴다(겹치지 않게 한 번에 바꿔 끼움, about-alu.js) */
 .ab .stage.is-vid .stage__alu{visibility:hidden;}
-/* 펼침 영상 첫 장면 그림: 멈춘 알루와 0.28초 겹쳐 바꿔 질감 차이를 합성으로 넘긴다.
-   영상과 같은 screen 합성이라 다 덮였을 때 영상과 똑같이 보이고, 알루는 조금 늦게(ease-in) 빠져
-   screen 겹침의 가운데 어두워짐을 메운다 */
-.stage__f0{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;pointer-events:none;z-index:2;
-  mix-blend-mode:screen;transition:opacity 280ms linear;}
-.stage__f0.is-on{opacity:1;}
 .ab .stage__vid.is-prep{opacity:.01;}   /* 펼치기 직전 첫 장면을 미리 그려 두기(눈에 안 보임) */
-/* 겹쳐 넘기기 곡선: 한쪽은 직선, 다른 쪽은 가운데서 약 0.65가 되게(screen 합성에서 밝기가 평평하게 유지됨) */
-.ab .stage.is-xf .stage__alu{opacity:0;transition:opacity 280ms cubic-bezier(.42,0,1,1);}   /* 펼침: 알루→그림 */
-.ab .stage__vid.is-xin{transition:opacity 120ms cubic-bezier(0,0,.58,1);}                   /* 펼침: 그림→영상 */
-.stage__f0.is-xout{transition:opacity 120ms linear;}
-.ab .stage.is-xb .stage__alu{transition:opacity 280ms cubic-bezier(0,0,.58,1);}             /* 접힘 끝: 그림→알루 */
-.stage.is-fallback .stage__f0{display:none;}
+/* 알루↔영상 겹쳐 넘기기(0.45초, 영상이 움직이는 구간에서). 한쪽은 직선, 다른 쪽은 가운데서 약 0.65가 되게 해
+   screen 합성에서도 밝기가 평평하게 유지된다 */
+.ab .stage.is-xf .stage__alu{opacity:0;transition:opacity 450ms cubic-bezier(.42,0,1,1);}   /* 펼침: 알루 빠짐 */
+.ab .stage__vid.is-xin{transition:opacity 450ms linear;}                                    /* 펼침: 영상 차오름 */
+.ab .stage__vid.is-xout{transition:opacity 450ms linear;}                                   /* 접힘 끝: 영상 빠짐 */
+.ab .stage.is-xb .stage__alu{transition:opacity 450ms cubic-bezier(0,0,.58,1);}             /* 접힘 끝: 알루 차오름 */
 /* 알루 아래 아주 작은 클릭 안내(펼쳐지면 숨김) */
 .ab .stage__hint{font-size:9px;letter-spacing:.26em;color:var(--sub);opacity:.7;z-index:3;}
 .ab .stage.is-bloomed .stage__hint{opacity:0;transform:translateY(6px);}
