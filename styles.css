@@ -463,6 +463,9 @@ html.wd-open body{position:fixed;left:0;right:0;width:100%;overflow:hidden;}
 
 /* 서명이 화면 밖으로 넘쳐도 가로 스크롤이 생기지 않게 */
 .page{overflow-x:clip;}
+/* 메인 About 조명(.ab .stage::before/::after)이 화면 밖으로 퍼져도 모바일 페이지 폭이 늘지 않게.
+   body의 overflow-x는 뷰포트로 넘어가서 iOS에서 페이지가 줌아웃되고 좌우로 밀리는 걸 못 막음 */
+#main{overflow-x:clip;}
 
 /* 아이글씨 버전: 화려한 서명보다 작게, 문단 위에 비스듬히 얹는다 */
 .sig__mark{width:min(78%,640px);left:34%;top:4%;transform:rotate(-6deg);}
