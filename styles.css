@@ -38,8 +38,10 @@ body:not([data-page="home"]) .hd::before{opacity:1;}
 .mark__flower{opacity:0;transform:scale(.3) rotate(-70deg);}
 .hd__brand:hover .mark__dot,.hd__brand:focus-visible .mark__dot{opacity:0;transform:scale(1.2);}
 .hd__brand:hover .mark__flower,.hd__brand:focus-visible .mark__flower{opacity:1;transform:scale(1.18) rotate(0deg);}
-.wordmark{position:relative;display:block;width:132px;height:22px;overflow:hidden;}
-.wordmark img{position:absolute;width:312px;max-width:none;height:auto;left:-93px;top:-88px;user-select:none;-webkit-user-drag:none;}
+/* 로고는 logo-nav.webp 안의 글자만 창으로 잘라 보여준다. 글자(원본 194~464 × 178~217px)가 위·오른쪽이
+   1px씩 잘리던 것을 위아래 여백이 고르게 맞춤 */
+.wordmark{position:relative;display:block;width:136px;height:22px;overflow:hidden;}
+.wordmark img{position:absolute;width:312px;max-width:none;height:auto;left:-92.5px;top:-85px;user-select:none;-webkit-user-drag:none;}
 
 .hd__nav{display:flex;gap:clamp(22px,3.3vw,48px);}
 .hd__nav a{position:relative;font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--fg);padding:10px 0;opacity:.78;transition:opacity var(--t-micro) var(--ease);}
@@ -164,8 +166,8 @@ body:not([data-page="home"]) .hd::before{opacity:1;}
   .hero__steps span.is-on{width:28px;}
   .hd__nav{gap:18px;}
   .hd__nav a{font-size:13px;}
-  .wordmark{width:94px;height:16px;}
-  .wordmark img{width:222px;left:-66px;top:-63px;}
+  .wordmark{width:97px;height:16px;}
+  .wordmark img{width:222px;left:-65.7px;top:-60.5px;}
   .mark{width:24px;height:24px;}
   .hd__brand{gap:9px;}
   .work__bar{flex-direction:column;align-items:flex-start;gap:6px;}

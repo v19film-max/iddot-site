@@ -149,7 +149,7 @@
     }
 
     function paint() {
-      var t = heroVideo.currentTime || 0;
+      var t = imgFallback ? imgNow() : (heroVideo.currentTime || 0);
       var i = segIndexAt(t);
       setTitle(i);
       steps.forEach(function (s, k) {
@@ -168,7 +168,32 @@
     var small = window.matchMedia('(max-width: 760px)').matches;
     heroVideo.src = heroVideo.getAttribute(small ? 'data-src-mobile' : 'data-src-desktop');
 
-    heroVideo.addEventListener('playing', function () { root.classList.add('hero-live'); startLoop(); });
+    heroVideo.addEventListener('playing', function () {
+      root.classList.add('hero-live'); startLoop();
+      if (imgFallback) { imgFallback.remove(); imgFallback = null; heroVideo.style.visibility = ''; }   // 진짜 영상이 돌면 대체 재생은 걷는다
+    });
+
+    // 저전력 모드 대체 재생: 아이폰 사파리는 영상 자동 재생을 막아도 <img>에 넣은 mp4는 움직이는 그림처럼 돌린다.
+    // 영상이 거절되면 같은 파일을 <img>로 띄우고(지원 안 하는 브라우저는 onerror로 걷음), 제목·진행 막대는 시계로 맞춘다.
+    // 화면을 만지면(그때는 영상 재생이 허용됨) 같은 위치부터 진짜 영상으로 넘어간다.
+    var imgFallback = null, imgT0 = 0;
+    var isWebKit = /iPhone|iPad|iPod/.test(navigator.userAgent) ||
+      (/AppleWebKit/.test(navigator.userAgent) && !/Chrome|Chromium|Edg|Android/.test(navigator.userAgent));
+    function imgNow() { return ((performance.now() - imgT0) / 1000) % REEL.duration; }
+    function useImg() {
+      if (imgFallback || reduceMotion || !isWebKit || root.classList.contains('hero-live')) return;
+      var im = document.createElement('img');
+      im.className = heroVideo.className; im.alt = ''; im.setAttribute('aria-hidden', 'true'); im.decoding = 'async';
+      im.onload = function () {
+        if (imgFallback !== im) return;
+        imgT0 = performance.now(); heroVideo.style.visibility = 'hidden';
+        root.classList.add('hero-live'); startLoop();
+      };
+      im.onerror = function () { if (imgFallback === im) { im.remove(); imgFallback = null; heroVideo.style.visibility = ''; } };
+      im.src = heroVideo.currentSrc || heroVideo.src;
+      heroVideo.parentNode.insertBefore(im, heroVideo.nextSibling);
+      imgFallback = im;
+    }
     heroVideo.addEventListener('pause', stopLoop);
     heroVideo.addEventListener('timeupdate', paint);
 
@@ -188,7 +213,11 @@
       if (armed) return; armed = true;
       GESTURES.forEach(function (n) { document.addEventListener(n, onGesture, { capture: true, passive: true }); });
     };
-    var tryPlay = function () { var p = heroVideo.play(); if (p && p.catch) p.catch(armGesture); };
+    var tryPlay = function () {
+      if (imgFallback && imgT0) { try { heroVideo.currentTime = imgNow(); } catch (e) { /* 아직 메타데이터 전 */ } }
+      var p = heroVideo.play();
+      if (p && p.catch) p.catch(function () { armGesture(); useImg(); });
+    };
     if (reduceMotion) armGesture(); else tryPlay();
     // 화면 밖이거나 탭이 가려지면 멈춰서 배터리·데이터를 아낀다
     if ('IntersectionObserver' in window) {
