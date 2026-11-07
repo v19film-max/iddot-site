@@ -377,15 +377,17 @@ export function mountAluSphere(el, opts = {}) {
     if (restOn) { spin += (restSpin - spin) * (still ? 1 : Math.min(1, dt * 13)); if (Math.abs(restSpin - spin) < .002) spin = restSpin; spinVel = 0; }
     turn.rotation.y = spin - iw * 2.4;
     if (!grab?.moved) sp.pitch.step(Math.round(sp.pitch.x / (Math.PI * 2)) * Math.PI * 2, dt);
-    scene.rotation.x = sp.pitch.x;
+    // 제자리 서기 중엔 끌어 넘긴 자세·흔들림도 원래 렌더 자세로 모은다(영상 첫 장면과 어긋나 튀지 않게)
+    const pitchHome = Math.round(sp.pitch.x / (Math.PI * 2)) * Math.PI * 2;
+    scene.rotation.x = sp.pitch.x + (pitchHome - sp.pitch.x) * rest;
     tilt.rotation.x = ((still ? 0 : Math.sin(time * .16 + 1) * .04) + sp.lean.x) * (1 - rest);
-    tilt.rotation.z = sp.shake.x * .02;
+    tilt.rotation.z = sp.shake.x * .02 * (1 - rest);
     scene.scale.set(Math.max(.001, sp.born.x));
     const u = bodyProgram.uniforms, off = u.uOffset.value;
     if (still) { u.uSquash.value = 1; off[1] = 0; }
     else { u.uSquash.value = 1 + (sp.squash.x - 1) * (1 - rest); off[1] = (.012 * Math.sin(time * .7) + .006 * Math.sin(time * 1.3 + 2)) * (1 - rest); }
     u.uPivot.value = -.95;
-    u.uDroop.value = sp.droop.x; u.uWanderT.value = time;
+    u.uDroop.value = sp.droop.x * (1 - rest); u.uWanderT.value = time;
     const dn = u.uDent.value; dn[0] = dentDir[0]; dn[1] = dentDir[1]; dn[2] = dentDir[2]; dn[3] = sp.dent.x * (1 - rest); u.uRipple.value = Math.min(.06, Math.abs(sp.dent.v) * .012 + .04 * Math.exp(-rippleT)) * (1 - rest); u.uRippleT.value = rippleT;
     u.uWobble.value = still ? 0 : sp.wobble.x; u.uWobbleT.value = wobbleT;
     renderer.render({ scene, camera, target: msaa });
