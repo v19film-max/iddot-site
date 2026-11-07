@@ -24,7 +24,14 @@ const vid = (name) => {
   stage.appendChild(v);
   return v;
 };
-let bloomV = null, foldV = null;
+let bloomV = null, foldV = null, f0 = null;
+// 펼침 영상 첫 장면 그림(검정 바탕은 투명). 실시간 알루와 블렌더 영상의 질감 차이를 이 그림으로 덮어 합성한다.
+// 영상끼리 screen으로 겹치면 밝기가 출렁이고, 숨겨 둔 영상은 아이폰에서 제때 안 그려질 수 있어 그림을 쓴다.
+const still = () => {
+  const i = new Image(); i.className = 'stage__f0'; i.alt = ''; i.setAttribute('aria-hidden', 'true');
+  i.decoding = 'async'; i.src = `assets/alu/bloom-f0-${small.matches ? 720 : 1080}.webp?v=s1`;
+  stage.appendChild(i); return i;
+};
 
 const show = (v, on) => v && v.classList.toggle('is-on', on);
 // 첫 장면에 멈춰 둔 채 화면에 실제로 그려질 때까지 기다린다(그리기 전에 알루를 숨기면 한 프레임 비어 튐)
@@ -76,12 +83,22 @@ async function run() {
     const v = want;
     if (v) {
       // 펼치기: 알루가 돌던 방향으로 이어 돌다 원래 렌더 자세에서 멈추면(최대 약 1초) 같은 자세에서 시작하는 영상으로 넘어간다.
+      // 영상은 1% 불투명도로 미리 깔아 둔다: 아이폰도 첫 장면을 실제로 그려 두고, 눈에는 안 보인다
+      bloomV.classList.add('is-prep');
       const ready = atStart(bloomV);
       await Promise.race([alu.rest(true), wait(1400)]);
-      if (reduced.matches) { await toEnd(bloomV); show(bloomV, true); stage.classList.add('is-vid'); }
+      if (reduced.matches) { bloomV.classList.remove('is-prep'); await toEnd(bloomV); show(bloomV, true); stage.classList.add('is-vid'); }
       else {
         await ready;
-        swapPlay(bloomV);
+        if (f0 && f0.complete && f0.naturalWidth) {
+          // ① 멈춘 알루 위로 영상 첫 장면 그림을 0.28초에 걸쳐 덮는다(같은 자세, 질감만 바뀜)
+          f0.classList.add('is-on'); stage.classList.add('is-xf'); await wait(300);
+          // ② 같은 프레임에 그림을 걷고 이미 그려 둔 영상 첫 장면을 켠 뒤(둘이 겹쳐 밝아지지 않게) 그 자리에서 재생
+          f0.style.transition = 'none'; f0.classList.remove('is-on');
+          bloomV.classList.remove('is-prep'); show(bloomV, true); stage.classList.add('is-vid');
+          void f0.offsetWidth; f0.style.transition = '';
+          const p = bloomV.play(); if (p && p.catch) p.catch(() => {});
+        } else { bloomV.classList.remove('is-prep'); swapPlay(bloomV); }
         await wait(300); if (bloomV.classList.contains('is-on')) alu.pause?.(true);   // 영상이 덮는 동안 알루는 쉰다(끊김 방지)
         await ended(bloomV);
       }
@@ -89,7 +106,7 @@ async function run() {
       open = true;
     } else {
       // 접기: 꽃(펼침 영상 마지막 장면 = 접힘 영상 첫 장면)에서 거꾸로 접혀 알루로, 그다음 실시간 알루로 넘어간다.
-      if (reduced.matches) { alu.pause?.(false); stage.classList.remove('is-vid'); show(bloomV, false); }
+      if (reduced.matches) { alu.pause?.(false); stage.classList.remove('is-vid', 'is-xf'); show(bloomV, false); }
       else {
         await playFrom0(foldV);
         // 같은 장면끼리 바꿔 끼우기: 겹쳐 흐려지지 않게 전환 없이 한 번에
@@ -100,7 +117,7 @@ async function run() {
         await ended(foldV);
         // 접힘 영상 끝 장면 = 알루 원래 자세: 전환 없이 한 번에 알루로 바꿔 끼운다
         box.style.transition = 'none';
-        stage.classList.remove('is-vid'); show(foldV, false); void box.offsetWidth;
+        stage.classList.remove('is-vid', 'is-xf'); show(foldV, false); void box.offsetWidth;
         box.style.transition = '';
         bloomV.pause(); bloomV.currentTime = 0;                   // 다음 펼침을 위해 첫 장면을 미리 준비
         await wait(220);
@@ -126,7 +143,7 @@ const mount = () => {
   mounted = true;
   alu = mountAluSphere(box, {
     assets: new URL('../assets/alu/', import.meta.url).href,
-    onReady: () => { bloomV = vid('bloom'); foldV = vid('fold'); stage.classList.add('is-ready'); stage._alu = alu; },
+    onReady: () => { bloomV = vid('bloom'); foldV = vid('fold'); f0 = still(); stage.classList.add('is-ready'); stage._alu = alu; },
     onFail: () => stage.classList.add('is-fallback'),
     // 누르면 앱처럼 쏙 들어갔다가 그 반동으로 펼쳐진다.
     onTap: () => setTimeout(toggle, 90),
