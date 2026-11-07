@@ -788,5 +788,12 @@ body::after{content:'';position:fixed;inset:-50%;z-index:400;pointer-events:none
   mix-blend-mode:screen;transition:opacity 280ms linear;}
 .stage__f0.is-on{opacity:1;}
 .ab .stage__vid.is-prep{opacity:.01;}   /* 펼치기 직전 첫 장면을 미리 그려 두기(눈에 안 보임) */
-.ab .stage.is-xf .stage__alu{opacity:0;transition:opacity 280ms cubic-bezier(.55,0,1,.45);}
+/* 겹쳐 넘기기 곡선: 한쪽은 직선, 다른 쪽은 가운데서 약 0.65가 되게(screen 합성에서 밝기가 평평하게 유지됨) */
+.ab .stage.is-xf .stage__alu{opacity:0;transition:opacity 280ms cubic-bezier(.42,0,1,1);}   /* 펼침: 알루→그림 */
+.ab .stage__vid.is-xin{transition:opacity 120ms cubic-bezier(0,0,.58,1);}                   /* 펼침: 그림→영상 */
+.stage__f0.is-xout{transition:opacity 120ms linear;}
+.ab .stage.is-xb .stage__alu{transition:opacity 280ms cubic-bezier(0,0,.58,1);}             /* 접힘 끝: 그림→알루 */
 .stage.is-fallback .stage__f0{display:none;}
+/* 알루 아래 아주 작은 클릭 안내(펼쳐지면 숨김) */
+.ab .stage__hint{font-size:9px;letter-spacing:.26em;color:var(--sub);opacity:.7;z-index:3;}
+.ab .stage.is-bloomed .stage__hint{opacity:0;transform:translateY(6px);}
