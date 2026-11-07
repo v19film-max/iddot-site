@@ -55,6 +55,31 @@
     onScroll();
   }
 
+  // 메인에서는 지금 보고 있는 구간에 맞춰 메뉴 밑줄이 옮겨 간다(Work → About(+Team) → Contact).
+  // 밑줄은 CSS 전환으로 새 메뉴는 왼쪽에서 그어지고 이전 메뉴는 오른쪽으로 걷힌다.
+  if (header && document.body.getAttribute('data-page') === 'home') {
+    var navLinks = $$('.hd__nav a');
+    var spy = [['work', '#work'], ['about', '#about'], ['contact', '#contact']].map(function (p) {
+      return { el: document.getElementById(p[0]), link: navLinks.filter(function (a) { return (a.getAttribute('href') || '').slice(-p[1].length) === p[1]; })[0] };
+    }).filter(function (s) { return s.el && s.link; });
+    var spyOn = null, spyRaf = 0;
+    var spyUpdate = function () {
+      spyRaf = 0;
+      var line = window.innerHeight * .4, cur = spy[0];
+      spy.forEach(function (s) { if (s.el.getBoundingClientRect().top <= line) cur = s; });
+      // 맨 아래까지 내렸으면 마지막 구간(짧아서 기준선에 못 닿아도)
+      if (window.innerHeight + window.pageYOffset >= document.documentElement.scrollHeight - 4) cur = spy[spy.length - 1];
+      if (cur === spyOn) return;
+      spyOn = cur;
+      spy.forEach(function (s) { if (s === cur) s.link.setAttribute('aria-current', 'page'); else s.link.removeAttribute('aria-current'); });
+    };
+    if (spy.length) {
+      window.addEventListener('scroll', function () { if (!spyRaf) spyRaf = requestAnimationFrame(spyUpdate); }, { passive: true });
+      window.addEventListener('resize', function () { if (!spyRaf) spyRaf = requestAnimationFrame(spyUpdate); });
+      spyUpdate();
+    }
+  }
+
   /* ── 3. 첫 화면 쇼릴 ───────────────────────── */
   // 임시 쇼릴(hero-reel.mp4) 구간표.
   // 진짜 쇼릴로 바꾸면 이 표만 실제 구간에 맞게 고친다.

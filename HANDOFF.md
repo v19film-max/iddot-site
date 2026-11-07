@@ -17,6 +17,8 @@
 
 ## 0. 최근 작업 로그
 
+- **2026-11-07 (Claude Code, 클라우드)** — 메인 상단 메뉴 밑줄이 스크롤 위치를 따라감(Work → About(Team 포함) → Contact, 화면 40% 기준선, 맨 아래면 Contact).
+  `app.js` 2. 헤더 아래 스크롤 스파이가 `aria-current`를 옮김. hover 밑줄은 `@media (hover:hover)`로 한정(휴대폰에서 누른 뒤 밑줄 두 개 남던 것 제거).
 - **2026-11-07 (Claude Code, 클라우드)** — 첫 화면 쇼릴이 재생 안 되던 경우 대응(`app.js` initHero): 자동 재생이 거절되면(아이폰 저전력 모드 등)
   화면을 처음 만질 때(pointerdown/touchend/keydown) 재생. '동작 줄이기' 기기는 전엔 아예 재생 안 됐는데 이제 처음 만질 때 재생. `app.js?v=p10`.
 - **2026-11-07 (Claude Code, 클라우드)** — 알루↔꽃 전환을 '움직임 속 겹쳐 넘기기'로 변경(정지 그림 `bloom-f0` 단계 삭제, 파일도 삭제).

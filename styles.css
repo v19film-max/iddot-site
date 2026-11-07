@@ -44,8 +44,13 @@ body:not([data-page="home"]) .hd::before{opacity:1;}
 .hd__nav{display:flex;gap:clamp(22px,3.3vw,48px);}
 .hd__nav a{position:relative;font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--fg);padding:10px 0;opacity:.78;transition:opacity var(--t-micro) var(--ease);}
 .hd__nav a::after{content:'';position:absolute;left:0;right:0;bottom:4px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform var(--t-pop) var(--ease);}
-.hd__nav a:hover,.hd__nav a[aria-current="page"]{opacity:1;}
-.hd__nav a:hover::after,.hd__nav a[aria-current="page"]::after{transform:scaleX(1);transform-origin:left;}
+.hd__nav a[aria-current="page"]{opacity:1;}
+.hd__nav a[aria-current="page"]::after{transform:scaleX(1);transform-origin:left;}
+/* 마우스가 있는 기기에서만 hover 밑줄(휴대폰은 누른 뒤 hover가 남아 밑줄이 두 개 생겼음) */
+@media (hover:hover){
+  .hd__nav a:hover{opacity:1;}
+  .hd__nav a:hover::after{transform:scaleX(1);transform-origin:left;}
+}
 
 /* ── 첫 화면 쇼릴 ─────────────────────── */
 .hero{position:relative;width:100%;height:max(56vh,42.5vw);max-height:92vh;overflow:hidden;background:#000;}
