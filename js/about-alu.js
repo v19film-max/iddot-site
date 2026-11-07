@@ -52,6 +52,17 @@ const swapPlay = (v) => {
   show(v, true); stage.classList.add('is-vid');
   const p = v.play(); if (p && p.catch) p.catch(() => {});
 };
+// 재생을 걸고, 영상이 실제로 재생 장면을 그리기 시작하면(두 번째 프레임 이후) 풀린다.
+// 늦어지면 최대 0.4초까지 기다린다(검은 프레임보다 살짝 늦은 시작이 덜 거슬림).
+const playing = (v) => new Promise((res) => {
+  let done = false;
+  const fin = () => { if (done) return; done = true; res(); };
+  const tick = (now, meta) => { if (done) return; if ((meta && meta.mediaTime >= .03) || v.currentTime >= .03) fin(); else v.requestVideoFrameCallback(tick); };
+  if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(tick);
+  else { const f = () => { if (v.currentTime >= .03) { v.removeEventListener('timeupdate', f); fin(); } }; v.addEventListener('timeupdate', f); }
+  setTimeout(fin, 400);
+  const p = v.play(); if (p && p.catch) p.catch(fin);
+});
 const playFrom0 = (v) => new Promise((res) => {
   v.currentTime = 0;
   const go = () => { v.removeEventListener('playing', go); res(); };
@@ -93,11 +104,13 @@ async function run() {
         if (f0 && f0.complete && f0.naturalWidth) {
           // ① 멈춘 알루 위로 영상 첫 장면 그림을 0.28초에 걸쳐 덮는다(같은 자세, 질감만 바뀜)
           f0.classList.add('is-on'); stage.classList.add('is-xf'); await wait(300);
-          // ② 같은 프레임에 그림을 걷고 이미 그려 둔 영상 첫 장면을 켠 뒤(둘이 겹쳐 밝아지지 않게) 그 자리에서 재생
+          // ② 그림이 덮고 있는 동안(영상은 1%로 숨은 채) 재생을 먼저 건다. 아이폰은 재생을 시작하는 순간
+          //    영상이 한 프레임 검게 비치는 일이 있어서다. 영상이 실제로 장면을 그리기 시작하면, 영상 처음
+          //    0.17초는 움직임 없는 같은 장면이라 그 사이에 같은 프레임에서 그림→영상으로 바꾼다(겹쳐 밝아지지 않게).
+          await playing(bloomV);
           f0.style.transition = 'none'; f0.classList.remove('is-on');
           bloomV.classList.remove('is-prep'); show(bloomV, true); stage.classList.add('is-vid');
           void f0.offsetWidth; f0.style.transition = '';
-          const p = bloomV.play(); if (p && p.catch) p.catch(() => {});
         } else { bloomV.classList.remove('is-prep'); swapPlay(bloomV); }
         await wait(300); if (bloomV.classList.contains('is-on')) alu.pause?.(true);   // 영상이 덮는 동안 알루는 쉰다(끊김 방지)
         await ended(bloomV);
