@@ -23,8 +23,10 @@ button{font-family:inherit;}
 
 /* ── 헤더 ─────────────────────────────── */
 .hd{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--hd);padding:0 var(--pad);display:flex;align-items:center;justify-content:space-between;gap:20px;}
-.hd::before{content:'';position:absolute;inset:0;z-index:-1;background:rgba(8,8,9,.88);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);opacity:0;transition:opacity var(--t-pop) var(--ease);}
-.hd::after{content:'';position:absolute;inset:0 0 -40px;z-index:-2;pointer-events:none;background:linear-gradient(to bottom,rgba(8,8,9,.55),transparent);transition:opacity var(--t-pop) var(--ease);}
+/* 배경판은 위로 120px 더 뻗는다: 아이폰 사파리는 페이지가 상태바(시계) 뒤까지 비치는데 고정 헤더는 그 아래에 붙어서,
+   헤더 위로 콘텐츠가 보이며 검은 띠가 떠 보이던 것을 막는다(다른 브라우저에선 화면 밖이라 영향 없음) */
+.hd::before{content:'';position:absolute;inset:-120px 0 0;z-index:-1;background:rgba(8,8,9,.88);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);opacity:0;transition:opacity var(--t-pop) var(--ease);}
+.hd::after{content:'';position:absolute;inset:-120px 0 -40px;z-index:-2;pointer-events:none;background:linear-gradient(to bottom,rgba(8,8,9,.55) 120px,transparent);transition:opacity var(--t-pop) var(--ease);}
 .hd[data-top="false"]::before{opacity:1;}
 .hd[data-top="false"]::after{opacity:0;}
 body:not([data-page="home"]) .hd::before{opacity:1;}
