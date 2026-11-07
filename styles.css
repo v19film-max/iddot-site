@@ -765,3 +765,5 @@ body::after{content:'';position:fixed;inset:-50%;z-index:400;pointer-events:none
 .ab .stage{--lx:0;--le:0;}
 .ab .stage::before{opacity:calc(.78 + var(--le) * .22);transform:translateX(calc(var(--lx) * 9%)) scale(calc(1 + var(--le) * .06));will-change:transform,opacity;}
 .ab .stage::after{opacity:calc(.8 + var(--le) * .5);transform:translateX(calc(var(--lx) * -6%)) scaleX(calc(1 + var(--le) * .15));}
+/* 꽃 영상도 검정은 투명처럼: 뒤 조명이 그대로 비친다 */
+.ab .stage__vid{mix-blend-mode:screen;background:transparent;}
