@@ -150,17 +150,35 @@
     setTitle(0);
     paint();
 
-    if (!reduceMotion) {
-      var tryPlay = function () { var p = heroVideo.play(); if (p && p.catch) p.catch(function () {}); };
-      tryPlay();
-      // 화면 밖이거나 탭이 가려지면 멈춰서 배터리·데이터를 아낀다
-      if ('IntersectionObserver' in window) {
-        new IntersectionObserver(function (es) {
-          es.forEach(function (en) { if (en.isIntersecting && !document.hidden) tryPlay(); else heroVideo.pause(); });
-        }, { threshold: 0.15 }).observe(heroVideo);
-      }
-      document.addEventListener('visibilitychange', function () { if (document.hidden) heroVideo.pause(); else tryPlay(); });
+    // 자동 재생이 막히면(아이폰 저전력 모드 등) 화면을 처음 만지는 순간 재생한다.
+    // '동작 줄이기'를 켠 기기도 저절로는 안 돌리고, 처음 만질 때 재생한다(전엔 아예 재생되지 않았음).
+    var heroSeen = true, armed = false;
+    var GESTURES = ['pointerdown', 'touchend', 'keydown'];
+    var onGesture = function () {
+      GESTURES.forEach(function (n) { document.removeEventListener(n, onGesture, true); });
+      armed = false;
+      if (heroSeen && !document.hidden && heroVideo.paused) tryPlay();
+    };
+    var armGesture = function () {
+      if (armed) return; armed = true;
+      GESTURES.forEach(function (n) { document.addEventListener(n, onGesture, { capture: true, passive: true }); });
+    };
+    var tryPlay = function () { var p = heroVideo.play(); if (p && p.catch) p.catch(armGesture); };
+    if (reduceMotion) armGesture(); else tryPlay();
+    // 화면 밖이거나 탭이 가려지면 멈춰서 배터리·데이터를 아낀다
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) {
+        es.forEach(function (en) {
+          heroSeen = en.isIntersecting;
+          if (en.isIntersecting && !document.hidden) { if (!reduceMotion || root.classList.contains('hero-live')) tryPlay(); }
+          else heroVideo.pause();
+        });
+      }, { threshold: 0.15 }).observe(heroVideo);
     }
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) heroVideo.pause();
+      else if (heroSeen && (!reduceMotion || root.classList.contains('hero-live'))) tryPlay();
+    });
 
     nowBtn.addEventListener('click', function () {
       var key = segs[Math.max(0, current)].key;
