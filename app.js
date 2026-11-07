@@ -59,14 +59,14 @@
   // 임시 쇼릴(hero-reel.mp4) 구간표.
   // 진짜 쇼릴로 바꾸면 이 표만 실제 구간에 맞게 고친다.
   var REEL = {
-    duration: 21,      // 3.5초씩 6구간, 겹침 없이 컷으로 넘어간다
+    duration: 31.458, // 24fps 기준 컷 경계(튀는 컷 없이 잘라 붙임)
     segments: [
       { key: 'keyvitup-best-one',     start: 0 },
-      { key: 'limhyunsik-the-answer', start: 3.5 },
-      { key: 'sdf-bky-teaser',        start: 7 },
-      { key: 'hui-fan-concert-vcr',   start: 10.5 },
-      { key: 'victor',                start: 14 },
-      { key: 'borderless',            start: 17.5 }
+      { key: 'limhyunsik-the-answer', start: 4.792 },
+      { key: 'sdf-bky-teaser',        start: 9.667 },
+      { key: 'hui-fan-concert-vcr',   start: 14.667 },
+      { key: 'victor',                start: 19.75 },
+      { key: 'borderless',            start: 26.458 }
     ]
   };
   var heroVideo = $('#heroVideo');
@@ -85,6 +85,14 @@
       stepsEl.appendChild(s);
     });
     var steps = $$('span', stepsEl);
+    // 진행 막대를 누르면 그 장면으로 넘어간다(막대가 가늘어 가장 가까운 칸으로)
+    stepsEl.addEventListener('click', function (e) {
+      var best = 0, bd = 1e9;
+      steps.forEach(function (s, k) { var r = s.getBoundingClientRect(), d = Math.abs(e.clientX - (r.left + r.width / 2)); if (d < bd) { bd = d; best = k; } });
+      heroVideo.currentTime = segs[best].start + .02;
+      var p = heroVideo.play(); if (p && p.catch) p.catch(function () {});
+      paint();
+    });
 
     function segIndexAt(t) {
       var idx = 0;
@@ -217,6 +225,13 @@
     p.className = 'work-sub';
     p.textContent = cardSub(w);
     meta.appendChild(h); meta.appendChild(p);
+    if (w.role) {
+      // 대표가 맡은 직책을 제목 아래에 굵게
+      var r = document.createElement('p');
+      r.className = 'work-role';
+      r.textContent = w.role;
+      meta.appendChild(r);
+    }
 
     a.appendChild(media); a.appendChild(meta);
     art.appendChild(a);
@@ -391,7 +406,7 @@
   }
 
   /* ── 5b. 일반 페이지 등장 효과 (About · Contact) ── */
-  var pageReveals = $$('.page .reveal');
+  var pageReveals = $$('.page .reveal, .home-sec .reveal');
   if (pageReveals.length) {
     if ('IntersectionObserver' in window && !reduceMotion) {
       pageReveals.forEach(function (el, i) { if (i < 4) el.style.transitionDelay = i * 80 + 'ms'; });

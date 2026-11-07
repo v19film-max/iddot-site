@@ -579,3 +579,163 @@ body::after{content:'';position:fixed;inset:-50%;z-index:400;pointer-events:none
 .sig--anim img.sig__mark{visibility:hidden;}
 .sig__mark--cv{height:auto;}
 .form__status a{color:var(--fg);text-decoration:underline;text-underline-offset:3px;}
+
+/* ═══ 포트폴리오 첫 화면: 3D 점 → 꽃 로고 (bloom.js) ═══ */
+.stage{position:relative;height:100svh;min-height:560px;background:#000;overflow:hidden;isolation:isolate;}
+.stage::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(ellipse 46% 42% at 50% 48%,rgba(150,160,185,.10),transparent 70%);
+  opacity:.6;transition:opacity 1600ms var(--ease);}
+.stage.is-open::before{opacity:1;}
+.stage__canvas{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transform:scale(.92);
+  transition:opacity 1200ms var(--ease),transform 1600ms var(--ease);}
+.stage.is-ready .stage__canvas{opacity:1;transform:none;}
+.stage__fallback{display:none;position:absolute;left:50%;top:50%;width:min(64vmin,620px);transform:translate(-50%,-50%);}
+.stage.is-fallback .stage__fallback{display:block;}
+.stage.is-fallback .stage__canvas,.stage.is-fallback .stage__hint{display:none;}
+.stage__hit{position:absolute;left:50%;top:50%;width:min(44vmin,380px);height:min(44vmin,380px);transform:translate(-50%,-50%);
+  border:0;border-radius:50%;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.stage.is-open .stage__hit{width:min(70vmin,640px);height:min(70vmin,640px);}
+.stage__hit:focus-visible{outline:1px solid rgba(242,241,239,.5);outline-offset:6px;}
+.stage__hint,.stage__line{position:absolute;left:0;right:0;margin:0;text-align:center;pointer-events:none;}
+.stage__hint{bottom:clamp(96px,16vh,150px);font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--sub);
+  transition:opacity var(--t-pop) var(--ease),transform var(--t-window) var(--ease);}
+.stage__hint span{display:inline-block;animation:hintPulse 2.6s var(--ease) infinite;}
+@keyframes hintPulse{0%,100%{opacity:.45}50%{opacity:1}}
+.stage:not(.is-ready) .stage__hint,.stage.is-open .stage__hint{opacity:0;transform:translateY(6px);}
+.stage__line{bottom:clamp(96px,16vh,150px);font-size:clamp(15px,1.4vw,18px);font-weight:600;letter-spacing:-.01em;color:var(--fg);
+  opacity:0;transform:translateY(10px);transition:opacity 700ms var(--ease) 0ms,transform 900ms var(--ease) 0ms;}
+.stage.is-open .stage__line{opacity:1;transform:none;transition-delay:1100ms;}
+.stage__down{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--sub);
+  padding:10px 4px 26px;opacity:.7;transition:opacity var(--t-micro) var(--ease);}
+.stage__down::after{content:'';position:absolute;left:50%;bottom:0;width:1px;height:18px;background:currentColor;transform-origin:top;animation:downLine 2.2s var(--ease) infinite;}
+@keyframes downLine{0%{transform:scaleY(0)}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+.stage__down:hover{opacity:1;}
+@media (prefers-reduced-motion:reduce){.stage__hint span,.stage__down::after{animation:none;}.stage__canvas{transition:none;}}
+
+/* ═══ 홈 About: 왼쪽 3D 로고, 오른쪽 소개글 ═══ */
+.ab{max-width:var(--max);margin:clamp(100px,12vw,180px) auto 0;padding:0 var(--pad) clamp(80px,10vw,140px);
+  display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:clamp(32px,5vw,90px);align-items:center;scroll-margin-top:var(--hd);}
+.ab .stage{height:auto;min-height:0;aspect-ratio:1/1;background:transparent;overflow:visible;}
+.ab .stage::before{inset:-10%;}
+.ab .stage__hit{width:46%;height:46%;}
+.ab .stage.is-open .stage__hit{width:86%;height:86%;}
+.ab .stage__hint{bottom:2%;}
+.ab .stage__fallback{width:86%;}
+.ab__label{margin:0 0 22px;font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--sub);}
+.ab__en{margin:0;font-family:'EB Garamond',Georgia,'Times New Roman',serif;font-size:clamp(18px,1.7vw,23px);line-height:1.4;color:#d8d5cf;hyphens:none;}
+.ab__ko{margin-top:28px;font-size:14.5px;line-height:1.85;color:var(--sub);word-break:keep-all;}
+.ab__ko p{margin:0 0 10px;}
+.ab__ko strong{color:var(--fg);font-weight:600;}
+.ab__list{list-style:none;margin:30px 0 0;padding:18px 0 0;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 22px;
+  font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--fg);}
+.ab__contact{margin:34px 0 0;display:flex;gap:26px;font-size:13px;font-weight:600;}
+.ab__contact a{position:relative;padding-bottom:2px;}
+.ab__contact a::after{content:'';position:absolute;left:0;right:0;bottom:0;height:1px;background:currentColor;opacity:.35;transform-origin:left;transition:opacity var(--t-micro) var(--ease),transform var(--t-pop) var(--ease);}
+.ab__contact a:hover::after{opacity:1;}
+@media (max-width:860px){
+  .ab{grid-template-columns:1fr;gap:16px;}
+  .ab .stage{width:min(100%,520px);margin:0 auto;}
+}
+.stage__fallback{mix-blend-mode:screen;}
+
+/* ═══ 홈 한 페이지: 팀 · 문의 구역 ═══ */
+.home-sec{max-width:var(--max);margin:0 auto;padding:0 var(--pad);scroll-margin-top:var(--hd);}
+#team{padding-bottom:clamp(40px,6vw,80px);}
+#team .split{margin-top:0;}
+#contact{padding-top:clamp(80px,10vw,140px);padding-bottom:clamp(100px,11vw,170px);}
+#contact .page-title{margin-top:10px;}
+#contact{overflow-x:clip;}
+
+/* ═══ About 왼쪽: 알루 금속 구 (배경은 반드시 #000, 이음새 방지) ═══ */
+.ab{position:relative;isolation:isolate;}
+.ab::before{content:'';position:absolute;z-index:-1;top:-12%;bottom:-6%;left:calc(50% - 50vw);right:calc(50% - 50vw);background:#000;pointer-events:none;
+  -webkit-mask:linear-gradient(to bottom,transparent,#000 14%,#000 86%,transparent);mask:linear-gradient(to bottom,transparent,#000 14%,#000 86%,transparent);}
+.ab .stage{background:#000;overflow:hidden;}
+.ab .stage::before{display:none;}
+.stage__alu{position:absolute;inset:0;opacity:0;transform:scale(.96);
+  transition:opacity 900ms var(--ease),transform 1100ms var(--spring),filter 700ms var(--ease);}
+.stage.is-ready .stage__alu{opacity:1;transform:none;}
+.stage.is-open .stage__alu{opacity:0;transform:scale(.35);filter:blur(6px);pointer-events:none;transition-duration:520ms,620ms,520ms;}
+.stage__still{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:none;}
+.stage.is-fallback .stage__still{display:block;}
+.stage.is-fallback.is-open .stage__still{opacity:0;transition:opacity 400ms var(--ease);}
+.stage__flower{position:absolute;inset:7%;padding:0;border:0;background:none;cursor:pointer;opacity:0;pointer-events:none;
+  transform:scale(.18) rotate(-70deg);transition:opacity 380ms var(--ease),transform 600ms var(--ease-exit);}
+.stage__flower img{width:100%;height:100%;object-fit:contain;mix-blend-mode:screen;}
+.stage.is-open .stage__flower{opacity:1;pointer-events:auto;transform:none;
+  transition:opacity 500ms var(--ease) 120ms,transform 1300ms cubic-bezier(.22,1.25,.36,1) 80ms;}
+.stage__open{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);z-index:2;appearance:none;border:0;background:none;cursor:pointer;padding:10px 8px;
+  font:700 11px/1 'Pretendard Variable',Pretendard,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:var(--sub);
+  opacity:0;transition:opacity var(--t-pop) var(--ease),color var(--t-micro) var(--ease);}
+.stage.is-ready .stage__open,.stage.is-fallback .stage__open{opacity:1;animation:hintPulse 2.6s var(--ease) infinite;}
+.stage.is-open .stage__open{animation:none;opacity:.75;}
+.stage__open:hover{color:var(--fg);}
+@media (prefers-reduced-motion:reduce){.stage__alu,.stage__flower{transition:opacity 300ms linear !important;transform:none !important;filter:none !important;}.stage__open{animation:none !important;}}
+
+/* 알루 구 → 3D 꽃 이어받기: 누르는 순간 같은 자리의 3D 구로 바뀌고, 그 구가 꽃으로 펼쳐진다 */
+.stage__bloom{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;pointer-events:none;cursor:pointer;transition:opacity 260ms var(--ease);}
+.stage.is-bloom .stage__bloom{opacity:1;pointer-events:auto;}
+.stage.is-bloom .stage__alu{opacity:0;pointer-events:none;transition:opacity 260ms var(--ease);}
+/* 구는 알루 구 그대로 두고(갈아끼우지 않음) 자바스크립트가 매 장면 크기·투명도를 정한다 */
+.stage.is-bloom .stage__alu{opacity:1;pointer-events:none;transition:none;will-change:transform,opacity;}
+.stage__bloom{transition:none;}
+.stage.is-bloom .stage__bloom{opacity:1;}
+
+/* 점 → 꽃: 블렌더 통렌더 영상(펼침·접힘). 알루 위 같은 자리·같은 크기로 겹친다. */
+.stage__vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;background:#000;opacity:0;pointer-events:none;cursor:pointer;transition:opacity 220ms linear;z-index:1;}
+.stage__vid.is-on{opacity:1;pointer-events:auto;}
+.stage.is-fallback .stage__vid{display:none;}
+
+/* 크레딧: 구역 제목(가로 전체), 대표 이름 굵게 */
+.wd__credits .wd__sec{grid-column:1/-1;margin-top:14px;color:var(--fg);font-size:11px;font-weight:800;letter-spacing:.14em;}
+.wd__credits .wd__sec:first-child{margin-top:0;}
+.wd__credits dd strong{font-weight:800;color:var(--fg);}
+.wd__credits dd{color:var(--sub);word-break:keep-all;}
+.wd__credits{grid-template-columns:minmax(72px,34%) minmax(0,1fr);}
+.wd__credits dt:not(.wd__sec){line-height:1.45;}
+
+/* 카드: 대표가 맡은 직책(제목 위, 굵게) */
+.work-role{margin:0 0 6px;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--fg);line-height:1.4;}
+@media (max-width:700px){.work-role{font-size:10px;margin-bottom:4px;}}
+.wd__credits dt + dd:first-of-type{}
+.wd__credits dd.is-role{color:var(--fg);font-weight:800;letter-spacing:.06em;}
+
+/* 카드 직책: 제목 아래 */
+.work-role{margin:8px 0 0;}
+/* 상세 창: 전체 크레딧 위에 내 롤 */
+.wd__role{display:flex;align-items:baseline;gap:14px;margin:clamp(22px,2.6vw,34px) 0 0;padding:14px 0 0;border-top:1px solid var(--line);}
+.wd__role[hidden]{display:none;}
+.wd__role-k{color:var(--mute);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;}
+.wd__role-v{color:var(--fg);font-size:15px;font-weight:800;letter-spacing:.06em;}
+.wd__role + .wd__credits{margin-top:14px;}
+/* 쇼릴 진행 막대: 눌러서 장면 이동 */
+.hero__steps{cursor:pointer;padding:12px 0;margin-bottom:-12px;z-index:2;}
+.hero__steps span{transition:width var(--t-pop) var(--ease),background var(--t-micro) var(--ease);}
+.hero__steps:hover span:not(.is-on){background:rgba(242,241,239,.42);}
+
+/* 상세 창 Role: 작게(크레딧 줄과 같은 크기) */
+.wd__role{gap:12px;margin:clamp(18px,2vw,26px) 0 0;padding:10px 0 0;}
+.wd__role-k{font-size:10px;}
+.wd__role-v{font-size:12px;letter-spacing:.08em;}
+
+/* 문구: 더 작게 */
+.tagline{font-size:clamp(12px,1vw,14px);letter-spacing:.02em;font-weight:700;}
+/* About: 모형은 검은 공간 한가운데 작게 떠 있고, 소개글도 전체적으로 작게 */
+.ab{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,64px);padding-top:clamp(40px,5vw,80px);}
+.ab .stage{width:min(54%,360px);justify-self:center;}
+.ab .stage__open{font-size:9px;letter-spacing:.2em;bottom:1%;}
+.ab__body{max-width:400px;}
+.ab__label{margin-bottom:14px;font-size:10px;}
+.ab__en{font-size:clamp(13.5px,1.05vw,15px);line-height:1.5;}
+.ab__ko{margin-top:16px;font-size:12px;line-height:1.8;}
+.ab__ko p{margin-bottom:7px;}
+.ab__list{margin-top:18px;padding-top:12px;gap:6px 14px;font-size:9.5px;}
+.ab__contact{margin-top:20px;gap:18px;font-size:11.5px;}
+@media (max-width:860px){
+  .ab{grid-template-columns:1fr;gap:28px;}
+  .ab .stage{width:min(64%,300px);margin:0 auto;}
+  .ab__body{max-width:none;}
+}
+/* 원래 사이트 임시판: 알루 구만, 더 작게 */
+.ab .stage{width:min(38%,240px);}
+@media (max-width:860px){.ab .stage{width:min(46%,200px);}}

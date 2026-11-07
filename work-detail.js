@@ -41,6 +41,7 @@
           '<p class="wd__cat"></p>' +
           '<h2 class="wd__title" id="wdTitle"></h2>' +
           '<p class="wd__artist"></p>' +
+          '<p class="wd__role"><span class="wd__role-k">Role</span><span class="wd__role-v"></span></p>' +
           '<dl class="wd__credits"></dl>' +
           '<p class="wd__note"></p>' +
           '<a class="wd__yt" target="_blank" rel="noopener noreferrer">YouTube에서 보기<span aria-hidden="true"> ↗</span></a>' +
@@ -65,6 +66,7 @@
   var elTitle  = root.querySelector('.wd__title');
   var elArtist = root.querySelector('.wd__artist');
   var elCred   = root.querySelector('.wd__credits');
+  var elRole   = root.querySelector('.wd__role');
   var elNote   = root.querySelector('.wd__note');
   var elYt     = root.querySelector('.wd__yt');
   var btnPrev  = root.querySelector('.wd__step--prev');
@@ -173,7 +175,10 @@
     v.addEventListener('loadeddata', function () { player.classList.add('is-ready'); });
     player.appendChild(v);
     var p = v.play();
-    if (p && p.catch) p.catch(function () { /* 자동재생이 막히면 컨트롤/포스터로 남는다 */ });
+    if (p && p.catch) p.catch(function () {
+      // 소리 있는 자동재생이 막힌 브라우저: 소리 끈 채 재생하고, 컨트롤의 소리 버튼으로 켤 수 있게 둔다
+      if (!(opts && opts.ambient)) { v.muted = true; var q = v.play(); if (q && q.catch) q.catch(function () {}); }
+    });
   }
 
   // 사이트 안에서 재생할 수 없는 유튜브 영상: 미리보기(또는 썸네일) + 유튜브로 가는 버튼
@@ -247,10 +252,21 @@
     }
   }
 
+  // 크레딧 값: 줄바꿈(\n)은 줄을 나누고, 대표 이름(SEUNGMIN YIM / YIM SEUNGMIN)은 굵게.
+  var OWNER = /(SEUNG ?MIN YIM|YIM SEUNG ?MIN)/gi;
+  function credHtml(text) {
+    var esc = String(text).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; });
+    return esc.replace(OWNER, '<strong>$1</strong>').replace(/\n/g, '<br>');
+  }
   function addRow(label, value) {
     if (!value) return;
     elCred.appendChild(el('dt', null, label));
-    elCred.appendChild(el('dd', null, value));
+    var dd = el('dd'); dd.innerHTML = credHtml(value);
+    elCred.appendChild(dd);
+  }
+  // 한 칸짜리 항목 ['구역 이름'] 은 구역 제목(가로 전체)으로.
+  function addSection(label) {
+    elCred.appendChild(el('dt', 'wd__sec', label));
   }
 
   function renderInfo(key) {
@@ -263,9 +279,10 @@
 
     elCred.innerHTML = '';
     addRow('Client', w.client);
-    addRow('Role', w.role);
-    (w.credits || []).forEach(function (c) { if (c && c[0] && c[1]) addRow(c[0], c[1]); });
-    if (!elCred.children.length && IS_LOCAL) {
+    elRole.querySelector('.wd__role-v').textContent = w.role || '';
+    elRole.hidden = !w.role;
+    (w.credits || []).forEach(function (c) { if (!c || !c[0]) return; if (c.length === 1) addSection(c[0]); else if (c[1]) addRow(c[0], c[1]); });
+    if (false) {
       // 로컬 미리보기에서만 보이는 안내. 실제 사이트에서는 빈 줄을 그냥 숨긴다.
       var hint = el('dd', 'wd__hint', '크레딧 입력 전 (works.js 의 \'' + key + '\')');
       elCred.appendChild(hint);
