@@ -180,7 +180,7 @@ window.IDDOT_WORKS = {
     note: ''
   },
   'limhyunsik-the-answer': {
-    title: '‘나의 대답 (The Answer)’ MV',
+    title: '임현식(LIM HYUNSIK) ‘나의 대답 (The Answer)’ MV',
     artist: '임현식 (LIMHYUNSIK)',
     category: 'M/V · Music Video',
     cats: ['mv'], selected: true, preview: 'assets/limhyunsik-the-answer-preview.mp4',
