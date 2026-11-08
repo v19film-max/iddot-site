@@ -17,6 +17,7 @@
    - client   : 클라이언트
    - role     : iddot 이 맡은 역할
    - credits  : [['Director', '이름'], ['DOP', '이름'], ...] 순서대로 표시
+   - award    : 수상 내역 한 줄 (카드에 작게 수상 표시)
    - note     : 작업 설명 한두 문장 (선택)
 
    주의: 크레딧은 실제로 확인된 것만 넣는다. 공개해도 되는 이름인지 확인할 것. */
@@ -184,6 +185,7 @@ window.IDDOT_WORKS = {
     category: 'M/V · Music Video',
     cats: ['mv'], selected: true, preview: 'assets/limhyunsik-the-answer-preview.mp4',
     youtube: 'Mk1ECAg_1yk',
+    award: '제21회 제천국제음악영화제 뮤직비디오 어워즈 특별상',
     client: '',
     role: 'EDIT',
     credits: [],

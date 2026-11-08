@@ -304,6 +304,13 @@
       r.textContent = w.role;
       meta.appendChild(r);
     }
+    if (w.award) {
+      // 수상 표시: 작은 금색 점 + 한 줄
+      var aw = document.createElement('p');
+      aw.className = 'work-award';
+      aw.textContent = w.award;
+      meta.appendChild(aw);
+    }
 
     a.appendChild(media); a.appendChild(meta);
     art.appendChild(a);

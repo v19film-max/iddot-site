@@ -817,3 +817,6 @@ body::after{content:'';position:fixed;inset:-50%;z-index:400;pointer-events:none
 .bio__k{white-space:nowrap;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--fg);opacity:.75;padding-top:1px;}
 .bio__list em{font-style:normal;font-size:10px;opacity:.75;}
 @media (max-width:640px){.team-row{align-items:flex-start;}.bio{max-width:none;}.bio__list li{grid-template-columns:112px 1fr;}}
+/* 수상 표시: 작은 금색 점과 한 줄 */
+.work-award{display:flex;align-items:center;gap:7px;margin:8px 0 0;font-size:11px;line-height:1.5;color:#d6b45c;letter-spacing:-.005em;word-break:keep-all;}
+.work-award::before{content:'';flex:none;width:5px;height:5px;border-radius:50%;background:#d6b45c;box-shadow:0 0 6px rgba(214,180,92,.55);}
