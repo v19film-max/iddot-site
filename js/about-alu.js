@@ -4,31 +4,13 @@
    거친 알루 표면이 녹아 매끈한 액체 구가 되고, 닦이며 앞면부터 펼쳐져 iddot 크롬 꽃이 된다.
    다시 누르면 거꾸로 접혀(fold-*.mp4) 알루로 돌아오고, 그 자리에서 다시 돈다.
    그림 파일이 커서 About 근처에 왔을 때 불러온다. */
-import { mountAluSphere } from './alu-bloom.js?v=s11';
+import { mountAluSphere } from './alu-bloom.js?v=r1';
 
 const stage = document.getElementById('stage');
 const box = document.getElementById('aluBox');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 const small = matchMedia('(max-width: 700px)');
 
-// 꽃 영상과 회전을 맞추는 값(블렌더 장면 melt_scene_v18: 녹으며 0.18rad/s에서 천천히 멈춤)
-const SPIN_IN = { offset: -0.366, vel: .18 }, SPIN_OUT = { set: .183, vel: .18 };
-// 펼침 영상 시간(초) → 영상 속 알루의 [각도, 회전 속도]: 0.18rad/s로 돌다가 3.8초에 걸쳐 멈춰 원래 자세(0)에 닿는다
-const B_PRE = 4 / 30, B_TW = 3.8;
-const bloomYaw = (u) => {
-  const t = u - B_PRE; let a, v;
-  if (t <= 0) { a = .18 * Math.max(0, u); v = .18; }
-  else if (t < B_TW) { const k = t / B_TW; a = .18 * B_PRE + .18 * (t - B_TW * (k ** 6 - 3 * k ** 5 + 2.5 * k ** 4)); v = .18 * (1 - k * k * k * (k * (k * 6 - 15) + 10)); }
-  else { a = .18 * (B_PRE + B_TW * .5); v = 0; }
-  return [-0.366 + a, v];
-};
-// 접힘 영상 시간(초) → 그때 영상 속 알루의 [각도, 회전 속도] (블렌더 장면과 같은 식)
-const FOLD_UA = (390 - 118) / 60, FOLD_W = 1.9, V0 = .18;
-const foldYaw = (u) => {
-  const x = u - FOLD_UA; if (x <= 0) return [0, 0];
-  if (x < FOLD_W) { const k = x / FOLD_W; return [V0 * FOLD_W * (k ** 6 - 3 * k ** 5 + 2.5 * k ** 4), V0 * k * k * k * (k * (k * 6 - 15) + 10)]; }
-  return [V0 * FOLD_W * .5 + V0 * (x - FOLD_W), V0];
-};
 let alu = null, open = false, busy = false, want = false;
 
 // 영상 두 개(펼침·접힘). 같은 자리·같은 크기로 알루 위에 겹친다.
@@ -37,7 +19,7 @@ const vid = (name) => {
   v.className = 'stage__vid';
   v.muted = true; v.playsInline = true; v.preload = 'auto'; v.disablePictureInPicture = true;
   v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true');
-  v.src = `assets/alu/${name}-${small.matches ? 720 : 1080}.mp4?v=s4`;
+  v.src = `assets/alu/${name}-${small.matches ? 720 : 1080}.mp4?v=r1`;
   v.addEventListener('click', () => toggle());
   stage.appendChild(v);
   return v;
@@ -112,7 +94,7 @@ async function run() {
       // 영상은 1% 불투명도로 미리 깔아 둔다: 아이폰도 첫 장면을 실제로 그려 두고, 눈에는 안 보인다
       bloomV.classList.add('is-prep');
       const ready = atStart(bloomV);
-      await Promise.race([alu.rest(true, SPIN_IN), wait(2000)]);
+      await Promise.race([alu.rest(true), wait(1400)]);
       if (reduced.matches) { bloomV.classList.remove('is-prep'); await toEnd(bloomV); show(bloomV, true); stage.classList.add('is-vid'); }
       else {
         await ready;
@@ -121,15 +103,9 @@ async function run() {
         // 질감이 바뀌는 것이 움직임 속에 묻혀 '전환'이 아니라 녹는 연출의 일부로 보인다.
         // (곡선: 영상은 직선으로 차오르고 알루는 ease-in으로 늦게 빠져 screen 합성 밝기가 평평)
         await playing(bloomV);
-        // 영상이 실제로 재생되기까지 잠깐 늦는 동안 실시간 알루가 앞서 돌아 있으니, 0.25초에 걸쳐 영상 자세로 부드럽게 맞추고 그다음은 그대로 따라간다(겹쳐 보이는 잔상 방지)
-        { const m = alu.motion?.(); if (m && alu.follow) {
-            const corr = (m.spin - m.base) - bloomYaw(bloomV.currentTime)[0], t0 = performance.now();
-            alu.follow(() => { const k = Math.min(1, (performance.now() - t0) / 250), e = k * k * (3 - 2 * k), y = bloomYaw(bloomV.currentTime); return [y[0] + corr * (1 - e), y[1]]; });
-        } }
         bloomV.classList.add('is-xin'); bloomV.classList.remove('is-prep'); show(bloomV, true);
         stage.classList.add('is-xf');
         await wait(920);
-        alu.follow?.(null);
         stage.classList.add('is-vid'); bloomV.classList.remove('is-xin');
         await wait(300); if (bloomV.classList.contains('is-on')) alu.pause?.(true);   // 영상이 덮는 동안 알루는 쉰다(끊김 방지)
         await ended(bloomV);
@@ -149,21 +125,17 @@ async function run() {
         // 접힘 영상이 알루 자세로 가라앉는 마지막 0.5초 동안 영상→알루(같은 자세로 멈춰 있음)를 겹쳐 넘긴다.
         // 움직임이 잦아드는 속에서 질감이 바뀌어 끝에서 툭 바뀌는 느낌이 없다(영상 끝 검은 프레임도 피함).
         // (곡선: 영상은 직선으로 빠지고 알루는 ease-out으로 빨리 차올라 screen 합성 밝기가 평평)
-        foldV.classList.add('is-dim');                            // 영상 밝기를 실시간 알루에 맞춰 서서히 낮춘다(재질 차이 완화)
-        await atTail(foldV, .95);
-        // 겹쳐 넘기는 0.9초 동안 실시간 알루가 영상 속 자세를 프레임마다 그대로 따라간다(어긋나 겹쳐 보이지 않게)
-        alu.rest(false, SPIN_OUT);
-        alu.follow?.(() => foldYaw(foldV.currentTime));
+        await atTail(foldV, .5);
         foldV.classList.add('is-xout');
         stage.classList.add('is-xb'); stage.classList.remove('is-vid', 'is-xf');
         show(foldV, false);
-        await wait(920);
-        alu.follow?.(null);
-        stage.classList.remove('is-xb'); foldV.classList.remove('is-xout', 'is-dim');
+        await wait(470);
+        stage.classList.remove('is-xb'); foldV.classList.remove('is-xout');
         foldV.pause();
         bloomV.pause(); bloomV.currentTime = 0;                   // 다음 펼침을 위해 첫 장면을 미리 준비
+        await wait(220);
       }
-      if (reduced.matches) alu.rest(false);
+      alu.rest(false);
       open = false;
     }
   }
