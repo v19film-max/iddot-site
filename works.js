@@ -260,7 +260,7 @@ window.IDDOT_WORKS = {
     client: '',
     role: 'EDIT',
     credits: [],
-    note: '뮤직비디오 편집을 맡았습니다.'
+    note: ''
   },
   'keyvitup-inkigayo': {
     title: 'KEYVITUP | SBS 인기가요 260412 무대',
@@ -271,7 +271,7 @@ window.IDDOT_WORKS = {
     client: '',
     role: 'SET DESIGN',
     credits: [],
-    note: '무대 세트 디자인, 도면 제작'
+    note: 'Stage Set Design, Technical Drawings'
   },
   'geukrak-newzealand-1': {
     title: '[극락여행사] 뉴질랜드 여행 브이로그인 줄 알았는데 - 뉴질랜드 마라톤 1부',
