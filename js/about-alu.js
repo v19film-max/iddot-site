@@ -4,7 +4,7 @@
    거친 알루 표면이 녹아 매끈한 액체 구가 되고, 닦이며 앞면부터 펼쳐져 iddot 크롬 꽃이 된다.
    다시 누르면 거꾸로 접혀(fold-*.mp4) 알루로 돌아오고, 그 자리에서 다시 돈다.
    그림 파일이 커서 About 근처에 왔을 때 불러온다. */
-import { mountAluSphere } from './alu-bloom.js?v=s3';
+import { mountAluSphere } from './alu-bloom.js?v=s4';
 
 const stage = document.getElementById('stage');
 const box = document.getElementById('aluBox');
@@ -99,13 +99,13 @@ async function run() {
       else {
         await ready;
         // 영상은 1%로 숨은 채 재생을 먼저 건다(아이폰은 재생 시작 순간 한 프레임 검게 비칠 수 있음).
-        // 영상이 실제로 장면을 그리기 시작하면, 녹기 시작하는 첫 0.45초 동안 멈춘 알루→영상을 겹쳐 넘긴다.
+        // 영상이 실제로 장면을 그리기 시작하면, 녹기 시작하는 첫 0.9초 동안 멈춘 알루→영상을 겹쳐 넘긴다.
         // 질감이 바뀌는 것이 움직임 속에 묻혀 '전환'이 아니라 녹는 연출의 일부로 보인다.
         // (곡선: 영상은 직선으로 차오르고 알루는 ease-in으로 늦게 빠져 screen 합성 밝기가 평평)
         await playing(bloomV);
         bloomV.classList.add('is-xin'); bloomV.classList.remove('is-prep'); show(bloomV, true);
         stage.classList.add('is-xf');
-        await wait(470);
+        await wait(920);
         stage.classList.add('is-vid'); bloomV.classList.remove('is-xin');
         await wait(300); if (bloomV.classList.contains('is-on')) alu.pause?.(true);   // 영상이 덮는 동안 알루는 쉰다(끊김 방지)
         await ended(bloomV);

@@ -791,8 +791,8 @@ body::after{content:'';position:fixed;inset:-50%;z-index:400;pointer-events:none
 .ab .stage__vid.is-prep{opacity:.01;}   /* 펼치기 직전 첫 장면을 미리 그려 두기(눈에 안 보임) */
 /* 알루↔영상 겹쳐 넘기기(0.45초, 영상이 움직이는 구간에서). 한쪽은 직선, 다른 쪽은 가운데서 약 0.65가 되게 해
    screen 합성에서도 밝기가 평평하게 유지된다 */
-.ab .stage.is-xf .stage__alu{opacity:0;transition:opacity 450ms cubic-bezier(.42,0,1,1);}   /* 펼침: 알루 빠짐 */
-.ab .stage__vid.is-xin{transition:opacity 450ms linear;}                                    /* 펼침: 영상 차오름 */
+.ab .stage.is-xf .stage__alu{opacity:0;transition:opacity 900ms cubic-bezier(.42,0,1,1);}   /* 펼침: 알루 빠짐 */
+.ab .stage__vid.is-xin{transition:opacity 900ms linear,filter 900ms linear;filter:brightness(.9) contrast(.96);}                                    /* 펼침: 영상 차오름 */
 .ab .stage__vid.is-xout{transition:opacity 450ms linear;}                                   /* 접힘 끝: 영상 빠짐 */
 .ab .stage.is-xb .stage__alu{transition:opacity 450ms cubic-bezier(0,0,.58,1);}             /* 접힘 끝: 알루 차오름 */
 /* 알루 아래 아주 작은 클릭 안내(펼쳐지면 숨김) */
@@ -803,3 +803,7 @@ body::after{content:'';position:fixed;inset:-50%;z-index:400;pointer-events:none
 .ab .stage{width:min(32%,205px);align-self:center;}
 .ab__body{align-self:center;}
 @media (max-width:860px){.ab .stage{width:min(40%,160px);}}
+
+/* 영상 첫 장면이 실시간 알루보다 살짝 밝고 선명해서, 겹쳐 넘기는 동안 맞춰 두었다가 녹는 동안 천천히 원래대로 */
+.ab .stage__vid.is-prep{filter:brightness(.9) contrast(.96);}
+.ab .stage.is-vid .stage__vid{transition:filter 1400ms ease;}

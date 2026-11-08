@@ -462,7 +462,7 @@ export function mountAluSphere(el, opts = {}) {
     if (on) {
       const T = Math.PI * 2;
       // 돌던 방향의 다음 원래 자세까지(거의 멈춰 있으면 가까운 쪽). 남은 각도가 클수록 조금 더 오래 돈다.
-      const v = Math.abs(spinVel) > .05 ? spinVel : 0;
+      const v = Math.abs(spinVel) > .6 ? spinVel : 0;   // 손으로 돌릴 때만 그 방향으로 이어 돌고, 그냥 돌던 중이면 가장 가까운 자세로(불필요한 한 바퀴 방지)
       restSpin = v > 0 ? Math.ceil(spin / T) * T : v < 0 ? Math.floor(spin / T) * T : Math.round(spin / T) * T;
       const d = restSpin - spin;
       restDur = .35 + .65 * Math.abs(d) / T;
