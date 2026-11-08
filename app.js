@@ -6,6 +6,19 @@
    5. 카드 미리보기: 마우스를 올릴 때만 영상을 받아 재생
    6. 문의 폼 (contact.html)
    원칙: 스크립트가 실패해도 내용이 영구히 숨겨지지 않는다. 모든 전환에 애니메이션. */
+/* 새로 고침하면 항상 맨 위(쇼릴)부터. 작업 상세 창 주소(#work/…)만 예외 */
+(function () {
+  var nav = (performance.getEntriesByType && performance.getEntriesByType('navigation')[0]) || {};
+  if (nav.type !== 'reload') return;            // 다른 페이지에서 #team 등으로 들어온 경우는 그대로
+  try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch (e) {}
+  var h = location.hash;
+  if (h && h.indexOf('#work/') !== 0) { try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} }
+  if (!h || h.indexOf('#work/') !== 0) {
+    window.scrollTo(0, 0);
+    window.addEventListener('load', function () { window.scrollTo(0, 0); });
+  }
+})();
+
 (function () {
   'use strict';
 

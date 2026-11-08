@@ -343,8 +343,9 @@ export function mountAluSphere(el, opts = {}) {
     const dt = last ? Math.min(gap / 1000, .05) : 0; last = now;
     const still = reduced.matches;
     if (!still) { time += dt; grainT = time * 9; flowPhase += restOn ? 0 : dt * .3; }
-    rest += ((restOn ? 1 : 0) - rest) * (still ? 1 : Math.min(1, dt * 13));
-    if (restOn) { flowPhase += (restFlow - flowPhase) * (still ? 1 : Math.min(1, dt * 13)); if (Math.abs(restFlow - flowPhase) < .002) flowPhase = restFlow; lastActive = time; }
+    // 제자리로 들어갈 땐 0.6초쯤, 다시 둥실 뜨는 기본 동작으로 돌아갈 땐 1.5초쯤 걸쳐 천천히 이어진다(툭 떨어지지 않게)
+    rest += ((restOn ? 1 : 0) - rest) * (still ? 1 : Math.min(1, dt * (restOn ? 5.5 : 1.6)));
+    if (restOn) { flowPhase += (restFlow - flowPhase) * (still ? 1 : Math.min(1, dt * 6)); if (Math.abs(restFlow - flowPhase) < .002) flowPhase = restFlow; lastActive = time; }
     const fa = bodyProgram.uniforms.uFlowAt.value; fa[0] = .35 / BU * Math.cos(flowPhase); fa[1] = .2 / BU * Math.sin(2 * flowPhase); fa[2] = .35 / BU * Math.sin(flowPhase);
     const dozing = doze && time - lastActive > DOZE_AFTER;
     // 숨쉬기: 들숨이 조금 길게.
