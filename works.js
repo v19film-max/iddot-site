@@ -106,6 +106,7 @@ window.IDDOT_WORKS = {
       ["Art Team", "NAYOUNG KIM, JISU CHOI, WOOHYEON LEE"],
       ["Set Builder", "DABIN CHEON, JONGWOOK PARK"],
       ["Edited by", "SEUNGMIN YIM"],
+      ["Post-production Supervisor", "SEUNGMIN YIM"],
       ["DI", "MINJAE KIM (SQUARE COLOR)"],
       ["AI VFX", "HYEONSEONG LEE"],
       ["Sound Mixer", "JUNHYEONG JEON"]
