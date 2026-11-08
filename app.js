@@ -155,7 +155,11 @@
       // 제목 교체: 위로 빠지고 아래에서 올라온다
       nowTitle.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-8px)' }],
         { duration: T.micro, easing: EASE_EXIT, fill: 'forwards' }).onfinish = function () {
+        // 줄 수가 바뀌면(한 줄↔두 줄) 높이를 부드럽게 이어 바꿔, 위의 NOW PLAYING이 툭 튀지 않고 자연스럽게 오르내리게
+        var h0 = nowTitle.offsetHeight;
         fill();
+        var h1 = nowTitle.offsetHeight;
+        if (Math.abs(h1 - h0) > 1 && nowTitle.animate) nowTitle.animate([{ height: h0 + 'px' }, { height: h1 + 'px' }], { duration: 520, easing: EASE });
         nowTitle.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }],
           { duration: T.pop, easing: EASE, fill: 'forwards' });
       };
