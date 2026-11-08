@@ -258,7 +258,7 @@ export function mountAluSphere(el, opts = {}) {
     squash: new Spring(70, 12, 1), lean: new Spring(22, 7), droop: new Spring(8, 5), wobble: new Spring(30, 7),
     dent: new Spring(150, 5), shake: new Spring(260, 9), pitch: new Spring(5, 3.4), born: new Spring(12, 4.2),
   };
-  let restAt = 0, restA = 0, relSpin = false, rest = 0, restOn = false, restSpin = 0, restFlow = 0, restCb = null, paused = false, restT0 = -1, restS0 = 0, restM0 = 0, restDur = .5;   // 제자리 서기(영상으로 넘어가기 직전)·멈춤(영상이 덮는 동안)
+  let restAt = 0, restA = 0, relSpin = false, rest = 0, restOn = false, restSpin = 0, restFlow = 0, restCb = null, paused = false, restT0 = -1, restS0 = 0, restM0 = 0, restDur = .5, restVel = 0, restBase = 0;   // 제자리 서기(영상으로 넘어가기 직전)·멈춤(영상이 덮는 동안)
   let wobbleT = 0, lastActive = 0, nodAt = 0, nodPhase = 0, rippleT = 9, dentDir = [0, 0, 1];
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -385,8 +385,9 @@ export function mountAluSphere(el, opts = {}) {
     if (restOn) {
       if (restT0 < 0) restT0 = time;
       const k = still ? 1 : Math.min(1, (time - restT0) / restDur), k2 = k * k, k3 = k2 * k;
-      spin = (2 * k3 - 3 * k2 + 1) * restS0 + (k3 - 2 * k2 + k) * restM0 + (3 * k2 - 2 * k3) * restSpin;
-      if (k >= 1) spin = restSpin;
+      // 끝 속도 restVel: 영상이 같은 속도로 이어 돌기 때문에 멈추지 않고 그 속도로 도착한다
+      spin = (2 * k3 - 3 * k2 + 1) * restS0 + (k3 - 2 * k2 + k) * restM0 + (3 * k2 - 2 * k3) * restSpin + (k3 - k2) * restVel * restDur;
+      if (k >= 1) spin = restSpin + restVel * Math.max(0, time - restT0 - restDur);
       spinVel = 0;
     }
     turn.rotation.y = spin - iw * 2.4;
@@ -414,7 +415,7 @@ export function mountAluSphere(el, opts = {}) {
     grainProgram.uniforms.tImage.value = lensA.texture; grainProgram.uniforms.uGrainT.value = grainT;
     renderer.render({ scene: grainMesh });
     [lensA, lensB] = [lensB, lensA];
-    if (restCb && rest > .985 && Math.abs(spin - restSpin) < .004 && Math.abs(flowPhase - restFlow) < .004) { const cb = restCb; restCb = null; cb(); }
+    if (restCb && rest > .985 && restT0 >= 0 && time - restT0 >= restDur && Math.abs(flowPhase - restFlow) < .004) { const cb = restCb; restCb = null; cb(); }
     if (!still || restCb) raf = requestAnimationFrame(frame);
   };
   const wake = () => { if (!raf && alive && !document.hidden) { last = 0; raf = requestAnimationFrame(frame); } };
@@ -464,9 +465,30 @@ export function mountAluSphere(el, opts = {}) {
     gl.getExtension('WEBGL_lose_context')?.loseContext(); canvas.remove();
   };
   // 제자리 서기: 원래 렌더 자세로 모이면 약속이 풀린다(영상 첫 장면과 같은 모습).
-  destroy.rest = (on) => new Promise((res) => {
+  // opt(서기): { offset: 영상 첫 장면 자세(원래 자세 기준 각도), vel: 그 순간 회전 속도 }
+  // opt(풀기): { set: 영상 마지막 장면 자세, vel: 그 순간 회전 속도 } → 그 자세·속도에서 그대로 이어 돈다
+  destroy.rest = (on, opt) => new Promise((res) => {
     if (restOn !== on) { restAt = -1; relSpin = !on; }
     restOn = on;
+    if (on && opt && opt.vel != null) {
+      const T = Math.PI * 2, off = opt.offset || 0;
+      restVel = opt.vel;
+      // 지금 속도로 0.8초 뒤 닿을 곳에서 가장 가까운 '영상 첫 자세'
+      const v = spinVel, guess = spin + Math.max(v, restVel) * .8;
+      restBase = Math.round((guess - off) / T) * T; restSpin = restBase + off;
+      const d = restSpin - spin;
+      restDur = Math.max(.6, Math.min(1.6, .6 + .8 * Math.abs(d - restVel * .8) / Math.PI + Math.abs(d) / 3));
+      restM0 = v * restDur;
+      restS0 = spin; restT0 = -1;
+      restFlow = Math.round(flowPhase / T) * T; grab = null;
+      restCb = res; wake(); if (!body) { restCb = null; res(); }
+      return;
+    }
+    if (!on && opt && opt.set != null) {
+      spin = restBase + opt.set; spinVel = opt.vel || 0; relSpin = false; restVel = 0;
+      restCb = null; wake(); res(); return;
+    }
+    restVel = 0;
     if (on) {
       const T = Math.PI * 2;
       // 돌던 방향의 다음 원래 자세까지(거의 멈춰 있으면 가까운 쪽). 남은 각도가 클수록 조금 더 오래 돈다.

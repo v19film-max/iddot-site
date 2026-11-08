@@ -4,13 +4,15 @@
    거친 알루 표면이 녹아 매끈한 액체 구가 되고, 닦이며 앞면부터 펼쳐져 iddot 크롬 꽃이 된다.
    다시 누르면 거꾸로 접혀(fold-*.mp4) 알루로 돌아오고, 그 자리에서 다시 돈다.
    그림 파일이 커서 About 근처에 왔을 때 불러온다. */
-import { mountAluSphere } from './alu-bloom.js?v=s8';
+import { mountAluSphere } from './alu-bloom.js?v=s9';
 
 const stage = document.getElementById('stage');
 const box = document.getElementById('aluBox');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 const small = matchMedia('(max-width: 700px)');
 
+// 꽃 영상과 회전을 맞추는 값(블렌더 장면 melt_scene_v18: 녹으며 0.18rad/s에서 천천히 멈춤)
+const SPIN_IN = { offset: -0.366, vel: .18 }, SPIN_OUT = { set: .183, vel: .18 };
 let alu = null, open = false, busy = false, want = false;
 
 // 영상 두 개(펼침·접힘). 같은 자리·같은 크기로 알루 위에 겹친다.
@@ -19,7 +21,7 @@ const vid = (name) => {
   v.className = 'stage__vid';
   v.muted = true; v.playsInline = true; v.preload = 'auto'; v.disablePictureInPicture = true;
   v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true');
-  v.src = `assets/alu/${name}-${small.matches ? 720 : 1080}.mp4?v=s2`;
+  v.src = `assets/alu/${name}-${small.matches ? 720 : 1080}.mp4?v=s3`;
   v.addEventListener('click', () => toggle());
   stage.appendChild(v);
   return v;
@@ -94,7 +96,7 @@ async function run() {
       // 영상은 1% 불투명도로 미리 깔아 둔다: 아이폰도 첫 장면을 실제로 그려 두고, 눈에는 안 보인다
       bloomV.classList.add('is-prep');
       const ready = atStart(bloomV);
-      await Promise.race([alu.rest(true), wait(1400)]);
+      await Promise.race([alu.rest(true, SPIN_IN), wait(2000)]);
       if (reduced.matches) { bloomV.classList.remove('is-prep'); await toEnd(bloomV); show(bloomV, true); stage.classList.add('is-vid'); }
       else {
         await ready;
@@ -127,7 +129,7 @@ async function run() {
         // (곡선: 영상은 직선으로 빠지고 알루는 ease-out으로 빨리 차올라 screen 합성 밝기가 평평)
         await atTail(foldV, .5);
         foldV.classList.add('is-xout');
-        alu.rest(false);                                          // 알루가 차오르는 순간부터 0에서 천천히 둥실 돌기 시작
+        alu.rest(false, SPIN_OUT);                                // 영상 마지막 자세·속도에서 그대로 이어 돌며 천천히 둥실
         stage.classList.add('is-xb'); stage.classList.remove('is-vid', 'is-xf');
         show(foldV, false);
         await wait(470);
