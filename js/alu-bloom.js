@@ -507,6 +507,6 @@ export function mountAluSphere(el, opts = {}) {
   // 영상이 알루를 완전히 덮는 동안은 그리기를 멈춘다(영상 재생이 끊기지 않게).
   destroy.pause = (v) => { paused = v; if (!v) wake(); };
   // 회전 상태 읽기(뒤 조명이 회전에 반응하도록)
-  destroy.motion = () => ({ spin, vel: spinVel, idle: SPIN_IDLE });
+  destroy.motion = () => ({ spin, vel: spinVel, idle: SPIN_IDLE, base: restBase });
   return destroy;
 }
