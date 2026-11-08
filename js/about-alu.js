@@ -4,7 +4,7 @@
    거친 알루 표면이 녹아 매끈한 액체 구가 되고, 닦이며 앞면부터 펼쳐져 iddot 크롬 꽃이 된다.
    다시 누르면 거꾸로 접혀(fold-*.mp4) 알루로 돌아오고, 그 자리에서 다시 돈다.
    그림 파일이 커서 About 근처에 왔을 때 불러온다. */
-import { mountAluSphere } from './alu-bloom.js?v=s9';
+import { mountAluSphere } from './alu-bloom.js?v=s10';
 
 const stage = document.getElementById('stage');
 const box = document.getElementById('aluBox');
@@ -13,6 +13,13 @@ const small = matchMedia('(max-width: 700px)');
 
 // 꽃 영상과 회전을 맞추는 값(블렌더 장면 melt_scene_v18: 녹으며 0.18rad/s에서 천천히 멈춤)
 const SPIN_IN = { offset: -0.366, vel: .18 }, SPIN_OUT = { set: .183, vel: .18 };
+// 접힘 영상 시간(초) → 그때 영상 속 알루의 [각도, 회전 속도] (블렌더 장면과 같은 식)
+const FOLD_UA = (390 - 118) / 60, FOLD_W = 1.9, V0 = .18;
+const foldYaw = (u) => {
+  const x = u - FOLD_UA; if (x <= 0) return [0, 0];
+  if (x < FOLD_W) { const k = x / FOLD_W; return [V0 * FOLD_W * (k ** 6 - 3 * k ** 5 + 2.5 * k ** 4), V0 * k * k * k * (k * (k * 6 - 15) + 10)]; }
+  return [V0 * FOLD_W * .5 + V0 * (x - FOLD_W), V0];
+};
 let alu = null, open = false, busy = false, want = false;
 
 // 영상 두 개(펼침·접힘). 같은 자리·같은 크기로 알루 위에 겹친다.
@@ -127,13 +134,17 @@ async function run() {
         // 접힘 영상이 알루 자세로 가라앉는 마지막 0.5초 동안 영상→알루(같은 자세로 멈춰 있음)를 겹쳐 넘긴다.
         // 움직임이 잦아드는 속에서 질감이 바뀌어 끝에서 툭 바뀌는 느낌이 없다(영상 끝 검은 프레임도 피함).
         // (곡선: 영상은 직선으로 빠지고 알루는 ease-out으로 빨리 차올라 screen 합성 밝기가 평평)
-        await atTail(foldV, .5);
+        foldV.classList.add('is-dim');                            // 영상 밝기를 실시간 알루에 맞춰 서서히 낮춘다(재질 차이 완화)
+        await atTail(foldV, .95);
+        // 겹쳐 넘기는 0.9초 동안 실시간 알루가 영상 속 자세를 프레임마다 그대로 따라간다(어긋나 겹쳐 보이지 않게)
+        alu.rest(false, SPIN_OUT);
+        alu.follow?.(() => foldYaw(foldV.currentTime));
         foldV.classList.add('is-xout');
-        alu.rest(false, SPIN_OUT);                                // 영상 마지막 자세·속도에서 그대로 이어 돌며 천천히 둥실
         stage.classList.add('is-xb'); stage.classList.remove('is-vid', 'is-xf');
         show(foldV, false);
-        await wait(470);
-        stage.classList.remove('is-xb'); foldV.classList.remove('is-xout');
+        await wait(920);
+        alu.follow?.(null);
+        stage.classList.remove('is-xb'); foldV.classList.remove('is-xout', 'is-dim');
         foldV.pause();
         bloomV.pause(); bloomV.currentTime = 0;                   // 다음 펼침을 위해 첫 장면을 미리 준비
       }

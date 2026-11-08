@@ -258,7 +258,7 @@ export function mountAluSphere(el, opts = {}) {
     squash: new Spring(70, 12, 1), lean: new Spring(22, 7), droop: new Spring(8, 5), wobble: new Spring(30, 7),
     dent: new Spring(150, 5), shake: new Spring(260, 9), pitch: new Spring(5, 3.4), born: new Spring(12, 4.2),
   };
-  let restAt = 0, restA = 0, relSpin = false, rest = 0, restOn = false, restSpin = 0, restFlow = 0, restCb = null, paused = false, restT0 = -1, restS0 = 0, restM0 = 0, restDur = .5, restVel = 0, restBase = 0;   // 제자리 서기(영상으로 넘어가기 직전)·멈춤(영상이 덮는 동안)
+  let follow = null, restAt = 0, restA = 0, relSpin = false, rest = 0, restOn = false, restSpin = 0, restFlow = 0, restCb = null, paused = false, restT0 = -1, restS0 = 0, restM0 = 0, restDur = .5, restVel = 0, restBase = 0;   // 제자리 서기(영상으로 넘어가기 직전)·멈춤(영상이 덮는 동안)
   let wobbleT = 0, lastActive = 0, nodAt = 0, nodPhase = 0, rippleT = 9, dentDir = [0, 0, 1];
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -390,6 +390,7 @@ export function mountAluSphere(el, opts = {}) {
       if (k >= 1) spin = restSpin + restVel * Math.max(0, time - restT0 - restDur);
       spinVel = 0;
     }
+    if (follow) { const a = follow(); if (a != null) { spin = restBase + a[0]; spinVel = a[1]; } }   // 겹쳐 넘기는 동안 영상 자세를 그대로 따라간다
     turn.rotation.y = spin - iw * 2.4;
     if (!grab?.moved) sp.pitch.step(Math.round(sp.pitch.x / (Math.PI * 2)) * Math.PI * 2, dt);
     // 제자리 서기 중엔 끌어 넘긴 자세·흔들림도 원래 렌더 자세로 모은다(영상 첫 장면과 어긋나 튀지 않게)
@@ -502,6 +503,7 @@ export function mountAluSphere(el, opts = {}) {
       restCb = res; wake(); if (!body) { restCb = null; res(); }
     } else { restCb = null; wake(); res(); }
   });
+  destroy.follow = (fn) => { follow = fn || null; wake(); };
   // 영상이 알루를 완전히 덮는 동안은 그리기를 멈춘다(영상 재생이 끊기지 않게).
   destroy.pause = (v) => { paused = v; if (!v) wake(); };
   // 회전 상태 읽기(뒤 조명이 회전에 반응하도록)
