@@ -869,3 +869,6 @@ body::after{content:'';position:fixed;inset:-50%;z-index:400;pointer-events:none
 /* 문의: 안내 문장 대신 영어 큰 글씨 하나 */
 .contact-big{font-size:clamp(44px,7vw,104px);letter-spacing:-.045em;line-height:1;margin-top:0;}
 #contact .contact-big{margin-top:0;}
+/* About: 알루 옆 설명글 대신 한 줄(원본은 iddot-site-백업 폴더와 태그 about-text-before-oneline에 보관) */
+.ab__body--one{align-self:center;}
+.ab__one{margin:0;font-size:clamp(13px,1.05vw,16px);font-weight:700;letter-spacing:.04em;color:var(--fg);}
