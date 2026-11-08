@@ -64,6 +64,13 @@ const pickVariant = () => {
   return best;
 };
 
+// 카카오톡 같은 앱 안 브라우저는 '누른 순간'에 건 재생만 허락한다. 누르는 즉시 영상들을 한 번 재생→멈춤 해서 허락을 받아 둔다.
+const unlockVideos = () => {
+  [...bloomVs, foldV].forEach((v) => {
+    if (!v || v._unl) return; v._unl = true; v.muted = true;
+    try { const p = v.play(); if (p && p.then) p.then(() => { if (!v._want) v.pause(); }).catch(() => {}); else if (!v._want) v.pause(); } catch (e) {}
+  });
+};
 const show = (v, on) => v && v.classList.toggle('is-on', on);
 // 첫 장면에 멈춰 둔 채 화면에 실제로 그려질 때까지 기다린다(그리기 전에 알루를 숨기면 한 프레임 비어 튐)
 const atStart = (v) => new Promise((res) => {
@@ -86,10 +93,10 @@ const playing = (v) => new Promise((res) => {
   if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(tick);
   else { const f = () => { if (v.currentTime >= U0 + .03) { v.removeEventListener('timeupdate', f); fin(); } }; v.addEventListener('timeupdate', f); }
   setTimeout(fin, 400);
-  const p = v.play(); if (p && p.catch) p.catch(fin);
+  v._want = true; const p = v.play(); if (p && p.catch) p.catch(fin);
 });
 const playFrom0 = (v) => new Promise((res) => {
-  v.currentTime = 0;
+  v.currentTime = 0; v._want = true;
   const go = () => { v.removeEventListener('playing', go); res(); };
   v.addEventListener('playing', go);
   const p = v.play(); if (p && p.catch) p.catch(() => { v.removeEventListener('playing', go); res(); });
@@ -146,6 +153,13 @@ async function run() {
         // 질감이 바뀌는 것이 움직임 속에 묻혀 '전환'이 아니라 녹는 연출의 일부로 보인다.
         // (곡선: 영상은 직선으로 차오르고 알루는 ease-in으로 늦게 빠져 screen 합성 밝기가 평평)
         await playing(bloomV);
+        // 영상이 재생되지 않았으면(앱 안 브라우저의 재생 막힘 등) 넘어가지 않고 실시간 알루를 그대로 둔다(잔상 방지)
+        if (!bloomV.paused && bloomV.currentTime < U0 + .02) { for (let i = 0; i < 12 && !bloomV.paused && bloomV.currentTime < U0 + .02; i++) await wait(50); }   // 늦게 시작하면 조금 더 기다린다
+        if (bloomV.paused) {
+          bloomV._want = false; bloomV.pause(); bloomV.classList.remove('is-prep');
+          alu.rest(false); want = false; open = false; label(false); busy = false;
+          stage.classList.add('is-novideo'); return;
+        }
         // 영상이 실제로 재생되기까지 잠깐 늦는 동안 실시간 알루가 앞서 돌아 있으니, 0.25초에 걸쳐 영상 자세로 부드럽게 맞추고 그다음은 그대로 따라간다(겹쳐 보이는 잔상 방지)
         { const m = alu.motion?.(); if (m && alu.follow) {
             const corr = (m.spin - m.base) - bloomYaw(bloomV.currentTime)[0], t0 = performance.now();
@@ -212,7 +226,7 @@ const mount = () => {
     onReady: () => { bloomVs = [0, 1, 2, 3, 4, 5, 6, 7].map((k) => vid(`bloom-v${k}`)); bloomV = bloomVs[0]; foldV = vid('fold-v0'); stage.classList.add('is-ready'); stage._alu = alu; },
     onFail: () => stage.classList.add('is-fallback'),
     // 누르면 앱처럼 쏙 들어갔다가 그 반동으로 펼쳐진다.
-    onTap: () => setTimeout(toggle, 90),
+    onTap: () => { unlockVideos(); setTimeout(toggle, 90); },
   });
   light(alu);
 };
@@ -250,4 +264,31 @@ if ('IntersectionObserver' in window) {
   io.observe(stage);
 } else {
   mount();
+}
+
+// 진단 표시: 주소 끝에 ?diag=1 을 붙여 열면 화면 위에 이 브라우저의 지원 상태를 보여준다(카카오톡 같은 앱 안 브라우저 점검용)
+if (/[?&]diag=1/.test(location.search)) {
+  const box = document.createElement('pre');
+  box.style.cssText = 'position:fixed;left:8px;right:8px;bottom:8px;z-index:99999;margin:0;padding:10px;background:rgba(0,0,0,.85);color:#9f9;font:11px/1.5 monospace;white-space:pre-wrap;border:1px solid #393;border-radius:8px;max-height:45vh;overflow:auto';
+  document.body.appendChild(box);
+  const g2 = (() => { try { return !!document.createElement('canvas').getContext('webgl2'); } catch (e) { return false; } })();
+  let playRes = '시험 전';
+  const t = document.createElement('video'); t.muted = true; t.playsInline = true; t.setAttribute('playsinline', ''); t.src = 'assets/alu/bloom-v0-720.mp4?diag';
+  t.play().then(() => { playRes = '자동 재생 됨'; t.pause(); }).catch((e) => { playRes = '자동 재생 막힘: ' + e.name; });
+  const tick = () => {
+    const v = document.querySelector('.stage__vid.is-on, .stage__vid.is-prep');
+    box.textContent = [
+      '브라우저: ' + navigator.userAgent,
+      '3D(WebGL2): ' + (g2 ? '됨' : '안 됨'),
+      '자동 재생 시험: ' + playRes,
+      ':has 선택자: ' + (CSS.supports && CSS.supports('selector(:has(a))') ? '됨' : '안 됨'),
+      '영상 프레임 콜백: ' + ('requestVideoFrameCallback' in HTMLVideoElement.prototype ? '됨' : '안 됨'),
+      '동작 줄이기 설정: ' + (reduced.matches ? '켜짐' : '꺼짐'),
+      '무대 상태: ' + stage.className,
+      '알루 회전: ' + (stage._alu && stage._alu.motion ? stage._alu.motion().vel.toFixed(3) : '-'),
+      '재생 중 영상: ' + (v ? (v.src.split('/').pop() + ' ' + v.currentTime.toFixed(2) + (v.paused ? ' (멈춤)' : '')) : '-'),
+    ].join('\n');
+    setTimeout(tick, 300);
+  };
+  tick();
 }
