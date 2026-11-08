@@ -352,7 +352,8 @@
       var tr = tab.getBoundingClientRect(), pr = tab.parentNode.getBoundingClientRect();
       bar.style.transition = animate ? 'transform ' + T.pop + 'ms ' + EASE + ', width ' + T.pop + 'ms ' + EASE : 'none';
       bar.style.width = tr.width + 'px';
-      bar.style.transform = 'translateX(' + (tr.left - pr.left) + 'px)';
+      // 탭이 두 줄로 넘어가도 선택 밑줄이 그 탭 바로 아래에 붙도록 세로 위치도 맞춘다
+      bar.style.transform = 'translate(' + (tr.left - pr.left) + 'px,' + (tr.bottom - pr.bottom) + 'px)';
     }
 
     // 개수 표시: 연타해도 항상 마지막 값이 남도록, 이전 전환을 취소하고 최신 값만 쓴다

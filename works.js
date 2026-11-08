@@ -197,7 +197,7 @@ window.IDDOT_WORKS = {
       ["Cinematography", "JaeSs GeeM"],
       ["Gaffer", "YONGGU KIM"],
       ["Production Designer", "JIO KIM"],
-      ["Editor", "SEUNGMIN LIM"],
+      ["Editor", "SEUNGMIN YIM"],
       ["Visual Effects Supervisor", "JUNHEE LEE"],
       ["DI Colorist", "YOUNGJUN LEE (MONETCOLOR)"],
       ["Location Manager", "WONHEE HAN (ONE location)"],
@@ -248,7 +248,7 @@ window.IDDOT_WORKS = {
     client: '',
     role: 'DIRECTOR / EDIT',
     credits: [],
-    note: ''
+    note: '기획부터 크리에이티브 디렉팅, 각본과 연출(Written & Directed)까지 맡았고, 편집·색보정 등 후반작업 전반을 총괄했습니다.'
   },
   'leejimin-youre-mine': {
     title: '넌 내꺼 넌 내 남자 (You’re Mine, You’re My Man) MV',
@@ -259,7 +259,7 @@ window.IDDOT_WORKS = {
     client: '',
     role: 'EDIT',
     credits: [],
-    note: ''
+    note: '뮤직비디오 편집을 맡았습니다.'
   },
   'keyvitup-inkigayo': {
     title: 'KEYVITUP | SBS 인기가요 260412 무대',
@@ -270,7 +270,7 @@ window.IDDOT_WORKS = {
     client: '',
     role: 'SET DESIGN',
     credits: [],
-    note: ''
+    note: '무대 세트 디자인과 제작용 도면 작업을 맡았습니다.'
   },
   'geukrak-newzealand-1': {
     title: '[극락여행사] 뉴질랜드 여행 브이로그인 줄 알았는데 - 뉴질랜드 마라톤 1부',
@@ -279,7 +279,7 @@ window.IDDOT_WORKS = {
     cats: ['digital'],
     youtube: '23X45ADl_MA',
     client: '',
-    role: '',
+    role: 'EDIT 총괄',
     credits: [],
     note: ''
   },
@@ -290,7 +290,7 @@ window.IDDOT_WORKS = {
     cats: ['digital'],
     youtube: 'ticWQ8-qLU4',
     client: '',
-    role: '',
+    role: 'EDIT 총괄',
     credits: [],
     note: ''
   },
@@ -301,7 +301,7 @@ window.IDDOT_WORKS = {
     cats: ['digital'],
     youtube: 'hFIOsapDEr8',
     client: '',
-    role: '',
+    role: 'EDIT 총괄',
     credits: [],
     note: ''
   }
