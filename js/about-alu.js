@@ -4,7 +4,7 @@
    거친 알루 표면이 녹아 매끈한 액체 구가 되고, 닦이며 앞면부터 펼쳐져 iddot 크롬 꽃이 된다.
    다시 누르면 거꾸로 접혀(fold-*.mp4) 알루로 돌아오고, 그 자리에서 다시 돈다.
    그림 파일이 커서 About 근처에 왔을 때 불러온다. */
-import { mountAluSphere } from './alu-bloom.js?v=s7';
+import { mountAluSphere } from './alu-bloom.js?v=s8';
 
 const stage = document.getElementById('stage');
 const box = document.getElementById('aluBox');
@@ -127,15 +127,15 @@ async function run() {
         // (곡선: 영상은 직선으로 빠지고 알루는 ease-out으로 빨리 차올라 screen 합성 밝기가 평평)
         await atTail(foldV, .5);
         foldV.classList.add('is-xout');
+        alu.rest(false);                                          // 알루가 차오르는 순간부터 0에서 천천히 둥실 돌기 시작
         stage.classList.add('is-xb'); stage.classList.remove('is-vid', 'is-xf');
         show(foldV, false);
         await wait(470);
         stage.classList.remove('is-xb'); foldV.classList.remove('is-xout');
         foldV.pause();
         bloomV.pause(); bloomV.currentTime = 0;                   // 다음 펼침을 위해 첫 장면을 미리 준비
-        await wait(220);
       }
-      alu.rest(false);
+      if (reduced.matches) alu.rest(false);
       open = false;
     }
   }

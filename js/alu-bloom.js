@@ -258,7 +258,7 @@ export function mountAluSphere(el, opts = {}) {
     squash: new Spring(70, 12, 1), lean: new Spring(22, 7), droop: new Spring(8, 5), wobble: new Spring(30, 7),
     dent: new Spring(150, 5), shake: new Spring(260, 9), pitch: new Spring(5, 3.4), born: new Spring(12, 4.2),
   };
-  let rest = 0, restOn = false, restSpin = 0, restFlow = 0, restCb = null, paused = false, restT0 = -1, restS0 = 0, restM0 = 0, restDur = .5;   // 제자리 서기(영상으로 넘어가기 직전)·멈춤(영상이 덮는 동안)
+  let restAt = 0, restA = 0, relSpin = false, rest = 0, restOn = false, restSpin = 0, restFlow = 0, restCb = null, paused = false, restT0 = -1, restS0 = 0, restM0 = 0, restDur = .5;   // 제자리 서기(영상으로 넘어가기 직전)·멈춤(영상이 덮는 동안)
   let wobbleT = 0, lastActive = 0, nodAt = 0, nodPhase = 0, rippleT = 9, dentDir = [0, 0, 1];
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -346,9 +346,10 @@ export function mountAluSphere(el, opts = {}) {
     const gap = last ? now - last : 0;
     const dt = last ? Math.min(gap / 1000, .05) : 0; last = now;
     const still = reduced.matches;
-    if (!still) { time += dt; grainT = time * 9; flowPhase += restOn ? 0 : dt * .3; }
-    // 제자리로 들어갈 땐 0.6초쯤, 다시 둥실 뜨는 기본 동작으로 돌아갈 땐 1.5초쯤 걸쳐 천천히 이어진다(툭 떨어지지 않게)
-    rest += ((restOn ? 1 : 0) - rest) * (still ? 1 : Math.min(1, dt * (restOn ? 5.5 : 1.6)));
+    if (!still) { time += dt; grainT = time * 9; flowPhase += restOn ? 0 : dt * .3 * (1 - rest); }
+    // 제자리로 들어갈 땐 0.7초, 다시 둥실 뜨는 기본 동작으로 돌아갈 땐 1.8초에 걸쳐 부드러운 곡선으로(시작·끝 속도 0, 툭 떨어지지 않게)
+    if (restAt < 0) { restAt = time; restA = rest; }
+    { const k = still ? 1 : Math.min(1, (time - restAt) / (restOn ? .7 : 1.8)), e = k * k * k * (k * (k * 6 - 15) + 10); rest = restA + ((restOn ? 1 : 0) - restA) * e; }
     if (restOn) { flowPhase += (restFlow - flowPhase) * (still ? 1 : Math.min(1, dt * 6)); if (Math.abs(restFlow - flowPhase) < .002) flowPhase = restFlow; lastActive = time; }
     const fa = bodyProgram.uniforms.uFlowAt.value; fa[0] = .35 / BU * Math.cos(flowPhase); fa[1] = .2 / BU * Math.sin(2 * flowPhase); fa[2] = .35 / BU * Math.sin(flowPhase);
     const dozing = doze && time - lastActive > DOZE_AFTER;
@@ -377,7 +378,8 @@ export function mountAluSphere(el, opts = {}) {
     const drift = 1 + .3 * Math.sin(time * .13) + .15 * Math.sin(time * .37 + 1);
     const spinTarget = SPIN_IDLE * drift;
     const held = grab?.moved;
-    if (!held) spinVel += (spinTarget - spinVel) * Math.min(1, dt * (Math.abs(spinTarget) > Math.abs(spinVel) ? 1.6 : .6));
+    if (!held && !restOn && rest > .001 && relSpin) spinVel = spinTarget * (1 - rest);     // 풀려날 때: 둥실 동작과 같은 곡선으로 0에서 천천히 돌기 시작
+    else if (!held) { relSpin = false; spinVel += (spinTarget - spinVel) * Math.min(1, dt * (Math.abs(spinTarget) > Math.abs(spinVel) ? 1.6 : .6)); }
     if (!still && !held) spin += dt * spinVel;
     // 제자리 서기: 돌던 방향·속도 그대로 이어 돌다가 부드럽게 감속해 원래 렌더 자세에서 멈춘다(에르미트 곡선, 넘침 없음)
     if (restOn) {
@@ -463,6 +465,7 @@ export function mountAluSphere(el, opts = {}) {
   };
   // 제자리 서기: 원래 렌더 자세로 모이면 약속이 풀린다(영상 첫 장면과 같은 모습).
   destroy.rest = (on) => new Promise((res) => {
+    if (restOn !== on) { restAt = -1; relSpin = !on; }
     restOn = on;
     if (on) {
       const T = Math.PI * 2;
