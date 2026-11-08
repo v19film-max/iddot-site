@@ -28,7 +28,7 @@ const vid = (name) => {
   v.className = 'stage__vid';
   v.muted = true; v.playsInline = true; v.preload = 'auto'; v.disablePictureInPicture = true;
   v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true');
-  v.src = `assets/alu/${name}-${small.matches ? 720 : 1080}.mp4?v=s3`;
+  v.src = `assets/alu/${name}-${small.matches ? 720 : 1080}.mp4?v=s4`;
   v.addEventListener('click', () => toggle());
   stage.appendChild(v);
   return v;
