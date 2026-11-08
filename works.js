@@ -232,5 +232,38 @@ window.IDDOT_WORKS = {
     role: 'SET DESIGN',
     credits: [],
     note: ''
+  },
+  'geukrak-newzealand-1': {
+    title: '[극락여행사] 뉴질랜드 여행 브이로그인 줄 알았는데 - 뉴질랜드 마라톤 1부',
+    artist: '여행에미치다',
+    category: 'Digital Content · YouTube',
+    cats: ['digital'],
+    youtube: '23X45ADl_MA',
+    client: '',
+    role: '',
+    credits: [],
+    note: ''
+  },
+  'yeohaengtalk-science-1': {
+    title: '8살 때 여행이 죽을 때까지 기억에 남는 이유ㅣ여행토크 : 과학여행 1부 ‘뇌과학’',
+    artist: '여행에미치다',
+    category: 'Digital Content · YouTube',
+    cats: ['digital'],
+    youtube: 'ticWQ8-qLU4',
+    client: '',
+    role: '',
+    credits: [],
+    note: ''
+  },
+  'beaman-motivation': {
+    title: '세계적인 동기부여 강사의 충격적인 고백',
+    artist: 'BE A MAN_비어맨',
+    category: 'Digital Content · YouTube',
+    cats: ['digital'],
+    youtube: 'hFIOsapDEr8',
+    client: '',
+    role: '',
+    credits: [],
+    note: ''
   }
 };

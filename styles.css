@@ -798,3 +798,8 @@ body::after{content:'';position:fixed;inset:-50%;z-index:400;pointer-events:none
 /* 알루 아래 아주 작은 클릭 안내(펼쳐지면 숨김) */
 .ab .stage__hint{font-size:9px;letter-spacing:.26em;color:var(--sub);opacity:.7;z-index:3;}
 .ab .stage.is-bloomed .stage__hint{opacity:0;transform:translateY(6px);}
+/* About 구도: 알루 더 작게, 글은 알루와 같은 높이 가운데로 올리고 아래 여백 확보 */
+.ab{align-items:center;padding-bottom:clamp(48px,6vw,96px);}
+.ab .stage{width:min(32%,205px);align-self:center;}
+.ab__body{align-self:center;}
+@media (max-width:860px){.ab .stage{width:min(40%,160px);}}
