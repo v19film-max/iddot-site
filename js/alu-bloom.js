@@ -258,7 +258,7 @@ export function mountAluSphere(el, opts = {}) {
     squash: new Spring(70, 12, 1), lean: new Spring(22, 7), droop: new Spring(8, 5), wobble: new Spring(30, 7),
     dent: new Spring(150, 5), shake: new Spring(260, 9), pitch: new Spring(5, 3.4), born: new Spring(12, 4.2),
   };
-  let follow = null, restAt = 0, restA = 0, relSpin = false, rest = 0, restOn = false, restSpin = 0, restFlow = 0, restCb = null, paused = false, restT0 = -1, restS0 = 0, restM0 = 0, restDur = .5, restVel = 0, restBase = 0;   // 제자리 서기(영상으로 넘어가기 직전)·멈춤(영상이 덮는 동안)
+  let easeT0 = -1, easeV0 = 0, follow = null, restAt = 0, restA = 0, relSpin = false, rest = 0, restOn = false, restSpin = 0, restFlow = 0, restCb = null, paused = false, restT0 = -1, restS0 = 0, restM0 = 0, restDur = .5, restVel = 0, restBase = 0;   // 제자리 서기(영상으로 넘어가기 직전)·멈춤(영상이 덮는 동안)
   let wobbleT = 0, lastActive = 0, nodAt = 0, nodPhase = 0, rippleT = 9, dentDir = [0, 0, 1];
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -379,7 +379,8 @@ export function mountAluSphere(el, opts = {}) {
     const spinTarget = SPIN_IDLE * drift;
     const held = grab?.moved;
     if (!held && !restOn && rest > .001 && relSpin) spinVel = spinTarget * (1 - rest);     // 풀려날 때: 둥실 동작과 같은 곡선으로 0에서 천천히 돌기 시작
-    else if (!held) { relSpin = false; spinVel += (spinTarget - spinVel) * Math.min(1, dt * (Math.abs(spinTarget) > Math.abs(spinVel) ? 1.6 : .6)); }
+    else if (!held && easeT0 >= 0 && !restOn && time - easeT0 < 2) { relSpin = false; const k = (time - easeT0) / 2, e = k * k * k * (k * (k * 6 - 15) + 10); spinVel = easeV0 + (spinTarget - easeV0) * e; }   // 영상에서 넘어온 속도 → 평소 속도로 부드럽게
+    else if (!held) { relSpin = false; if (easeT0 >= 0 && time - easeT0 >= 2) easeT0 = -1; spinVel += (spinTarget - spinVel) * Math.min(1, dt * (Math.abs(spinTarget) > Math.abs(spinVel) ? 1.6 : .6)); }
     if (!still && !held) spin += dt * spinVel;
     // 제자리 서기: 돌던 방향·속도 그대로 이어 돌다가 부드럽게 감속해 원래 렌더 자세에서 멈춘다(에르미트 곡선, 넘침 없음)
     if (restOn) {
@@ -475,9 +476,10 @@ export function mountAluSphere(el, opts = {}) {
       // 정해 준 각도(항상 지금보다 앞쪽)까지 돌던 방향으로 이어 돌아, 그 각도에 영상과 같은 속도로 도착한다
       const T = Math.PI * 2;
       restVel = opt.vel || 0; restSpin = opt.target; restBase = opt.base;
-      const d = restSpin - spin;
-      restDur = Math.max(.6, Math.min(1.9, .6 + d / 1.4));
-      restM0 = spinVel * restDur;
+      // 가까우면 영상과 같은 속도(0.18)로 그대로 굴러 들어가고, 멀면 살짝 빨라졌다가 부드럽게 줄어 영상 시작 속도로 도착한다
+      const d = restSpin - spin, vEnd = restVel || .18;
+      restDur = Math.min(2.6, Math.max(.5, d / Math.max(vEnd, Math.min(.64, d / 2.2))));
+      restM0 = Math.max(0, spinVel) * restDur;
       restS0 = spin; restT0 = -1;
       restFlow = Math.round(flowPhase / T) * T; grab = null;
       restCb = res; wake(); if (!body) { restCb = null; res(); }
@@ -515,7 +517,7 @@ export function mountAluSphere(el, opts = {}) {
       restCb = res; wake(); if (!body) { restCb = null; res(); }
     } else { restCb = null; wake(); res(); }
   });
-  destroy.follow = (fn) => { follow = fn || null; wake(); };
+  destroy.follow = (fn) => { if (!fn && follow) { easeT0 = time; easeV0 = spinVel; } follow = fn || null; wake(); };
   // 영상이 알루를 완전히 덮는 동안은 그리기를 멈춘다(영상 재생이 끊기지 않게).
   destroy.pause = (v) => { paused = v; if (!v) wake(); };
   // 회전 상태 읽기(뒤 조명이 회전에 반응하도록)
