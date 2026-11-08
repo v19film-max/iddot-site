@@ -278,8 +278,10 @@ export function mountAluSphere(el, opts = {}) {
   });
   const lensMesh = new Mesh(gl, { geometry: quad, program: lensProgram }), grainMesh = new Mesh(gl, { geometry: quad, program: grainProgram });
 
+  // 표면 결 그림: 작은 판(1.7MB)으로 먼저 띄우고, 원본(27MB)이 도착하면 그대로 바꿔 끼운다(최종 화질은 원본과 같음)
+  const fullNormal = loadImage(base + 'alu-metal-normal.png');
   Promise.all([fetch(base + 'alu-metal.bin').then(r => { if (!r.ok) throw Error('mesh'); return r.arrayBuffer(); }),
-    loadImage(base + 'alu-metal-normal.png'), loadImage(base + 'alu-metal-light.png')])
+    loadImage(base + 'alu-metal-normal-2k.webp').catch(() => fullNormal), loadImage(base + 'alu-metal-light.png')])
     .then(([buf, normalImg, lightImg]) => {
       if (!alive) return;
       const head = new DataView(buf), vc = head.getUint32(0, true), ic = head.getUint32(4, true);
@@ -287,11 +289,13 @@ export function mountAluSphere(el, opts = {}) {
       const pos = new Int16Array(buf, 16, vc * 4), nor = new Int16Array(buf, 16 + vc * 8, vc * 4);
       const uv = new Uint16Array(buf, 16 + vc * 16, vc * 2);
       const index = new Uint32Array(buf.slice(16 + vc * 20, 16 + vc * 20 + ic * 4));
+      let normalTex = null;
+      if (normalImg && !/normal\.png/.test(normalImg.src)) fullNormal.then((img) => { if (!alive || !normalTex) return; normalTex.image = img; normalTex.needsUpdate = true; wake(); }).catch(() => {});
       const lightTex = new Texture(gl, { image: lightImg, flipY: false, generateMipmaps: false, minFilter: gl.LINEAR, magFilter: gl.LINEAR });
       bodyProgram = new Program(gl, {
         vertex: bodyVertex, fragment: bodyFragment.replace('precision highp float;', `precision highp float;\n#define TAPS 2`), cullFace: null, depthTest: true,
         uniforms: {
-          tNormal: { value: new Texture(gl, { image: normalImg, flipY: false, generateMipmaps: true, minFilter: gl.LINEAR_MIPMAP_LINEAR, magFilter: gl.LINEAR, anisotropy: 8 }) },
+          tNormal: { value: (normalTex = new Texture(gl, { image: normalImg, flipY: false, generateMipmaps: true, minFilter: gl.LINEAR_MIPMAP_LINEAR, magFilter: gl.LINEAR, anisotropy: 8 })) },
           tLight: { value: lightTex },
           uExposure: { value: 1.9 }, uLight: { value: 0 }, uFocus: { value: 7 }, uFocusRange: { value: 1.5 },
           uFlowAt: { value: [.35 / BU, 0, 0] }, uFlowAt0: { value: [.35 / BU, 0, 0] }, uFlow: { value: FLOW }, uFlowScale: { value: FLOW_SCALE },
