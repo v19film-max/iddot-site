@@ -872,3 +872,8 @@ body::after{content:'';position:fixed;inset:-50%;z-index:400;pointer-events:none
 /* About: 알루 옆 설명글 대신 한 줄(원본은 iddot-site-백업 폴더와 태그 about-text-before-oneline에 보관) */
 .ab__body--one{align-self:center;}
 .ab__one{margin:0;font-size:clamp(13px,1.05vw,16px);font-weight:700;letter-spacing:.04em;color:var(--fg);}
+/* About 한 줄: 작게, 휴대폰은 가운데 / 알루 아래 Click: 흰색, 알루와 거리 띄우기 */
+.ab__one{font-size:11px;letter-spacing:.12em;}
+@media (max-width:860px){.ab__body--one{text-align:center;}}
+.ab .stage__hint{bottom:-18%;color:var(--fg);opacity:.9;}
+@media (max-width:860px){.ab__body--one{margin-top:34px;}}
