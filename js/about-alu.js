@@ -4,7 +4,7 @@
    거친 알루 표면이 녹아 매끈한 액체 구가 되고, 닦이며 앞면부터 펼쳐져 iddot 크롬 꽃이 된다.
    다시 누르면 거꾸로 접혀(fold-*.mp4) 알루로 돌아오고, 그 자리에서 다시 돈다.
    그림 파일이 커서 About 근처에 왔을 때 불러온다. */
-import { mountAluSphere } from './alu-bloom.js?v=s4';
+import { mountAluSphere } from './alu-bloom.js?v=s5';
 
 const stage = document.getElementById('stage');
 const box = document.getElementById('aluBox');
@@ -187,10 +187,13 @@ function light(alu) {
 
 
 
+// 페이지가 다 뜨고 한가해지면 미리 불러 둔다(About까지 내려왔을 때 이미 떠 있도록). 그 전에 가까이 오면 바로.
+const early = () => (window.requestIdleCallback ? requestIdleCallback(mount, { timeout: 1500 }) : setTimeout(mount, 300));
+if (document.readyState === 'complete') early(); else addEventListener('load', early, { once: true });
 if ('IntersectionObserver' in window) {
   const io = new IntersectionObserver((es) => {
     if (es.some((e) => e.isIntersecting)) { io.disconnect(); mount(); }
-  }, { rootMargin: '900px 0px' });
+  }, { rootMargin: '1600px 0px' });
   io.observe(stage);
 } else {
   mount();
