@@ -248,7 +248,7 @@ window.IDDOT_WORKS = {
     client: '',
     role: 'DIRECTOR / EDIT',
     credits: [],
-    note: '기획부터 크리에이티브 디렉팅, 각본과 연출(Written & Directed)까지 맡았고, 편집·색보정 등 후반작업 전반을 총괄했습니다.'
+    note: 'Creative Direction, Written & Directed, Post-production Supervision'
   },
   'leejimin-youre-mine': {
     title: '넌 내꺼 넌 내 남자 (You’re Mine, You’re My Man) MV',
@@ -270,7 +270,7 @@ window.IDDOT_WORKS = {
     client: '',
     role: 'SET DESIGN',
     credits: [],
-    note: '무대 세트 디자인과 제작용 도면 작업을 맡았습니다.'
+    note: '무대 세트 디자인, 도면 제작'
   },
   'geukrak-newzealand-1': {
     title: '[극락여행사] 뉴질랜드 여행 브이로그인 줄 알았는데 - 뉴질랜드 마라톤 1부',
