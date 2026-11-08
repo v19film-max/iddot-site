@@ -214,17 +214,6 @@ window.IDDOT_WORKS = {
     ],
     note: ''
   },
-  'leejimin-youre-mine': {
-    title: '넌 내꺼 넌 내 남자 (You’re Mine, You’re My Man) MV',
-    artist: '이지민 (LEE JI MIN)',
-    category: 'M/V · Music Video',
-    cats: ['mv'], selected: true,
-    youtube: 'J-mE0MhouOI',
-    client: '',
-    role: 'EDIT',
-    credits: [],
-    note: ''
-  },
   'victor': {
     title: 'DANCE FILM ‘VICTOR’',
     artist: 'V19 FILM',
@@ -258,6 +247,17 @@ window.IDDOT_WORKS = {
     video: 'assets/borderless-full.mp4',
     client: '',
     role: 'DIRECTOR / EDIT',
+    credits: [],
+    note: ''
+  },
+  'leejimin-youre-mine': {
+    title: '넌 내꺼 넌 내 남자 (You’re Mine, You’re My Man) MV',
+    artist: '이지민 (LEE JI MIN)',
+    category: 'M/V · Music Video',
+    cats: ['mv'], selected: true,
+    youtube: 'J-mE0MhouOI',
+    client: '',
+    role: 'EDIT',
     credits: [],
     note: ''
   },
