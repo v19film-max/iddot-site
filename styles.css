@@ -866,3 +866,6 @@ body::after{content:'';position:fixed;inset:-50%;z-index:400;pointer-events:none
 /* 접힘 끝: 영상 밝기를 알루에 맞춰 서서히 */
 .ab .stage__vid.is-dim{filter:brightness(.9);transition:filter 600ms ease;}
 .ab .stage__vid.is-dim.is-xout{transition:opacity 900ms linear,filter 600ms ease;}   /* 밝기 맞춤 중에도 영상이 0.9초에 걸쳐 빠지게(한꺼번에 사라져 어두워지던 것) */
+/* 문의: 안내 문장 대신 영어 큰 글씨 하나 */
+.contact-big{font-size:clamp(44px,7vw,104px);letter-spacing:-.045em;line-height:1;margin-top:0;}
+#contact .contact-big{margin-top:0;}
