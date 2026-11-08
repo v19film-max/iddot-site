@@ -173,7 +173,7 @@ async function run() {
         await atTail(foldV, .95);   // 접힘 끝은 보통 속도로 렌더해 시작 장면을 거꾸로 한 모양 → 시작과 똑같이 0.9초 겹친다
         // 겹쳐 넘기는 0.9초 동안 실시간 알루가 영상 속 자세를 프레임마다 그대로 따라간다(어긋나 겹쳐 보이지 않게)
         alu.rest(false, { set: vk * QT + .183, vel: .18 });
-        alu.follow?.(() => foldYaw(foldV.currentTime));
+        { const u0 = foldV.currentTime, tf0 = performance.now(); alu.follow?.(() => foldYaw(u0 + (performance.now() - tf0) / 1000)); }   // 영상이 끝나 시간이 멈춰도 알루는 계속 돌도록 흐르는 시계로 따라간다
         foldV.classList.add('is-xout');
         stage.classList.add('is-xb'); stage.classList.remove('is-vid', 'is-xf');
         show(foldV, false);
