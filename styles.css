@@ -807,3 +807,13 @@ body::after{content:'';position:fixed;inset:-50%;z-index:400;pointer-events:none
 /* 영상 첫 장면이 실시간 알루보다 살짝 밝고 선명해서, 겹쳐 넘기는 동안 맞춰 두었다가 녹는 동안 천천히 원래대로 */
 .ab .stage__vid.is-prep{filter:brightness(.9) contrast(.96);}
 .ab .stage.is-vid .stage__vid{transition:filter 1400ms ease;}
+/* 팀: 카드 옆 이력(작게). 카드와 같은 높이 아래쪽에 맞춰 이력서처럼 */
+.pc-name-en{display:inline-block;margin-left:6px;font-size:10px;font-weight:600;letter-spacing:.14em;color:var(--sub,#9a9791);vertical-align:middle;}
+.team-row{align-items:flex-end;}
+.bio{flex:1 1 280px;max-width:380px;padding-bottom:6px;}
+.bio__lead{margin:0 0 18px;word-break:keep-all;font-size:12px;line-height:1.8;color:var(--fg);}
+.bio__list{list-style:none;margin:0;padding:12px 0 0;border-top:1px solid rgba(255,255,255,.12);display:grid;gap:7px;}
+.bio__list li{word-break:keep-all;display:grid;grid-template-columns:118px 1fr;gap:12px;font-size:11px;line-height:1.6;color:var(--sub,#9a9791);}
+.bio__k{white-space:nowrap;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--fg);opacity:.75;padding-top:1px;}
+.bio__list em{font-style:normal;font-size:10px;opacity:.75;}
+@media (max-width:640px){.team-row{align-items:flex-start;}.bio{max-width:none;}.bio__list li{grid-template-columns:112px 1fr;}}
