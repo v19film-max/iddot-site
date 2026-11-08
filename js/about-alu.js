@@ -4,7 +4,7 @@
    거친 알루 표면이 녹아 매끈한 액체 구가 되고, 닦이며 앞면부터 펼쳐져 iddot 크롬 꽃이 된다.
    다시 누르면 거꾸로 접혀(fold-*.mp4) 알루로 돌아오고, 그 자리에서 다시 돈다.
    그림 파일이 커서 About 근처에 왔을 때 불러온다. */
-import { mountAluSphere } from './alu-bloom.js?v=v2';
+import { mountAluSphere } from './alu-bloom.js?v=v3';
 
 const stage = document.getElementById('stage');
 const box = document.getElementById('aluBox');
@@ -14,7 +14,11 @@ const small = matchMedia('(max-width: 700px)');
 // 꽃 영상과 회전을 맞추는 값(블렌더 장면 melt_scene_v18: 녹으며 0.18rad/s에서 천천히 멈춤)
 const SPIN_IN = { offset: -0.366, vel: .18 }, SPIN_OUT = { set: .183, vel: .18 };
 // 시작 자세가 90도씩 다른 영상 4벌(v0~v3). 누를 때 알루 바로 앞쪽 자세의 영상을 골라, 알루가 뒤로 돌지 않고 앞으로만 이어 돈다.
-const QT = Math.PI / 2, NV = 4;
+const QT = Math.PI / 2, NV = 8;
+// 변형별 시작 각도: 0·90·180·270도(v0~v3), 45·135·225·315도(v4~v7)
+const OFFS = [0, 1, 2, 3, .5, 1.5, 2.5, 3.5].map((x) => x * QT);
+// 누르면 녹기 전 정지 구간은 건너뛰고 이 시각부터 이어 붙인다(변화가 바로 시작되게)
+const U0 = .2;
 let vk = 0;   // 지금 고른 변형 번호
 // 펼침 영상 시간(초) → 영상 속 알루의 [각도, 회전 속도]: 0.18rad/s로 돌다가 3.8초에 걸쳐 멈춰 원래 자세(0)에 닿는다
 const B_PRE = 4 / 30, B_TW = 3.8;
@@ -23,12 +27,12 @@ const bloomYaw = (u) => {
   if (t <= 0) { a = .18 * Math.max(0, u); v = .18; }
   else if (t < B_TW) { const k = t / B_TW; a = .18 * B_PRE + .18 * (t - B_TW * (k ** 6 - 3 * k ** 5 + 2.5 * k ** 4)); v = .18 * (1 - k * k * k * (k * (k * 6 - 15) + 10)); }
   else { a = .18 * (B_PRE + B_TW * .5); v = 0; }
-  return [-0.366 + vk * QT + a, v];
+  return [-0.366 + OFFS[vk] + a, v];
 };
 // 접힘 영상 시간(초) → 그때 영상 속 알루의 [각도, 회전 속도] (블렌더 장면과 같은 식)
 const FOLD_UA = (390 - 118) / 60, FOLD_W = 1.9, V0 = .18;
 const foldYaw = (u) => {
-  const x = u - FOLD_UA, o = vk * QT; if (x <= 0) return [o, 0];
+  const x = u - FOLD_UA, o = OFFS[vk]; if (x <= 0) return [o, 0];
   if (x < FOLD_W) { const k = x / FOLD_W; return [o + V0 * FOLD_W * (k ** 6 - 3 * k ** 5 + 2.5 * k ** 4), V0 * k * k * k * (k * (k * 6 - 15) + 10)]; }
   return [o + V0 * FOLD_W * .5 + V0 * (x - FOLD_W), V0];
 };
@@ -45,15 +49,16 @@ const vid = (name) => {
   stage.appendChild(v);
   return v;
 };
-const vsrc = (name) => `assets/alu/${name}-${small.matches ? 720 : 1080}.mp4?v=v2`;
+const vsrc = (name) => `assets/alu/${name}-${small.matches ? 720 : 1080}.mp4?v=v3`;
 let bloomV = null, foldV = null, bloomVs = [];
 // 누르는 순간: 지금 각도·속도에서 가장 가까운 '앞쪽' 시작 자세를 고른다
 const pickVariant = () => {
   const m = alu.motion?.(); if (!m) return null;
-  const T = Math.PI * 2, lead = Math.max(m.vel, .18) * .6, s0 = m.spin + lead;
+  const T = Math.PI * 2, lead = Math.max(m.vel, .18) * .35, s0 = m.spin + lead;
+  const keep = vk; vk = 0; const a0 = bloomYaw(U0)[0] - (-0.366 + OFFS[0]); vk = keep;   // 영상 U0초 지점까지 이미 돈 각도
   let best = null;
   for (let k = 0; k < NV; k++) {
-    const off = -0.366 + k * QT, d = ((off - s0) % T + T) % T, target = s0 + d;
+    const off = -0.366 + OFFS[k] + a0, d = ((off - s0) % T + T) % T, target = s0 + d;
     if (!best || target < best.target) best = { k, target, base: target - off };
   }
   return best;
@@ -66,20 +71,20 @@ const atStart = (v) => new Promise((res) => {
   const fin = () => { if (done) return; done = true; requestAnimationFrame(() => requestAnimationFrame(res)); };
   setTimeout(fin, 700);
   v.pause();
-  if (v.readyState >= 2 && v.currentTime === 0) return fin();
+  if (v.readyState >= 2 && Math.abs(v.currentTime - U0) < .005) return fin();
   // 되감은 첫 장면이 실제로 그려지면(지원 브라우저) 바로, 아니면 seeked 뒤 두 프레임 기다린다
   if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(() => fin());
   v.addEventListener('seeked', fin, { once: true });
-  v.currentTime = 0;
+  v.currentTime = U0;
 });
 // 재생을 걸고, 영상이 실제로 재생 장면을 그리기 시작하면(두 번째 프레임 이후) 풀린다.
 // 늦어지면 최대 0.4초까지 기다린다(검은 프레임보다 살짝 늦은 시작이 덜 거슬림).
 const playing = (v) => new Promise((res) => {
   let done = false;
   const fin = () => { if (done) return; done = true; res(); };
-  const tick = (now, meta) => { if (done) return; if ((meta && meta.mediaTime >= .03) || v.currentTime >= .03) fin(); else v.requestVideoFrameCallback(tick); };
+  const tick = (now, meta) => { if (done) return; if ((meta && meta.mediaTime >= U0 + .03) || v.currentTime >= U0 + .03) fin(); else v.requestVideoFrameCallback(tick); };
   if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(tick);
-  else { const f = () => { if (v.currentTime >= .03) { v.removeEventListener('timeupdate', f); fin(); } }; v.addEventListener('timeupdate', f); }
+  else { const f = () => { if (v.currentTime >= U0 + .03) { v.removeEventListener('timeupdate', f); fin(); } }; v.addEventListener('timeupdate', f); }
   setTimeout(fin, 400);
   const p = v.play(); if (p && p.catch) p.catch(fin);
 });
@@ -172,7 +177,7 @@ async function run() {
         foldV.classList.add('is-dim');                            // 영상 밝기를 실시간 알루에 맞춰 서서히 낮춘다(재질 차이 완화)
         await atTail(foldV, .95);   // 접힘 끝은 보통 속도로 렌더해 시작 장면을 거꾸로 한 모양 → 시작과 똑같이 0.9초 겹친다
         // 겹쳐 넘기는 0.9초 동안 실시간 알루가 영상 속 자세를 프레임마다 그대로 따라간다(어긋나 겹쳐 보이지 않게)
-        alu.rest(false, { set: vk * QT + .183, vel: .18 });
+        alu.rest(false, { set: OFFS[vk] + .183, vel: .18 });
         { const u0 = foldV.currentTime, tf0 = performance.now(); alu.follow?.(() => foldYaw(u0 + (performance.now() - tf0) / 1000)); }   // 영상이 끝나 시간이 멈춰도 알루는 계속 돌도록 흐르는 시계로 따라간다
         foldV.classList.add('is-xout');
         stage.classList.add('is-xb'); stage.classList.remove('is-vid', 'is-xf');
@@ -204,7 +209,7 @@ const mount = () => {
   mounted = true;
   alu = mountAluSphere(box, {
     assets: new URL('../assets/alu/', import.meta.url).href,
-    onReady: () => { bloomVs = [0, 1, 2, 3].map((k) => vid(`bloom-v${k}`)); bloomV = bloomVs[0]; foldV = vid('fold-v0'); stage.classList.add('is-ready'); stage._alu = alu; },
+    onReady: () => { bloomVs = [0, 1, 2, 3, 4, 5, 6, 7].map((k) => vid(`bloom-v${k}`)); bloomV = bloomVs[0]; foldV = vid('fold-v0'); stage.classList.add('is-ready'); stage._alu = alu; },
     onFail: () => stage.classList.add('is-fallback'),
     // 누르면 앱처럼 쏙 들어갔다가 그 반동으로 펼쳐진다.
     onTap: () => setTimeout(toggle, 90),

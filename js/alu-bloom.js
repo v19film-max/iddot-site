@@ -478,7 +478,7 @@ export function mountAluSphere(el, opts = {}) {
       restVel = opt.vel || 0; restSpin = opt.target; restBase = opt.base;
       // 가까우면 영상과 같은 속도(0.18)로 그대로 굴러 들어가고, 멀면 살짝 빨라졌다가 부드럽게 줄어 영상 시작 속도로 도착한다
       const d = restSpin - spin, vEnd = restVel || .18;
-      restDur = Math.min(2.6, Math.max(.5, d / Math.max(vEnd, Math.min(.64, d / 2.2))));
+      restDur = Math.min(1.2, Math.max(.35, d / Math.max(vEnd, Math.min(1, d / 1))));   // 최대 1.2초 안에 도착(빨리 변하기 시작)
       restM0 = Math.max(0, spinVel) * restDur;
       restS0 = spin; restT0 = -1;
       restFlow = Math.round(flowPhase / T) * T; grab = null;
