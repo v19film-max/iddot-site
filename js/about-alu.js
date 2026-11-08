@@ -170,14 +170,14 @@ async function run() {
         // 움직임이 잦아드는 속에서 질감이 바뀌어 끝에서 툭 바뀌는 느낌이 없다(영상 끝 검은 프레임도 피함).
         // (곡선: 영상은 직선으로 빠지고 알루는 ease-out으로 빨리 차올라 screen 합성 밝기가 평평)
         foldV.classList.add('is-dim');                            // 영상 밝기를 실시간 알루에 맞춰 서서히 낮춘다(재질 차이 완화)
-        await atTail(foldV, .95);
+        await atTail(foldV, .38);   // 영상 속 알루가 다시 거친 표면으로 돌아온 마지막 순간에만 겹친다(재질 차이 방지)
         // 겹쳐 넘기는 0.9초 동안 실시간 알루가 영상 속 자세를 프레임마다 그대로 따라간다(어긋나 겹쳐 보이지 않게)
         alu.rest(false, { set: vk * QT + .183, vel: .18 });
         alu.follow?.(() => foldYaw(foldV.currentTime));
         foldV.classList.add('is-xout');
         stage.classList.add('is-xb'); stage.classList.remove('is-vid', 'is-xf');
         show(foldV, false);
-        await wait(920);
+        await wait(400);
         alu.follow?.(null);
         stage.classList.remove('is-xb'); foldV.classList.remove('is-xout', 'is-dim');
         foldV.pause();

@@ -793,8 +793,8 @@ body::after{content:'';position:fixed;inset:-50%;z-index:400;pointer-events:none
    screen 합성에서도 밝기가 평평하게 유지된다 */
 .ab .stage.is-xf .stage__alu{opacity:0;transition:opacity 900ms cubic-bezier(.42,0,1,1);}   /* 펼침: 알루 빠짐 */
 .ab .stage__vid.is-xin{transition:opacity 900ms linear,filter 900ms linear;filter:brightness(.9);}                                    /* 펼침: 영상 차오름 */
-.ab .stage__vid.is-xout{transition:opacity 900ms linear,filter 600ms ease;}                                   /* 접힘 끝: 영상 빠짐 */
-.ab .stage.is-xb .stage__alu{transition:opacity 900ms cubic-bezier(0,0,.58,1);}             /* 접힘 끝: 알루 차오름 */
+.ab .stage__vid.is-xout{transition:opacity 380ms linear,filter 600ms ease;}                                   /* 접힘 끝: 영상 빠짐 */
+.ab .stage.is-xb .stage__alu{transition:opacity 380ms cubic-bezier(0,0,.58,1);}             /* 접힘 끝: 알루 차오름 */
 /* 알루 아래 아주 작은 클릭 안내(펼쳐지면 숨김) */
 .ab .stage__hint{font-size:9px;letter-spacing:.26em;color:var(--sub);opacity:.7;z-index:3;}
 .ab .stage.is-bloomed .stage__hint{opacity:0;transform:translateY(6px);}
@@ -865,4 +865,4 @@ body::after{content:'';position:fixed;inset:-50%;z-index:400;pointer-events:none
 
 /* 접힘 끝: 영상 밝기를 알루에 맞춰 서서히 */
 .ab .stage__vid.is-dim{filter:brightness(.9);transition:filter 600ms ease;}
-.ab .stage__vid.is-dim.is-xout{transition:opacity 900ms linear,filter 600ms ease;}   /* 밝기 맞춤 중에도 영상이 0.9초에 걸쳐 빠지게(한꺼번에 사라져 어두워지던 것) */
+.ab .stage__vid.is-dim.is-xout{transition:opacity 380ms linear,filter 600ms ease;}   /* 밝기 맞춤 중에도 영상이 0.9초에 걸쳐 빠지게(한꺼번에 사라져 어두워지던 것) */
