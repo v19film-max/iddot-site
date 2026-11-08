@@ -862,3 +862,8 @@ body::after{content:'';position:fixed;inset:-50%;z-index:400;pointer-events:none
   .hd__nav{gap:13px;}
   .hd__nav a{font-size:11.5px;letter-spacing:.03em;padding:14px 0;}
 }
+/* 모바일 쇼릴: 작품명이 한 줄이든 두 줄이든 NOW PLAYING 자리가 움직이지 않게 두 줄 높이를 늘 확보 */
+@media (max-width:700px){
+  .hero__now{justify-content:flex-start;}
+  .hero__now-title{min-height:2.8em;}
+}
