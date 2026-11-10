@@ -10,6 +10,10 @@ const stage = document.getElementById('stage');
 const box = document.getElementById('aluBox');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 const small = matchMedia('(max-width: 700px)');
+// 사파리(맥·아이폰 웹킷): 합성(screen)과 밝기 필터가 함께 걸린 영상을 엉뚱한 자리에 잘라 그리는 문제가 있어
+// 필터 대신 투명도로 밝기를 맞추고 영상마다 별도 층을 쓰게 한다(styles.css의 .is-webkit 규칙).
+{ const ua = navigator.userAgent;
+  if ((/AppleWebKit/.test(ua) && !/Chrome|Chromium|Edg\/|OPR\//.test(ua)) || /CriOS|FxiOS|EdgiOS/.test(ua)) document.documentElement.classList.add('is-webkit'); }
 
 // 꽃 영상과 회전을 맞추는 값(블렌더 장면 melt_scene_v18: 녹으며 0.18rad/s에서 천천히 멈춤)
 const SPIN_IN = { offset: -0.366, vel: .18 }, SPIN_OUT = { set: .183, vel: .18 };
