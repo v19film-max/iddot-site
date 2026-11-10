@@ -39,18 +39,18 @@ const foldYaw = (u) => {
 let alu = null, open = false, busy = false, want = false;
 
 // 영상 두 개(펼침·접힘). 같은 자리·같은 크기로 알루 위에 겹친다.
-const vid = (name, preload = 'auto') => {
+const vid = (name) => {
   const v = document.createElement('video');
   v.className = 'stage__vid';
-  v.muted = true; v.playsInline = true; v.preload = preload; v.disablePictureInPicture = true;
+  v.muted = true; v.playsInline = true; v.preload = 'auto'; v.disablePictureInPicture = true;
   v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true');
   v.src = vsrc(name);
-  v.addEventListener('click', () => toggle());
+  v.addEventListener('click', () => { unlockVideos(); toggle(); });
   stage.appendChild(v);
   return v;
 };
 const vsrc = (name) => `assets/alu/${name}-${small.matches ? 720 : 1080}.mp4?v=v3`;
-let bloomV = null, foldV = null, bloomVs = [], foldVs = [];
+let bloomV = null, foldV = null, bloomVs = [];
 // 누르는 순간: 지금 각도·속도에서 가장 가까운 '앞쪽' 시작 자세를 고른다
 const pickVariant = () => {
   const m = alu.motion?.(); if (!m) return null;
@@ -66,7 +66,7 @@ const pickVariant = () => {
 
 // 카카오톡 같은 앱 안 브라우저는 '누른 순간'에 건 재생만 허락한다. 누르는 즉시 영상들을 한 번 재생→멈춤 해서 허락을 받아 둔다.
 const unlockVideos = () => {
-  [...bloomVs, ...foldVs].forEach((v) => {
+  [...bloomVs, foldV].forEach((v) => {
     if (!v || v._unl) return; v._unl = true; v.muted = true;
     try { const p = v.play(); if (p && p.then) p.then(() => { if (!v._want) v.pause(); }).catch(() => {}); else if (!v._want) v.pause(); } catch (e) {}
   });
@@ -140,7 +140,7 @@ async function run() {
       const pv = pickVariant();
       if (pv) {
         vk = pv.k; bloomV = bloomVs[vk];
-        foldV = foldVs[vk]; foldV.preload = 'auto';   // 접힘 영상도 변형마다 따로 둔 칸을 고른다(주소를 바꿔 끼우면 사파리가 영상을 옆으로 밀어 그림)
+        if (foldV._k !== vk) { foldV.remove(); foldV = vid(`fold-v${vk}`); foldV._k = vk; }   // 주소를 바꿔 끼우지 않고 새 칸을 만든다(사파리가 바뀐 영상을 옆으로 밀어 그림). 칸 수는 늘 9개
       }
       bloomV.classList.add('is-prep');
       const ready = atStart(bloomV);
@@ -223,7 +223,7 @@ const mount = () => {
   mounted = true;
   alu = mountAluSphere(box, {
     assets: new URL('../assets/alu/', import.meta.url).href,
-    onReady: () => { bloomVs = [0, 1, 2, 3, 4, 5, 6, 7].map((k) => vid(`bloom-v${k}`)); bloomV = bloomVs[0]; foldVs = [0, 1, 2, 3, 4, 5, 6, 7].map((k) => vid(`fold-v${k}`, 'metadata')); foldV = foldVs[0]; foldV.preload = 'auto'; stage.classList.add('is-ready'); stage._alu = alu; },
+    onReady: () => { bloomVs = [0, 1, 2, 3, 4, 5, 6, 7].map((k) => vid(`bloom-v${k}`)); bloomV = bloomVs[0]; foldV = vid('fold-v0'); foldV._k = 0; stage.classList.add('is-ready'); stage._alu = alu; /*시험 스위치: 주소에 ?t=nb 등을 붙였을 때만 켜짐*/{const q=(new URLSearchParams(location.search).get('t')||'');const st=document.createElement('style');let c='';if(q.includes('nb'))c+='.ab .stage__vid{mix-blend-mode:normal!important}';if(q.includes('nl'))c+='.ab .stage::before,.ab .stage::after{display:none!important}';if(q.includes('nov'))c+='.ab .stage{overflow:visible!important}';if(c){st.textContent=c;document.head.appendChild(st);}} },
     onFail: () => stage.classList.add('is-fallback'),
     // 누르면 앱처럼 쏙 들어갔다가 그 반동으로 펼쳐진다.
     onTap: () => { unlockVideos(); setTimeout(toggle, 90); },
