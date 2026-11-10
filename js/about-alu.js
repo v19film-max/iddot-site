@@ -10,10 +10,6 @@ const stage = document.getElementById('stage');
 const box = document.getElementById('aluBox');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 const small = matchMedia('(max-width: 700px)');
-// 사파리(맥·아이폰 웹킷): 합성(screen)과 밝기 필터가 함께 걸린 영상을 엉뚱한 자리에 잘라 그리는 문제가 있어
-// 필터 대신 투명도로 밝기를 맞추고 영상마다 별도 층을 쓰게 한다(styles.css의 .is-webkit 규칙).
-{ const ua = navigator.userAgent;
-  if ((/AppleWebKit/.test(ua) && !/Chrome|Chromium|Edg\/|OPR\//.test(ua)) || /CriOS|FxiOS|EdgiOS/.test(ua)) document.documentElement.classList.add('is-webkit'); }
 
 // 꽃 영상과 회전을 맞추는 값(블렌더 장면 melt_scene_v18: 녹으며 0.18rad/s에서 천천히 멈춤)
 const SPIN_IN = { offset: -0.366, vel: .18 }, SPIN_OUT = { set: .183, vel: .18 };
@@ -43,10 +39,10 @@ const foldYaw = (u) => {
 let alu = null, open = false, busy = false, want = false;
 
 // 영상 두 개(펼침·접힘). 같은 자리·같은 크기로 알루 위에 겹친다.
-const vid = (name) => {
+const vid = (name, preload = 'auto') => {
   const v = document.createElement('video');
   v.className = 'stage__vid';
-  v.muted = true; v.playsInline = true; v.preload = 'auto'; v.disablePictureInPicture = true;
+  v.muted = true; v.playsInline = true; v.preload = preload; v.disablePictureInPicture = true;
   v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true');
   v.src = vsrc(name);
   v.addEventListener('click', () => toggle());
@@ -54,7 +50,7 @@ const vid = (name) => {
   return v;
 };
 const vsrc = (name) => `assets/alu/${name}-${small.matches ? 720 : 1080}.mp4?v=v3`;
-let bloomV = null, foldV = null, bloomVs = [];
+let bloomV = null, foldV = null, bloomVs = [], foldVs = [];
 // 누르는 순간: 지금 각도·속도에서 가장 가까운 '앞쪽' 시작 자세를 고른다
 const pickVariant = () => {
   const m = alu.motion?.(); if (!m) return null;
@@ -70,7 +66,7 @@ const pickVariant = () => {
 
 // 카카오톡 같은 앱 안 브라우저는 '누른 순간'에 건 재생만 허락한다. 누르는 즉시 영상들을 한 번 재생→멈춤 해서 허락을 받아 둔다.
 const unlockVideos = () => {
-  [...bloomVs, foldV].forEach((v) => {
+  [...bloomVs, ...foldVs].forEach((v) => {
     if (!v || v._unl) return; v._unl = true; v.muted = true;
     try { const p = v.play(); if (p && p.then) p.then(() => { if (!v._want) v.pause(); }).catch(() => {}); else if (!v._want) v.pause(); } catch (e) {}
   });
@@ -144,7 +140,7 @@ async function run() {
       const pv = pickVariant();
       if (pv) {
         vk = pv.k; bloomV = bloomVs[vk];
-        if (!foldV.src.includes(`fold-v${vk}-`)) { foldV.src = vsrc(`fold-v${vk}`); foldV.load(); }
+        foldV = foldVs[vk]; foldV.preload = 'auto';   // 접힘 영상도 변형마다 따로 둔 칸을 고른다(주소를 바꿔 끼우면 사파리가 영상을 옆으로 밀어 그림)
       }
       bloomV.classList.add('is-prep');
       const ready = atStart(bloomV);
@@ -227,7 +223,7 @@ const mount = () => {
   mounted = true;
   alu = mountAluSphere(box, {
     assets: new URL('../assets/alu/', import.meta.url).href,
-    onReady: () => { bloomVs = [0, 1, 2, 3, 4, 5, 6, 7].map((k) => vid(`bloom-v${k}`)); bloomV = bloomVs[0]; foldV = vid('fold-v0'); stage.classList.add('is-ready'); stage._alu = alu; },
+    onReady: () => { bloomVs = [0, 1, 2, 3, 4, 5, 6, 7].map((k) => vid(`bloom-v${k}`)); bloomV = bloomVs[0]; foldVs = [0, 1, 2, 3, 4, 5, 6, 7].map((k) => vid(`fold-v${k}`, 'metadata')); foldV = foldVs[0]; foldV.preload = 'auto'; stage.classList.add('is-ready'); stage._alu = alu; },
     onFail: () => stage.classList.add('is-fallback'),
     // 누르면 앱처럼 쏙 들어갔다가 그 반동으로 펼쳐진다.
     onTap: () => { unlockVideos(); setTimeout(toggle, 90); },

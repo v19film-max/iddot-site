@@ -878,10 +878,3 @@ body::after{content:'';position:fixed;inset:-50%;z-index:400;pointer-events:none
 .ab .stage__hint{bottom:-18%;color:var(--fg);opacity:.9;}
 @media (max-width:860px){.ab__body--one{margin-top:34px;}}
 
-/* 사파리 전용: 영상에 필터를 쓰지 않고(screen 합성 + 필터가 겹치면 영상이 옆으로 밀려 잘려 그려짐)
-   검정 위 screen 합성에서는 투명도 0.9 = 밝기 0.9 이므로 같은 밝기를 투명도로 맞춘다. 영상은 각자 층으로 고정 */
-.is-webkit .ab .stage__vid{filter:none !important;-webkit-transform:translateZ(0);transform:translateZ(0);-webkit-backface-visibility:hidden;backface-visibility:hidden;}
-.is-webkit .ab .stage__vid.is-on.is-xin{opacity:.9;}
-.is-webkit .ab .stage.is-vid .stage__vid.is-on{transition:opacity 1400ms ease;}
-.is-webkit .ab .stage__vid.is-on.is-dim{opacity:.9;transition:opacity 600ms ease;}
-.is-webkit .ab .stage__vid.is-dim.is-xout,.is-webkit .ab .stage__vid.is-xout{transition:opacity 900ms linear;}
